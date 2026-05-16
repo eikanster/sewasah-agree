@@ -9,6 +9,8 @@
  */
 
 import type * as agreements from "../agreements.js";
+import type * as firms from "../firms.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -18,6 +20,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   agreements: typeof agreements;
+  firms: typeof firms;
+  users: typeof users;
 }>;
 
 /**
