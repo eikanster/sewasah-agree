@@ -219,6 +219,12 @@ export default function NewAgreementPage() {
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
 
+  const goToStep = (n: number) => {
+    setStep(n);
+    const el = document.getElementById("main-scroll");
+    if (el) el.scrollTop = 0;
+  };
+
   const [form, setForm] = useState({
     landlordName: "", landlordIc: "", landlordPhone: "", landlordEmail: "",
     tenantName: "", tenantIc: "", tenantPhone: "", tenantEmail: "",
@@ -550,7 +556,7 @@ export default function NewAgreementPage() {
       {/* Navigation */}
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "24px", paddingTop: "24px", borderTop: "1px solid oklch(0.87 0.016 55)" }}>
         <button style={btnGhost}
-          onClick={() => step > 1 ? setStep(step - 1) : router.back()}
+          onClick={() => step > 1 ? goToStep(step - 1) : router.back()}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.14 40)"; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.87 0.016 55)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.025 50)"; }}>
           {step === 1 ? "Batal" : "← Kembali"}
@@ -558,7 +564,7 @@ export default function NewAgreementPage() {
 
         {step < 5 ? (
           <button style={btnPrimary}
-            onClick={() => setStep(step + 1)}
+            onClick={() => goToStep(step + 1)}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "oklch(0.38 0.08 45)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.transform = ""; }}>
             Seterusnya →

@@ -21,6 +21,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (isLoaded && needsSetup) router.push("/setup");
   }, [isLoaded, needsSetup, router]);
 
+  // Scroll content panel to top on route change
+  useEffect(() => {
+    const el = document.getElementById("main-scroll");
+    if (el) el.scrollTop = 0;
+  }, [pathname]);
+
   if (!isLoaded) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "oklch(0.935 0.018 58)" }}>
@@ -178,7 +184,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           }}>🇲🇾 Malaysia</div>
         </div>
 
-        <main style={{ flex: 1, padding: "40px", maxWidth: "1100px", overflowY: "auto" }} className="page-enter">
+        <main id="main-scroll" style={{ flex: 1, padding: "40px", maxWidth: "1100px", overflowY: "auto", scrollBehavior: "smooth" }} className="page-enter">
           {children}
         </main>
       </div>
