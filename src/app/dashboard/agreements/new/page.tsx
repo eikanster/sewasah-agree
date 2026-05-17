@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
@@ -101,21 +101,14 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
 // ─── Step Card ────────────────────────────────────────────────────────────
 
 function StepCard({ children, visible }: { children: React.ReactNode; visible: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (visible && ref.current) ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [visible]);
-
+  if (!visible) return null;
   return (
-    <div ref={ref} style={{
+    <div style={{
       background: "oklch(0.99 0.005 58)",
       border: "1.5px solid oklch(0.87 0.016 55)",
       borderRadius: "20px",
       padding: "32px",
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(12px)",
-      transition: "opacity 280ms cubic-bezier(0.16,1,0.3,1), transform 280ms cubic-bezier(0.16,1,0.3,1)",
-      pointerEvents: visible ? "auto" : "none",
+      animation: "pageIn 260ms cubic-bezier(0.16,1,0.3,1) both",
     }}>
       {children}
     </div>
