@@ -32,7 +32,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", background: "oklch(0.935 0.018 58)" }}>
+    <div style={{ height: "100vh", display: "flex", background: "oklch(0.935 0.018 58)", overflow: "hidden" }}>
 
       {/* ── Sidebar ── */}
       <aside style={{
@@ -41,6 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         background: "oklch(0.145 0.038 43)",
         boxShadow: "2px 0 24px oklch(0.10 0.03 43 / 0.20)",
         position: "relative", zIndex: 10,
+        height: "100vh", overflowY: "auto",
       }}>
 
         {/* Inner texture line */}
@@ -158,7 +159,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* ── Content ── */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: "100vh", overflow: "auto" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
 
         {/* Topbar */}
         <div style={{
@@ -177,7 +178,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           }}>🇲🇾 Malaysia</div>
         </div>
 
-        <main style={{ flex: 1, padding: "40px", maxWidth: "1100px" }} className="page-enter">
+        <main style={{ flex: 1, padding: "40px", maxWidth: "1100px", overflowY: "auto" }} className="page-enter">
           {children}
         </main>
       </div>
