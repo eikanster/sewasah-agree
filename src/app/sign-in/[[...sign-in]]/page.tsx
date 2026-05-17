@@ -2,39 +2,49 @@ import { SignIn } from "@clerk/nextjs";
 
 export default function SignInPage() {
   return (
-    <div className="min-h-screen flex">
-      {/* Left — branding */}
-      <div className="hidden lg:flex w-1/2 gradient-brand flex-col justify-between p-12">
-        <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold text-sm">
-            SA
+    <div className="min-h-screen flex" style={{ background: "oklch(0.94 0.018 58)" }}>
+
+      {/* Left — Kedai warmth */}
+      <div className="hidden lg:flex w-5/12 flex-col justify-between p-12"
+        style={{ background: "oklch(0.16 0.04 45)" }}>
+
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
+            style={{ background: "oklch(0.55 0.14 40)", color: "oklch(0.99 0.005 58)" }}>
+            S
           </div>
-          <span className="text-white font-semibold text-lg">Sewasah Agree</span>
+          <span className="font-semibold" style={{ color: "oklch(0.92 0.012 58)" }}>
+            Sewasah Agree
+          </span>
         </div>
-        <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-white leading-tight">
-            Tenancy agreements,<br />done properly. 🇲🇾
+
+        <div className="space-y-6">
+          <h1 className="text-3xl font-bold leading-tight" style={{ color: "oklch(0.97 0.008 58)", letterSpacing: "-0.02em" }}>
+            Perjanjian sewaan,<br />selesai dengan mudah.
           </h1>
-          <p className="text-white/70 text-lg">
-            AI-generated. Lawyer-endorsed. Stamped and delivered. All in minutes.
+          <p style={{ color: "oklch(0.60 0.025 50)", lineHeight: "1.7", fontSize: "0.9375rem" }}>
+            Jana perjanjian, hantar untuk pengesahan peguam, dan serahkan kepada eDutiSetem — semua dalam satu tempat.
           </p>
-          <div className="flex gap-3 pt-4">
-            {["AI Generated", "LHDN Stamped", "Lawyer Endorsed"].map((tag) => (
-              <span key={tag} className="bg-white/20 text-white text-xs px-3 py-1.5 rounded-full font-medium">
+          <div className="flex flex-wrap gap-2 pt-2">
+            {["Jana Automatik", "Pengesahan Peguam", "eDutiSetem"].map((tag) => (
+              <span key={tag} className="text-xs px-3 py-1.5 rounded-full font-medium"
+                style={{ background: "oklch(0.24 0.035 45)", color: "oklch(0.70 0.025 50)" }}>
                 {tag}
               </span>
             ))}
           </div>
         </div>
-        <p className="text-white/40 text-sm">© 2026 Sewasah Agree. All rights reserved.</p>
+
+        <p className="text-xs" style={{ color: "oklch(0.38 0.025 50)" }}>
+          © 2026 Sewasah Agree
+        </p>
       </div>
 
       {/* Right — sign in */}
-      <div className="flex-1 flex items-center justify-center bg-background p-8">
-        <div className="w-full max-w-sm space-y-6">
-          <div className="lg:hidden text-center mb-8">
-            <p className="text-2xl font-bold text-foreground">Sewasah Agree</p>
-            <p className="text-muted-foreground text-sm">Tenancy Agreement Platform</p>
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="w-full max-w-sm">
+          <div className="lg:hidden mb-8 text-center">
+            <p className="text-xl font-bold" style={{ color: "oklch(0.13 0.025 45)" }}>Sewasah Agree</p>
           </div>
           <SignIn />
         </div>

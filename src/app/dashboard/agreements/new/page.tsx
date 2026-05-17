@@ -316,7 +316,7 @@ export default function NewAgreementPage() {
                 <p className="font-medium text-gray-700">Auto-calculated</p>
                 <div className="flex justify-between"><span className="text-gray-500">Security Deposit (2 months)</span><span className="font-medium">RM {securityDeposit.toLocaleString()}</span></div>
                 <div className="flex justify-between"><span className="text-gray-500">Stamp Duty (LHDN)</span><span className="font-medium">RM {stampDuty.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">myStamps Fee</span><span className="font-medium">RM 10.00</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">eDutiSetem Fee</span><span className="font-medium">RM 10.00</span></div>
                 <div className="border-t pt-2 flex justify-between"><span className="font-medium text-gray-700">Service Fee (charged to client)</span><span className="font-bold text-green-700">RM 50.00</span></div>
               </div>
             )}

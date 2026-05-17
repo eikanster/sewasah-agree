@@ -9,21 +9,21 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 
-const statusConfig: Record<string, { label: string; color: string }> = {
-  draft:             { label: "Draft",           color: "bg-gray-100 text-gray-600" },
-  pending_review:    { label: "Pending Review",  color: "bg-amber-100 text-amber-700" },
-  changes_requested: { label: "Changes Needed",  color: "bg-red-100 text-red-700" },
-  approved:          { label: "Approved",         color: "bg-blue-100 text-blue-700" },
-  pending_stamp:     { label: "Awaiting Stamp",  color: "bg-purple-100 text-purple-700" },
-  stamped:           { label: "Stamped",          color: "bg-teal-100 text-teal-700" },
-  completed:         { label: "Completed",        color: "bg-green-100 text-green-700" },
+const statusMap: Record<string, { label: string; cls: string }> = {
+  draft:             { label: "Draft",          cls: "status-draft" },
+  pending_review:    { label: "Pending Review", cls: "status-pending" },
+  changes_requested: { label: "Changes Needed", cls: "status-review" },
+  approved:          { label: "Approved",        cls: "status-approved" },
+  pending_stamp:     { label: "Awaiting Stamp", cls: "status-stamp" },
+  stamped:           { label: "Stamped",         cls: "status-approved" },
+  completed:         { label: "Completed",       cls: "status-completed" },
 };
 
 function greeting() {
   const h = new Date().getHours();
-  if (h < 12) return "Good morning 👋";
-  if (h < 17) return "Good afternoon 👋";
-  return "Good evening 👋";
+  if (h < 12) return "Selamat pagi";
+  if (h < 17) return "Selamat petang";
+  return "Selamat malam";
 }
 
 export default function DashboardPage() {
@@ -39,96 +39,130 @@ export default function DashboardPage() {
     appUser?.firmId ? { firmId: appUser.firmId } : "skip"
   );
 
-  const statCards = [
-    { label: "Pending Review", value: counts?.pendingReview ?? 0, emoji: "⏳", color: "from-amber-400 to-orange-400" },
-    { label: "Awaiting Stamp", value: counts?.pendingStamp ?? 0, emoji: "📮", color: "from-purple-400 to-violet-400" },
-    { label: "Completed",      value: counts?.completed ?? 0,     emoji: "✅", color: "from-teal-400 to-cyan-400" },
-    { label: "This Month",     value: counts?.totalThisMonth ?? 0, emoji: "📋", color: "from-blue-400 to-indigo-400" },
+  const stats = [
+    { label: "Pending Review", value: counts?.pendingReview ?? 0, hint: "Waiting for lawyer" },
+    { label: "Awaiting Stamp", value: counts?.pendingStamp ?? 0, hint: "Ready to submit" },
+    { label: "Completed",      value: counts?.completed ?? 0,     hint: "This month" },
+    { label: "Total",          value: counts?.totalThisMonth ?? 0, hint: "Agreements this month" },
   ];
 
   return (
     <div className="space-y-8">
+
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{greeting()}</h1>
-          <p className="text-muted-foreground text-sm mt-1">Here's what's happening today.</p>
+          <h1 className="text-2xl font-bold" style={{ color: "oklch(0.13 0.025 45)", letterSpacing: "-0.01em" }}>
+            {greeting()}
+          </h1>
+          <p className="text-sm mt-1" style={{ color: "oklch(0.48 0.025 50)" }}>
+            {appUser?.name ?? "Welcome back"}
+          </p>
         </div>
         <Link href="/dashboard/agreements/new">
-          <Button className="gradient-brand text-white border-0 shadow-md rounded-xl px-5">
+          <Button className="text-sm font-medium rounded-xl px-5 py-2.5 transition-all duration-150"
+            style={{ background: "oklch(0.55 0.14 40)", color: "oklch(0.99 0.005 58)", border: "none" }}>
             + New Agreement
           </Button>
         </Link>
       </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {statCards.map((card) => (
-          <div key={card.label} className="card-hover bg-white rounded-2xl p-5 shadow-sm border border-border">
-            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center text-lg mb-3`}>
-              {card.emoji}
-            </div>
-            <p className="text-3xl font-bold text-foreground">{card.value}</p>
-            <p className="text-xs text-muted-foreground mt-1">{card.label}</p>
+      {/* Stats — horizontal strip, not a card grid */}
+      <div className="grid grid-cols-4 gap-px rounded-2xl overflow-hidden"
+        style={{ background: "oklch(0.87 0.016 55)", border: "1px solid oklch(0.87 0.016 55)" }}>
+        {stats.map((s, i) => (
+          <div key={i} className="px-6 py-5" style={{ background: "oklch(0.97 0.012 58)" }}>
+            <p className="text-3xl font-bold" style={{ color: "oklch(0.13 0.025 45)", letterSpacing: "-0.02em" }}>
+              {s.value}
+            </p>
+            <p className="text-sm font-medium mt-1" style={{ color: "oklch(0.28 0.04 45)" }}>{s.label}</p>
+            <p className="text-xs mt-0.5" style={{ color: "oklch(0.55 0.025 50)" }}>{s.hint}</p>
           </div>
         ))}
       </div>
 
-      {/* Agreements Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
-        <div className="px-6 py-5 border-b border-border">
-          <h2 className="font-semibold text-foreground">All Agreements</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Manage and track tenancy agreements</p>
+      {/* Agreements */}
+      <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid oklch(0.87 0.016 55)" }}>
+        <div className="px-6 py-4 flex items-center justify-between"
+          style={{ background: "oklch(0.97 0.012 58)", borderBottom: "1px solid oklch(0.87 0.016 55)" }}>
+          <p className="font-semibold text-sm" style={{ color: "oklch(0.13 0.025 45)" }}>
+            Agreements
+          </p>
+          <p className="text-xs" style={{ color: "oklch(0.55 0.025 50)" }}>
+            {agreements?.length ?? 0} total
+          </p>
         </div>
 
         {!agreements || agreements.length === 0 ? (
-          <div className="py-16 text-center">
-            <p className="text-3xl mb-3">📄</p>
-            <p className="font-medium text-foreground">No agreements yet</p>
-            <p className="text-sm text-muted-foreground mt-1 mb-4">Create your first tenancy agreement to get started.</p>
+          <div className="py-16 text-center" style={{ background: "oklch(0.97 0.012 58)" }}>
+            <p className="text-4xl mb-3">📄</p>
+            <p className="font-semibold text-sm" style={{ color: "oklch(0.28 0.04 45)" }}>No agreements yet</p>
+            <p className="text-sm mt-1 mb-5" style={{ color: "oklch(0.55 0.025 50)" }}>
+              Create the first one to get started.
+            </p>
             <Link href="/dashboard/agreements/new">
-              <Button className="gradient-brand text-white border-0">+ New Agreement</Button>
+              <Button className="text-sm rounded-xl px-5"
+                style={{ background: "oklch(0.55 0.14 40)", color: "oklch(0.99 0.005 58)", border: "none" }}>
+                + New Agreement
+              </Button>
             </Link>
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Landlord</TableHead>
-                <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tenant</TableHead>
-                <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Property</TableHead>
-                <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Rent</TableHead>
-                <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</TableHead>
-                <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Date</TableHead>
-                <TableHead></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {agreements.map((a) => (
-                <TableRow key={a._id} className="hover:bg-muted/30">
-                  <TableCell className="font-medium text-sm">{a.landlordName}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{a.tenantName}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{a.propertyAddress.split(",")[0]}</TableCell>
-                  <TableCell className="text-sm font-medium">RM {a.monthlyRent.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusConfig[a.status]?.color}`}>
-                      {statusConfig[a.status]?.label}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-xs text-muted-foreground">
-                    {new Date(a.createdAt).toLocaleDateString("en-MY")}
-                  </TableCell>
-                  <TableCell>
-                    <Link href={`/dashboard/agreements/${a._id}`}>
-                      <Button variant="ghost" size="sm" className="text-xs rounded-lg hover:bg-muted">
-                        View →
-                      </Button>
-                    </Link>
-                  </TableCell>
+          <div style={{ background: "oklch(0.99 0.005 58)" }}>
+            <Table>
+              <TableHeader>
+                <TableRow style={{ borderBottom: "1px solid oklch(0.87 0.016 55)" }}>
+                  {["Landlord", "Tenant", "Property", "Rent", "Status", "Date", ""].map((h) => (
+                    <TableHead key={h} className="text-xs font-medium uppercase tracking-widest"
+                      style={{ color: "oklch(0.55 0.025 50)", paddingTop: "12px", paddingBottom: "12px" }}>
+                      {h}
+                    </TableHead>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {agreements.map((a) => {
+                  const s = statusMap[a.status] ?? { label: a.status, cls: "status-draft" };
+                  return (
+                    <TableRow key={a._id}
+                      className="transition-colors duration-100"
+                      style={{ borderBottom: "1px solid oklch(0.90 0.014 56)" }}
+                      onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.94 0.018 58)")}
+                      onMouseLeave={e => (e.currentTarget.style.background = "")}>
+                      <TableCell className="font-medium text-sm py-4"
+                        style={{ color: "oklch(0.13 0.025 45)" }}>{a.landlordName}</TableCell>
+                      <TableCell className="text-sm py-4"
+                        style={{ color: "oklch(0.48 0.025 50)" }}>{a.tenantName}</TableCell>
+                      <TableCell className="text-sm py-4"
+                        style={{ color: "oklch(0.48 0.025 50)" }}>{a.propertyAddress.split(",")[0]}</TableCell>
+                      <TableCell className="text-sm font-medium py-4"
+                        style={{ color: "oklch(0.28 0.04 45)" }}>
+                        RM {a.monthlyRent.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <span className={`${s.cls} inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium`}>
+                          {s.label}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-xs py-4" style={{ color: "oklch(0.55 0.025 50)" }}>
+                        {new Date(a.createdAt).toLocaleDateString("en-MY")}
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <Link href={`/dashboard/agreements/${a._id}`}>
+                          <button className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors duration-100"
+                            style={{ color: "oklch(0.55 0.14 40)" }}
+                            onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.93 0.06 40 / 0.15)")}
+                            onMouseLeave={e => (e.currentTarget.style.background = "")}>
+                            View →
+                          </button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </div>
     </div>

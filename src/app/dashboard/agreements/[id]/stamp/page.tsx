@@ -101,7 +101,7 @@ export default function StampPage() {
             <p className="font-semibold text-primary">RM {agreement.stampDuty.toFixed(2)}</p>
           </div>
           <div>
-            <p className="text-muted-foreground text-xs">myStamps Fee</p>
+            <p className="text-muted-foreground text-xs">eDutiSetem Fee</p>
             <p className="font-semibold">RM 10.00</p>
           </div>
           <div>
@@ -117,7 +117,7 @@ export default function StampPage() {
           <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold shrink-0">1</div>
           <div>
             <p className="font-medium text-foreground">Download Agreement PDF</p>
-            <p className="text-xs text-muted-foreground">Download the approved agreement to submit to myStamps</p>
+            <p className="text-xs text-muted-foreground">Download the approved agreement to submit to eDutiSetem</p>
           </div>
         </div>
         <Button onClick={handlePreview} variant="outline" className="w-full rounded-xl">
@@ -125,13 +125,13 @@ export default function StampPage() {
         </Button>
       </div>
 
-      {/* Step 2 — Submit to myStamps */}
+      {/* Step 2 — Submit to eDutiSetem */}
       <div className="bg-white rounded-2xl border border-border p-5 space-y-3">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold shrink-0">2</div>
           <div>
-            <p className="font-medium text-foreground">Submit to myStamps</p>
-            <p className="text-xs text-muted-foreground">Upload the agreement to myStamps for LHDN stamping (RM10 + stamp duty)</p>
+            <p className="font-medium text-foreground">Submit to eDutiSetem</p>
+            <p className="text-xs text-muted-foreground">Upload the agreement to eDutiSetem for LHDN stamping (RM10 + stamp duty)</p>
           </div>
         </div>
         <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm space-y-2">
@@ -142,11 +142,11 @@ export default function StampPage() {
               <span className="font-medium">RM {agreement.stampDuty.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span>myStamps Processing</span>
+              <span>eDutiSetem Processing</span>
               <span className="font-medium">RM 10.00</span>
             </div>
             <div className="flex justify-between border-t border-blue-200 pt-1 mt-1">
-              <span className="font-semibold">Total to Pay myStamps</span>
+              <span className="font-semibold">Total to Pay eDutiSetem</span>
               <span className="font-bold">RM {(agreement.stampDuty + 10).toFixed(2)}</span>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default function StampPage() {
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors"
         >
-          🔗 Open myStamps.my →
+          🔗 Open eDutiSetem.my →
         </a>
       </div>
 
@@ -170,7 +170,7 @@ export default function StampPage() {
           </div>
           <div>
             <p className="font-medium text-foreground">Confirm Stamping Done</p>
-            <p className="text-xs text-muted-foreground">Once myStamps returns the stamped document, confirm here</p>
+            <p className="text-xs text-muted-foreground">Once eDutiSetem returns the stamped document, confirm here</p>
           </div>
         </div>
 
@@ -178,7 +178,7 @@ export default function StampPage() {
           confirming ? (
             <div className="space-y-3">
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800">
-                ⚠️ Confirm that you have received the stamped document from myStamps before proceeding.
+                ⚠️ Confirm that you have received the stamped document from eDutiSetem before proceeding.
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" className="flex-1 rounded-xl" onClick={() => setConfirming(false)}>

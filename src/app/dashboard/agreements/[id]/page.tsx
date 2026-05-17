@@ -290,10 +290,13 @@ export default function AgreementDetailPage() {
         <div className="bg-white rounded-2xl border border-border p-5 flex items-center justify-between">
           <div>
             <p className="font-medium text-foreground text-sm">Ready for Stamping</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Agreement approved — proceed to stamp with myStamps</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Agreement approved — proceed to stamp with eDutiSetem</p>
           </div>
           <Button
-            onClick={() => router.push(`/dashboard/agreements/${agreement._id}/stamp`)}
+            onClick={async () => {
+              await updateStatus({ id: agreement._id, status: "pending_stamp" });
+              router.push(`/dashboard/agreements/${agreement._id}/stamp`);
+            }}
             className="gradient-brand text-white border-0 rounded-xl"
           >
             📮 Go to Stamping →
