@@ -44,6 +44,10 @@ export default function AgreementDetailPage() {
     await updateStatus({ id: agreement._id, status: nextStatus });
   };
 
+  const handleReset = async () => {
+    await updateStatus({ id: agreement._id, status: "pending_review" });
+  };
+
   const handlePreview = async () => {
     const data: AgreementData = {
       agreementDate: new Date(agreement.createdAt).toISOString().split("T")[0],
@@ -245,6 +249,18 @@ export default function AgreementDetailPage() {
         </div>
       </div>
 
+      {/* Reset status — dev/admin tool */}
+      {agreement.status !== "pending_review" && agreement.status !== "draft" && (
+        <div className="flex justify-end">
+          <button
+            onClick={handleReset}
+            className="text-xs text-muted-foreground hover:text-red-500 underline underline-offset-2 transition-colors"
+          >
+            ↩ Reset to Pending Review
+          </button>
+        </div>
+      )}
+
       {/* Preview Agreement */}
       <div className="bg-white rounded-2xl border border-border p-5 flex items-center justify-between">
         <div>
@@ -257,7 +273,7 @@ export default function AgreementDetailPage() {
       </div>
 
       {/* Action Button */}
-      {nextStatus && (
+      {nextStatus && agreement.status !== "approved" && (
         <div className="bg-white rounded-2xl border border-border p-5 flex items-center justify-between">
           <div>
             <p className="font-medium text-foreground text-sm">Next Step</p>
@@ -265,6 +281,22 @@ export default function AgreementDetailPage() {
           </div>
           <Button onClick={handleNextStatus} className="gradient-brand text-white border-0 rounded-xl">
             {nextLabel[agreement.status] ?? "Next →"}
+          </Button>
+        </div>
+      )}
+
+      {/* Stamping shortcut when approved */}
+      {agreement.status === "approved" && (
+        <div className="bg-white rounded-2xl border border-border p-5 flex items-center justify-between">
+          <div>
+            <p className="font-medium text-foreground text-sm">Ready for Stamping</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Agreement approved — proceed to stamp with myStamps</p>
+          </div>
+          <Button
+            onClick={() => router.push(`/dashboard/agreements/${agreement._id}/stamp`)}
+            className="gradient-brand text-white border-0 rounded-xl"
+          >
+            📮 Go to Stamping →
           </Button>
         </div>
       )}
