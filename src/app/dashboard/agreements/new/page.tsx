@@ -310,11 +310,8 @@ export default function NewAgreementPage() {
         <ProgressBar step={step} />
       </div>
 
-      {/* Two column layout */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "24px", alignItems: "start" }}>
-
-      {/* Left — form + nav */}
-      <div>
+      {/* Form — single column, max width for readability */}
+      <div style={{ maxWidth: "680px" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 
         {/* Step 1 — Parties */}
@@ -552,7 +549,7 @@ export default function NewAgreementPage() {
 
       </div>
 
-      {/* Navigation buttons — inside left column, below form */}
+      {/* Navigation buttons — always below the form */}
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px", paddingTop: "20px", borderTop: "1px solid oklch(0.87 0.016 55)" }}>
         <button style={btnGhost}
           onClick={() => step > 1 ? goToStep(step - 1) : router.back()}
@@ -574,87 +571,6 @@ export default function NewAgreementPage() {
             onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = ""}>
             {saving ? "Menyimpan..." : "Jana & Hantar ke Peguam →"}
           </button>
-        )}
-      </div>
-      </div>
-
-      {/* Live summary panel — right column */}
-      <div style={{ position: "sticky", top: "0", display: "flex", flexDirection: "column", gap: "12px" }}>
-        <div style={{
-          background: "oklch(0.975 0.010 58)",
-          border: "1.5px solid oklch(0.875 0.016 55)",
-          borderRadius: "18px", padding: "24px",
-          boxShadow: "0 1px 3px oklch(0.14 0.038 43 / 0.06)",
-        }}>
-          <p style={{ fontSize: "0.6875rem", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "oklch(0.55 0.14 40)", marginBottom: "16px" }}>
-            Ringkasan
-          </p>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {/* Step indicators */}
-            {[
-              { n: 1, label: "Pihak",    done: step > 1, summary: form.landlordName ? `${form.landlordName} → ${form.tenantName || "..."}` : null },
-              { n: 2, label: "Hartanah", done: step > 2, summary: form.propertyAddress ? form.propertyAddress.split(",")[0] : null },
-              { n: 3, label: "Terma",    done: step > 3, summary: rent > 0 ? `RM ${rent.toLocaleString()}/bulan` : null },
-              { n: 4, label: "Syarat",   done: step > 4, summary: step > 4 ? "Selesai" : null },
-              { n: 5, label: "Semak",    done: false,    summary: null },
-            ].map(({ n, label, done, summary }) => (
-              <div key={n} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-                <div style={{
-                  width: "22px", height: "22px", borderRadius: "50%", flexShrink: 0,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "0.6875rem", fontWeight: 700,
-                  background: done ? "oklch(0.42 0.09 145)" : step === n ? "oklch(0.55 0.14 40)" : "oklch(0.90 0.014 56)",
-                  color: done || step === n ? "oklch(0.99 0.005 58)" : "oklch(0.60 0.020 50)",
-                  marginTop: "1px",
-                }}>
-                  {done ? "✓" : n}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: "0.8125rem", fontWeight: step === n ? 600 : 400, color: step === n ? "oklch(0.22 0.035 45)" : done ? "oklch(0.42 0.09 145)" : "oklch(0.60 0.020 50)", margin: 0 }}>
-                    {label}
-                  </p>
-                  {summary && (
-                    <p style={{ fontSize: "0.75rem", color: "oklch(0.55 0.025 50)", marginTop: "2px", lineHeight: 1.3 }}>
-                      {summary}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Stamp duty preview */}
-        {rent > 0 && (
-          <div style={{
-            background: "oklch(0.975 0.010 58)",
-            border: "1.5px solid oklch(0.875 0.016 55)",
-            borderRadius: "18px", padding: "20px",
-            animation: "pageIn 200ms cubic-bezier(0.16,1,0.3,1) both",
-          }}>
-            <p style={{ fontSize: "0.6875rem", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "oklch(0.55 0.14 40)", marginBottom: "14px" }}>
-              Pengiraan
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {[
-                { label: "Sewa Bulanan", value: `RM ${rent.toLocaleString()}` },
-                { label: "Deposit (2 bulan)", value: `RM ${secDeposit.toLocaleString()}` },
-                { label: "Duti Setem", value: `RM ${stampDuty.toFixed(2)}` },
-                { label: "Yuran eDutiSetem", value: "RM 10.00" },
-              ].map(({ label, value }) => (
-                <div key={label} style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "0.8125rem", color: "oklch(0.55 0.025 50)" }}>{label}</span>
-                  <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "oklch(0.22 0.035 45)" }}>{value}</span>
-                </div>
-              ))}
-              <div style={{ height: "1px", background: "oklch(0.87 0.016 55)", margin: "4px 0" }} />
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "oklch(0.22 0.035 45)" }}>Jumlah Perkhidmatan</span>
-                <span style={{ fontSize: "0.875rem", fontWeight: 800, color: "oklch(0.55 0.14 40)" }}>RM 50.00</span>
-              </div>
-            </div>
-          </div>
         )}
       </div>
       </div>
