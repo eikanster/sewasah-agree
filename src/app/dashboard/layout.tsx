@@ -10,6 +10,7 @@ import { useAppUser } from "@/hooks/use-app-user";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", emoji: "🏠" },
   { href: "/dashboard/agreements/new", label: "New Agreement", emoji: "✍️" },
+  { href: "/lawyer", label: "Lawyer Review", emoji: "⚖️" },
 ];
 
 export default function DashboardLayout({
