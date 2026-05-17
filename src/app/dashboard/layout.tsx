@@ -9,7 +9,7 @@ import { useAppUser } from "@/hooks/use-app-user";
 const NAV = [
   { href: "/dashboard",                    label: "Dashboard",       sub: "Ringkasan"     },
   { href: "/dashboard/agreements/new",     label: "Perjanjian Baru", sub: "Cipta dokumen" },
-  { href: "/lawyer",                       label: "Semakan Peguam",  sub: "Lulus / tolak" },
+  { href: "/dashboard/lawyer",              label: "Semakan Peguam",  sub: "Lulus / tolak" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
