@@ -105,10 +105,11 @@ function StepCard({ children, visible }: { children: React.ReactNode; visible: b
   return (
     <div style={{
       background: "oklch(0.99 0.005 58)",
-      border: "1.5px solid oklch(0.87 0.016 55)",
+      border: "1.5px solid oklch(0.875 0.016 55)",
       borderRadius: "20px",
-      padding: "32px",
+      padding: "32px 36px",
       animation: "pageIn 260ms cubic-bezier(0.16,1,0.3,1) both",
+      boxShadow: "0 1px 3px oklch(0.14 0.038 43 / 0.05), inset 0 1px 0 oklch(0.99 0.005 58 / 0.8)",
     }}>
       {children}
     </div>
@@ -285,33 +286,37 @@ export default function NewAgreementPage() {
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: "860px" }}>
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "32px" }}>
-        <button onClick={() => router.back()} style={{
-          background: "none", border: "none", cursor: "pointer",
-          fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", padding: "6px",
-          borderRadius: "8px", transition: "background 120ms ease-out",
-        }}
-        onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.90 0.014 56)")}
-        onMouseLeave={e => (e.currentTarget.style.background = "none")}>
-          ← Kembali
-        </button>
-        <div>
-          <h1 style={{ fontSize: "1.375rem", fontWeight: 800, color: "oklch(0.13 0.025 45)", letterSpacing: "-0.02em", margin: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          <button onClick={() => router.back()} style={{
+            background: "none", border: "none", cursor: "pointer",
+            fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", padding: "6px 10px",
+            borderRadius: "8px", transition: "background 120ms ease-out",
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.90 0.014 56)")}
+          onMouseLeave={e => (e.currentTarget.style.background = "none")}>
+            ← Kembali
+          </button>
+          <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "oklch(0.13 0.025 45)", letterSpacing: "-0.02em", margin: 0 }}>
             Perjanjian Baru
           </h1>
         </div>
+        <span style={{
+          fontSize: "0.75rem", fontWeight: 600, color: "oklch(0.55 0.025 50)",
+          background: "oklch(0.90 0.014 56)", padding: "4px 12px", borderRadius: "999px",
+        }}>Langkah {step} / 5</span>
       </div>
 
       {/* Progress */}
-      <div style={{ marginBottom: "32px" }}>
+      <div style={{ marginBottom: "24px" }}>
         <ProgressBar step={step} />
       </div>
 
-      {/* Form — single column, max width for readability */}
-      <div style={{ maxWidth: "680px" }}>
+      {/* Form — full width of container */}
+      <div>
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 
         {/* Step 1 — Parties */}
@@ -549,29 +554,43 @@ export default function NewAgreementPage() {
 
       </div>
 
-      {/* Navigation buttons — always below the form */}
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px", paddingTop: "20px", borderTop: "1px solid oklch(0.87 0.016 55)" }}>
-        <button style={btnGhost}
-          onClick={() => step > 1 ? goToStep(step - 1) : router.back()}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.14 40)"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.87 0.016 55)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.025 50)"; }}>
-          {step === 1 ? "Batal" : "← Kembali"}
-        </button>
-        {step < 5 ? (
-          <button style={btnPrimary}
-            onClick={() => goToStep(step + 1)}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "oklch(0.38 0.08 45)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.transform = ""; }}>
-            Seterusnya →
-          </button>
-        ) : (
-          <button style={{ ...btnPrimary, background: "oklch(0.42 0.09 145)" }}
-            disabled={saving} onClick={handleSubmit}
-            onMouseEnter={e => { if (!saving) (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
-            onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = ""}>
-            {saving ? "Menyimpan..." : "Jana & Hantar ke Peguam →"}
-          </button>
-        )}
+      {/* Nav buttons — attached to bottom of form area, same width */}
+      <div style={{
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        marginTop: "16px",
+        background: "oklch(0.975 0.010 58)",
+        border: "1.5px solid oklch(0.875 0.016 55)",
+        borderRadius: "16px",
+        padding: "16px 24px",
+      }}>
+        <div style={{ fontSize: "0.8125rem", color: "oklch(0.60 0.020 50)" }}>
+          {step < 5 ? `${5 - step} langkah lagi` : "Sedia untuk dihantar"}
+        </div>
+        <div style={{ display: "flex", gap: "10px" }}>
+          {step > 1 && (
+            <button style={btnGhost}
+              onClick={() => goToStep(step - 1)}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.14 40)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.87 0.016 55)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.025 50)"; }}>
+              ← Kembali
+            </button>
+          )}
+          {step < 5 ? (
+            <button style={btnPrimary}
+              onClick={() => goToStep(step + 1)}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "oklch(0.38 0.08 45)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.transform = ""; }}>
+              Seterusnya →
+            </button>
+          ) : (
+            <button style={{ ...btnPrimary, background: "oklch(0.42 0.09 145)" }}
+              disabled={saving} onClick={handleSubmit}
+              onMouseEnter={e => { if (!saving) (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = ""}>
+              {saving ? "Menyimpan..." : "Jana & Hantar ke Peguam →"}
+            </button>
+          )}
+        </div>
       </div>
       </div>
   );
