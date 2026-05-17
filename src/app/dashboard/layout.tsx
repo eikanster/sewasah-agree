@@ -47,8 +47,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }}>
         <div style={{
           display: "flex", alignItems: "center",
-          padding: "0 24px",
+          padding: "0 16px",
           gap: "0",
+          overflowX: "auto",
+          scrollbarWidth: "none",
         }}>
           {/* Logo */}
           <div style={{
@@ -141,9 +143,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         style={{
           flex: 1,
           overflowY: "auto",
-          padding: "32px 32px 48px",
         }}
-        className="page-enter"
+        className="page-enter main-content"
       >
         {children}
       </main>

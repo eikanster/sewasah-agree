@@ -89,7 +89,7 @@ export default function DashboardPage() {
     <div className="page-enter" style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
 
       {/* ── Header ── */}
-      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+      <div className="dashboard-header">
         <div>
           <p style={{
             fontSize: "0.6875rem", fontWeight: 600, letterSpacing: "0.08em",
@@ -114,7 +114,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Stats ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px" }}>
+      <div className="stats-grid">
         <StatCard value={counts?.pendingReview  ?? 0} label="Menunggu Semak" sub="Perlu tindakan peguam"  terracotta delay={0}   />
         <StatCard value={counts?.pendingStamp   ?? 0} label="Tunggu Setem"   sub="Sedia untuk eDutiSetem" delay={60}  />
         <StatCard value={counts?.completed      ?? 0} label="Selesai"        sub="Bulan ini"              delay={120} />
@@ -180,19 +180,19 @@ export default function DashboardPage() {
 
         {/* Rows */}
         {agreements && agreements.length > 0 && (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table className="mobile-card-table" style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "oklch(0.955 0.013 57)" }}>
                 {[
-                  { label: "Tuan Rumah", w: "18%" },
-                  { label: "Penyewa",    w: "18%" },
-                  { label: "Hartanah",   w: "22%" },
-                  { label: "Sewa",       w: "12%" },
-                  { label: "Status",     w: "18%" },
-                  { label: "Tarikh",     w: "10%" },
-                  { label: "",           w: "2%"  },
-                ].map(({ label, w }) => (
-                  <th key={label} style={{
+                  { label: "Tuan Rumah", w: "18%",  hide: false },
+                  { label: "Penyewa",    w: "18%",  hide: true  },
+                  { label: "Hartanah",   w: "22%",  hide: true  },
+                  { label: "Sewa",       w: "12%",  hide: false },
+                  { label: "Status",     w: "18%",  hide: false },
+                  { label: "Tarikh",     w: "10%",  hide: true  },
+                  { label: "",           w: "2%",   hide: false },
+                ].map(({ label, w, hide }) => (
+                  <th key={label} className={hide ? "col-hide-mobile" : ""} style={{
                     padding: "10px 20px",
                     textAlign: "left",
                     fontSize: "0.6875rem",
@@ -225,10 +225,10 @@ export default function DashboardPage() {
                     <td style={{ padding: "15px 20px", fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.13 0.025 45)" }}>
                       {a.landlordName}
                     </td>
-                    <td style={{ padding: "15px 20px", fontSize: "0.875rem", color: "oklch(0.45 0.025 50)" }}>
+                    <td className="col-hide-mobile" style={{ padding: "15px 20px", fontSize: "0.875rem", color: "oklch(0.45 0.025 50)" }}>
                       {a.tenantName}
                     </td>
-                    <td style={{ padding: "15px 20px", fontSize: "0.875rem", color: "oklch(0.45 0.025 50)", maxWidth: "200px" }}>
+                    <td className="col-hide-mobile" style={{ padding: "15px 20px", fontSize: "0.875rem", color: "oklch(0.45 0.025 50)", maxWidth: "200px" }}>
                       <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {a.propertyAddress.split(",")[0]}
                       </span>
@@ -249,7 +249,7 @@ export default function DashboardPage() {
                         alignItems: "center",
                       }}>{s.label}</span>
                     </td>
-                    <td style={{ padding: "15px 20px", fontSize: "0.8125rem", color: "oklch(0.60 0.020 50)", whiteSpace: "nowrap" }}>
+                    <td className="col-hide-mobile" style={{ padding: "15px 20px", fontSize: "0.8125rem", color: "oklch(0.60 0.020 50)", whiteSpace: "nowrap" }}>
                       {new Date(a.createdAt).toLocaleDateString("ms-MY", { day: "numeric", month: "short" })}
                     </td>
                     <td style={{ padding: "15px 20px" }}>
