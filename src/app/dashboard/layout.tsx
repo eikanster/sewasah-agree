@@ -5,11 +5,48 @@ import { useRouter, usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useAppUser } from "@/hooks/use-app-user";
+import { Home, ClipboardCheck, Plus, FolderOpen } from "lucide-react";
 
-const NAV = [
+const TOP_NAV = [
   { href: "/dashboard",                label: "Dashboard"       },
   { href: "/dashboard/agreements/new", label: "Perjanjian Baru" },
   { href: "/dashboard/lawyer",         label: "Semakan Peguam"  },
+];
+
+type BotItem = {
+  href: string;
+  label: string;
+  Icon: React.ComponentType<{ size?: number }>;
+  check: (p: string) => boolean;
+  center?: boolean;
+};
+
+const BOTTOM_NAV: BotItem[] = [
+  {
+    href: "/dashboard",
+    label: "Utama",
+    Icon: Home,
+    check: (p) => p === "/dashboard",
+  },
+  {
+    href: "/dashboard/lawyer",
+    label: "Semak",
+    Icon: ClipboardCheck,
+    check: (p) => p.startsWith("/dashboard/lawyer"),
+  },
+  {
+    href: "/dashboard/agreements/new",
+    label: "Baru",
+    Icon: Plus,
+    check: (p) => p === "/dashboard/agreements/new",
+    center: true,
+  },
+  {
+    href: "/dashboard",
+    label: "Fail",
+    Icon: FolderOpen,
+    check: (p) => p.startsWith("/dashboard/agreements/") && !p.includes("/new"),
+  },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -21,7 +58,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (isLoaded && needsSetup) router.push("/setup");
   }, [isLoaded, needsSetup, router]);
 
-  // Scroll content to top on route change
   useEffect(() => {
     const el = document.getElementById("main-scroll");
     if (el) el.scrollTop = 0;
@@ -55,7 +91,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Logo */}
           <div style={{
             display: "flex", alignItems: "center", gap: "10px",
-            paddingRight: "28px",
+            paddingRight: "20px",
             borderRight: "1px solid oklch(0.225 0.032 43)",
             marginRight: "8px",
             height: "56px",
@@ -79,9 +115,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             }}>Sewasah Agree</span>
           </div>
 
-          {/* Tab Nav */}
-          <nav style={{ display: "flex", alignItems: "flex-end", height: "56px", flex: 1, gap: "2px" }}>
-            {NAV.map((item) => {
+          {/* Tab Nav — hidden on mobile via .top-nav-tabs class */}
+          <nav className="top-nav-tabs" style={{ display: "flex", alignItems: "flex-end", height: "56px", flex: 1, gap: "2px" }}>
+            {TOP_NAV.map((item) => {
               const active = item.href === "/dashboard"
                 ? pathname === item.href
                 : pathname.startsWith(item.href);
@@ -102,14 +138,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     cursor: "pointer",
                   }}
                   onMouseEnter={e => {
-                    if (!active) {
-                      (e.currentTarget as HTMLElement).style.color = "oklch(0.78 0.012 56)";
-                    }
+                    if (!active) (e.currentTarget as HTMLElement).style.color = "oklch(0.78 0.012 56)";
                   }}
                   onMouseLeave={e => {
-                    if (!active) {
-                      (e.currentTarget as HTMLElement).style.color = "oklch(0.58 0.018 48)";
-                    }
+                    if (!active) (e.currentTarget as HTMLElement).style.color = "oklch(0.58 0.018 48)";
                   }}>
                     {item.label}
                   </div>
@@ -118,21 +150,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             })}
           </nav>
 
-          {/* Right — user + country */}
-          <div style={{ display: "flex", alignItems: "center", gap: "14px", flexShrink: 0 }}>
-            <span style={{
+          {/* Right */}
+          <div style={{ display: "flex", alignItems: "center", gap: "14px", flexShrink: 0, marginLeft: "auto" }}>
+            <span className="flag-badge" style={{
               fontSize: "0.75rem", color: "oklch(0.50 0.018 46)",
               background: "oklch(0.22 0.030 43)",
               padding: "4px 12px", borderRadius: "999px",
             }}>🇲🇾 Malaysia</span>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <UserButton />
-              <div style={{ display: "none" }}>
-                <p style={{ fontSize: "0.8125rem", color: "oklch(0.70 0.015 48)" }}>
-                  {appUser?.name?.split(" ")[0]}
-                </p>
-              </div>
-            </div>
+            <UserButton />
           </div>
         </div>
       </header>
@@ -140,14 +165,50 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* ── Page Content ── */}
       <main
         id="main-scroll"
-        style={{
-          flex: 1,
-          overflowY: "auto",
-        }}
+        style={{ flex: 1, overflowY: "auto" }}
         className="page-enter main-content"
       >
         {children}
       </main>
+
+      {/* ── Bottom Nav (Mobile Only) ── */}
+      <nav className="bottom-nav">
+        {BOTTOM_NAV.map((item) => {
+          const active = item.check(pathname);
+
+          if (item.center) {
+            return (
+              <Link key={item.href + item.label} href={item.href} style={{ flex: 1, textDecoration: "none", display: "flex" }}>
+                <div className="bottom-nav-center-slot">
+                  <div className={`bottom-nav-center-btn${active ? " active" : ""}`}>
+                    <item.Icon size={22} />
+                  </div>
+                  <span className="bottom-nav-label" style={{ color: active ? "oklch(0.55 0.14 40)" : "oklch(0.50 0.018 48)" }}>
+                    {item.label}
+                  </span>
+                </div>
+              </Link>
+            );
+          }
+
+          return (
+            <Link key={item.href + item.label} href={item.href} style={{ flex: 1, textDecoration: "none", display: "flex" }}>
+              <div className={`bottom-nav-item${active ? " active" : ""}`}>
+                <item.Icon size={20} />
+                <span className="bottom-nav-label">{item.label}</span>
+              </div>
+            </Link>
+          );
+        })}
+
+        {/* Profile slot */}
+        <div className="bottom-nav-item" style={{ flex: 1, gap: "5px" }}>
+          <div style={{ transform: "scale(0.9)", lineHeight: 0 }}>
+            <UserButton />
+          </div>
+          <span className="bottom-nav-label">Profil</span>
+        </div>
+      </nav>
     </div>
   );
 }

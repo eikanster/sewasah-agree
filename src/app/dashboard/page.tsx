@@ -29,15 +29,16 @@ function today() {
 
 // ── Stat card ──────────────────────────────────────────────────────────────
 function StatCard({
-  value, label, sub, terracotta, delay,
-}: { value: number; label: string; sub: string; terracotta?: boolean; delay: number }) {
-  const bg   = terracotta && value > 0 ? "oklch(0.55 0.14 40)" : "oklch(0.975 0.010 58)";
-  const num  = terracotta && value > 0 ? "oklch(0.99 0.005 58)" : "oklch(0.13 0.025 45)";
-  const lbl  = terracotta && value > 0 ? "oklch(0.88 0.05 40)"  : "oklch(0.28 0.040 45)";
-  const hint = terracotta && value > 0 ? "oklch(0.78 0.08 40)"  : "oklch(0.55 0.025 50)";
-  const bdr  = terracotta && value > 0 ? "transparent"           : "oklch(0.875 0.016 55)";
-  const shd  = terracotta && value > 0
-    ? "0 8px 24px oklch(0.55 0.14 40 / 0.28), 0 2px 6px oklch(0.55 0.14 40 / 0.18)"
+  value, label, sub, terracotta, delay, large,
+}: { value: number; label: string; sub: string; terracotta?: boolean; delay: number; large?: boolean }) {
+  const active = terracotta && value > 0;
+  const bg   = active ? "oklch(0.55 0.14 40)" : "oklch(0.975 0.010 58)";
+  const num  = active ? "oklch(0.99 0.005 58)" : "oklch(0.13 0.025 45)";
+  const lbl  = active ? "oklch(0.88 0.05 40)"  : "oklch(0.28 0.040 45)";
+  const hint = active ? "oklch(0.78 0.08 40)"  : "oklch(0.55 0.025 50)";
+  const bdr  = active ? "transparent"           : "oklch(0.875 0.016 55)";
+  const shd  = active
+    ? "0 8px 32px oklch(0.55 0.14 40 / 0.32), 0 2px 8px oklch(0.55 0.14 40 / 0.20)"
     : "0 1px 3px oklch(0.14 0.038 43 / 0.06)";
 
   return (
@@ -45,27 +46,39 @@ function StatCard({
       background: bg,
       border: `1.5px solid ${bdr}`,
       borderRadius: "18px",
-      padding: "24px",
+      padding: large ? "28px 32px" : "24px",
       boxShadow: shd,
       animationDelay: `${delay}ms`,
       position: "relative",
       overflow: "hidden",
+      minHeight: large ? "120px" : undefined,
+      display: "flex", flexDirection: "column", justifyContent: "space-between",
     }}>
-      {/* Subtle inner ring for depth */}
-      {!(terracotta && value > 0) && (
+      {!active && (
         <div style={{
           position: "absolute", inset: 0, borderRadius: "18px",
           boxShadow: "inset 0 1px 0 oklch(0.99 0.005 58 / 0.8)",
           pointerEvents: "none",
         }} />
       )}
+      {active && large && (
+        <div style={{
+          position: "absolute", top: "-20px", right: "-20px",
+          width: "120px", height: "120px", borderRadius: "50%",
+          background: "oklch(0.62 0.14 40 / 0.25)",
+          pointerEvents: "none",
+        }} />
+      )}
       <p className="count-in" style={{
-        fontSize: "2.75rem", fontWeight: 800,
+        fontSize: large ? "3.75rem" : "2.75rem",
+        fontWeight: 800,
         letterSpacing: "-0.04em", lineHeight: 1,
         color: num, animationDelay: `${delay + 60}ms`,
       }}>{value}</p>
-      <p style={{ fontSize: "0.875rem", fontWeight: 600, marginTop: "10px", color: lbl }}>{label}</p>
-      <p style={{ fontSize: "0.75rem", marginTop: "3px", color: hint }}>{sub}</p>
+      <div>
+        <p style={{ fontSize: "0.875rem", fontWeight: 600, marginTop: "10px", color: lbl }}>{label}</p>
+        <p style={{ fontSize: "0.75rem", marginTop: "3px", color: hint }}>{sub}</p>
+      </div>
     </div>
   );
 }
@@ -115,10 +128,10 @@ export default function DashboardPage() {
 
       {/* ── Stats ── */}
       <div className="stats-grid">
-        <StatCard value={counts?.pendingReview  ?? 0} label="Menunggu Semak" sub="Perlu tindakan peguam"  terracotta delay={0}   />
+        <StatCard value={counts?.pendingReview  ?? 0} label="Menunggu Semak" sub="Perlu tindakan peguam"  terracotta large delay={0}   />
         <StatCard value={counts?.pendingStamp   ?? 0} label="Tunggu Setem"   sub="Sedia untuk eDutiSetem" delay={60}  />
         <StatCard value={counts?.completed      ?? 0} label="Selesai"        sub="Bulan ini"              delay={120} />
-        <StatCard value={counts?.totalThisMonth ?? 0} label="Jumlah"         sub="Perjanjian bulan ini"   delay={180} />
+        <StatCard value={counts?.totalThisMonth ?? 0} label="Jumlah"         sub="Perjanjian bulan ini"   large delay={180} />
       </div>
 
       {/* ── Table ── */}
