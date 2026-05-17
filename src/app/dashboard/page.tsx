@@ -4,19 +4,15 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useAppUser } from "@/hooks/use-app-user";
-import { Button } from "@/components/ui/button";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
 
-const statusMap: Record<string, { label: string; cls: string }> = {
-  draft:             { label: "Draft",          cls: "status-draft" },
-  pending_review:    { label: "Pending Review", cls: "status-pending" },
-  changes_requested: { label: "Changes Needed", cls: "status-review" },
-  approved:          { label: "Approved",        cls: "status-approved" },
-  pending_stamp:     { label: "Awaiting Stamp", cls: "status-stamp" },
-  stamped:           { label: "Stamped",         cls: "status-approved" },
-  completed:         { label: "Completed",       cls: "status-completed" },
+const statusMap: Record<string, { label: string; bg: string; color: string }> = {
+  draft:             { label: "Draft",          bg: "oklch(0.90 0.014 56)",   color: "oklch(0.38 0.025 50)" },
+  pending_review:    { label: "Pending Review", bg: "oklch(0.93 0.07 72)",    color: "oklch(0.38 0.12 65)" },
+  changes_requested: { label: "Changes Needed", bg: "oklch(0.93 0.06 27)",    color: "oklch(0.38 0.12 27)" },
+  approved:          { label: "Approved",        bg: "oklch(0.90 0.07 145)",   color: "oklch(0.32 0.10 145)" },
+  pending_stamp:     { label: "Awaiting Stamp", bg: "oklch(0.91 0.05 290)",   color: "oklch(0.38 0.10 290)" },
+  stamped:           { label: "Stamped",         bg: "oklch(0.90 0.07 145)",   color: "oklch(0.32 0.10 145)" },
+  completed:         { label: "Completed",       bg: "oklch(0.38 0.09 145)",   color: "oklch(0.97 0.008 58)" },
 };
 
 function greeting() {
@@ -39,130 +35,248 @@ export default function DashboardPage() {
     appUser?.firmId ? { firmId: appUser.firmId } : "skip"
   );
 
-  const stats = [
-    { label: "Pending Review", value: counts?.pendingReview ?? 0, hint: "Waiting for lawyer" },
-    { label: "Awaiting Stamp", value: counts?.pendingStamp ?? 0, hint: "Ready to submit" },
-    { label: "Completed",      value: counts?.completed ?? 0,     hint: "This month" },
-    { label: "Total",          value: counts?.totalThisMonth ?? 0, hint: "Agreements this month" },
-  ];
-
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
 
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: "oklch(0.13 0.025 45)", letterSpacing: "-0.01em" }}>
-            {greeting()}
-          </h1>
-          <p className="text-sm mt-1" style={{ color: "oklch(0.48 0.025 50)" }}>
-            {appUser?.name ?? "Welcome back"}
+          <p className="text-xs font-medium uppercase tracking-widest mb-2" style={{ color: "oklch(0.55 0.14 40)" }}>
+            {new Date().toLocaleDateString("en-MY", { weekday: "long", day: "numeric", month: "long" })}
           </p>
+          <h1 style={{
+            fontSize: "2.25rem",
+            fontWeight: 800,
+            letterSpacing: "-0.03em",
+            lineHeight: 1.1,
+            color: "oklch(0.13 0.025 45)"
+          }}>
+            {greeting()},<br />
+            <span style={{ color: "oklch(0.55 0.14 40)" }}>
+              {appUser?.name?.split(" ")[0] ?? "selamat datang"}.
+            </span>
+          </h1>
         </div>
         <Link href="/dashboard/agreements/new">
-          <Button className="text-sm font-medium rounded-xl px-5 py-2.5 transition-all duration-150"
-            style={{ background: "oklch(0.55 0.14 40)", color: "oklch(0.99 0.005 58)", border: "none" }}>
-            + New Agreement
-          </Button>
+          <button style={{
+            background: "oklch(0.55 0.14 40)",
+            color: "oklch(0.99 0.005 58)",
+            border: "none",
+            borderRadius: "14px",
+            padding: "12px 24px",
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "background 150ms ease-out, transform 150ms ease-out",
+            letterSpacing: "-0.01em",
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.background = "oklch(0.38 0.08 45)";
+            (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.background = "oklch(0.55 0.14 40)";
+            (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+          }}>
+            + Perjanjian Baru
+          </button>
         </Link>
       </div>
 
-      {/* Stats — horizontal strip, not a card grid */}
-      <div className="grid grid-cols-4 gap-px rounded-2xl overflow-hidden"
-        style={{ background: "oklch(0.87 0.016 55)", border: "1px solid oklch(0.87 0.016 55)" }}>
-        {stats.map((s, i) => (
-          <div key={i} className="px-6 py-5" style={{ background: "oklch(0.97 0.012 58)" }}>
-            <p className="text-3xl font-bold" style={{ color: "oklch(0.13 0.025 45)", letterSpacing: "-0.02em" }}>
-              {s.value}
-            </p>
-            <p className="text-sm font-medium mt-1" style={{ color: "oklch(0.28 0.04 45)" }}>{s.label}</p>
-            <p className="text-xs mt-0.5" style={{ color: "oklch(0.55 0.025 50)" }}>{s.hint}</p>
+      {/* Stats — four columns, varied visual weight */}
+      <div className="grid grid-cols-4 gap-4">
+        {[
+          { label: "Pending Review", value: counts?.pendingReview ?? 0, sub: "Tunggu peguam", accent: true },
+          { label: "Awaiting Stamp", value: counts?.pendingStamp ?? 0, sub: "Sedia hantar", accent: false },
+          { label: "Completed", value: counts?.completed ?? 0, sub: "Bulan ini", accent: false },
+          { label: "Total", value: counts?.totalThisMonth ?? 0, sub: "Perjanjian bulan ini", accent: false },
+        ].map((s, i) => (
+          <div key={i} style={{
+            background: s.accent && (counts?.pendingReview ?? 0) > 0
+              ? "oklch(0.55 0.14 40)"
+              : "oklch(0.97 0.012 58)",
+            border: `1px solid ${s.accent && (counts?.pendingReview ?? 0) > 0 ? "transparent" : "oklch(0.87 0.016 55)"}`,
+            borderRadius: "18px",
+            padding: "24px",
+            transition: "box-shadow 150ms ease-out",
+          }}
+          onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 4px 16px oklch(0.16 0.04 45 / 0.10)")}
+          onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}>
+            <p style={{
+              fontSize: "2.5rem",
+              fontWeight: 800,
+              letterSpacing: "-0.04em",
+              lineHeight: 1,
+              color: s.accent && (counts?.pendingReview ?? 0) > 0
+                ? "oklch(0.99 0.005 58)"
+                : "oklch(0.13 0.025 45)",
+            }}>{s.value}</p>
+            <p style={{
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              marginTop: "8px",
+              color: s.accent && (counts?.pendingReview ?? 0) > 0
+                ? "oklch(0.90 0.04 40)"
+                : "oklch(0.28 0.04 45)",
+            }}>{s.label}</p>
+            <p style={{
+              fontSize: "0.75rem",
+              marginTop: "2px",
+              color: s.accent && (counts?.pendingReview ?? 0) > 0
+                ? "oklch(0.80 0.06 40)"
+                : "oklch(0.55 0.025 50)",
+            }}>{s.sub}</p>
           </div>
         ))}
       </div>
 
-      {/* Agreements */}
-      <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid oklch(0.87 0.016 55)" }}>
-        <div className="px-6 py-4 flex items-center justify-between"
-          style={{ background: "oklch(0.97 0.012 58)", borderBottom: "1px solid oklch(0.87 0.016 55)" }}>
-          <p className="font-semibold text-sm" style={{ color: "oklch(0.13 0.025 45)" }}>
-            Agreements
+      {/* Agreements table */}
+      <div style={{
+        background: "oklch(0.99 0.005 58)",
+        border: "1px solid oklch(0.87 0.016 55)",
+        borderRadius: "20px",
+        overflow: "hidden",
+      }}>
+        {/* Table header */}
+        <div style={{
+          padding: "18px 28px",
+          borderBottom: "1px solid oklch(0.90 0.014 56)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}>
+          <p style={{ fontWeight: 700, fontSize: "0.9375rem", color: "oklch(0.13 0.025 45)" }}>
+            Senarai Perjanjian
           </p>
-          <p className="text-xs" style={{ color: "oklch(0.55 0.025 50)" }}>
-            {agreements?.length ?? 0} total
-          </p>
+          <span style={{
+            fontSize: "0.75rem",
+            fontWeight: 500,
+            color: "oklch(0.55 0.025 50)",
+            background: "oklch(0.90 0.014 56)",
+            padding: "3px 10px",
+            borderRadius: "999px",
+          }}>
+            {agreements?.length ?? 0} rekod
+          </span>
         </div>
 
         {!agreements || agreements.length === 0 ? (
-          <div className="py-16 text-center" style={{ background: "oklch(0.97 0.012 58)" }}>
-            <p className="text-4xl mb-3">📄</p>
-            <p className="font-semibold text-sm" style={{ color: "oklch(0.28 0.04 45)" }}>No agreements yet</p>
-            <p className="text-sm mt-1 mb-5" style={{ color: "oklch(0.55 0.025 50)" }}>
-              Create the first one to get started.
+          <div style={{ padding: "64px 28px", textAlign: "center" }}>
+            <div style={{
+              width: "56px", height: "56px",
+              background: "oklch(0.93 0.02 58)",
+              borderRadius: "16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 16px",
+              fontSize: "1.5rem",
+            }}>📄</div>
+            <p style={{ fontWeight: 600, color: "oklch(0.28 0.04 45)", fontSize: "0.9375rem" }}>
+              Tiada perjanjian lagi
+            </p>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px", marginBottom: "20px" }}>
+              Cipta perjanjian pertama untuk bermula.
             </p>
             <Link href="/dashboard/agreements/new">
-              <Button className="text-sm rounded-xl px-5"
-                style={{ background: "oklch(0.55 0.14 40)", color: "oklch(0.99 0.005 58)", border: "none" }}>
-                + New Agreement
-              </Button>
+              <button style={{
+                background: "oklch(0.55 0.14 40)",
+                color: "oklch(0.99 0.005 58)",
+                border: "none",
+                borderRadius: "12px",
+                padding: "10px 20px",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}>
+                + Perjanjian Baru
+              </button>
             </Link>
           </div>
         ) : (
-          <div style={{ background: "oklch(0.99 0.005 58)" }}>
-            <Table>
-              <TableHeader>
-                <TableRow style={{ borderBottom: "1px solid oklch(0.87 0.016 55)" }}>
-                  {["Landlord", "Tenant", "Property", "Rent", "Status", "Date", ""].map((h) => (
-                    <TableHead key={h} className="text-xs font-medium uppercase tracking-widest"
-                      style={{ color: "oklch(0.55 0.025 50)", paddingTop: "12px", paddingBottom: "12px" }}>
-                      {h}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {agreements.map((a) => {
-                  const s = statusMap[a.status] ?? { label: a.status, cls: "status-draft" };
-                  return (
-                    <TableRow key={a._id}
-                      className="transition-colors duration-100"
-                      style={{ borderBottom: "1px solid oklch(0.90 0.014 56)" }}
-                      onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.94 0.018 58)")}
-                      onMouseLeave={e => (e.currentTarget.style.background = "")}>
-                      <TableCell className="font-medium text-sm py-4"
-                        style={{ color: "oklch(0.13 0.025 45)" }}>{a.landlordName}</TableCell>
-                      <TableCell className="text-sm py-4"
-                        style={{ color: "oklch(0.48 0.025 50)" }}>{a.tenantName}</TableCell>
-                      <TableCell className="text-sm py-4"
-                        style={{ color: "oklch(0.48 0.025 50)" }}>{a.propertyAddress.split(",")[0]}</TableCell>
-                      <TableCell className="text-sm font-medium py-4"
-                        style={{ color: "oklch(0.28 0.04 45)" }}>
-                        RM {a.monthlyRent.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <span className={`${s.cls} inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium`}>
-                          {s.label}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-xs py-4" style={{ color: "oklch(0.55 0.025 50)" }}>
-                        {new Date(a.createdAt).toLocaleDateString("en-MY")}
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <Link href={`/dashboard/agreements/${a._id}`}>
-                          <button className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors duration-100"
-                            style={{ color: "oklch(0.55 0.14 40)" }}
-                            onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.93 0.06 40 / 0.15)")}
-                            onMouseLeave={e => (e.currentTarget.style.background = "")}>
-                            View →
-                          </button>
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid oklch(0.90 0.014 56)" }}>
+                {["Tuan Rumah", "Penyewa", "Hartanah", "Sewa", "Status", "Tarikh", ""].map((h) => (
+                  <th key={h} style={{
+                    padding: "10px 28px",
+                    textAlign: "left",
+                    fontSize: "0.6875rem",
+                    fontWeight: 600,
+                    letterSpacing: "0.07em",
+                    textTransform: "uppercase",
+                    color: "oklch(0.60 0.025 50)",
+                    background: "oklch(0.97 0.012 58)",
+                  }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {agreements.map((a, idx) => {
+                const s = statusMap[a.status] ?? statusMap.draft;
+                return (
+                  <tr key={a._id}
+                    style={{
+                      borderBottom: idx < agreements.length - 1 ? "1px solid oklch(0.92 0.012 56)" : "none",
+                      transition: "background 100ms ease-out",
+                      cursor: "default",
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.95 0.016 58)")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "")}>
+                    <td style={{ padding: "16px 28px", fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.13 0.025 45)" }}>
+                      {a.landlordName}
+                    </td>
+                    <td style={{ padding: "16px 28px", fontSize: "0.875rem", color: "oklch(0.48 0.025 50)" }}>
+                      {a.tenantName}
+                    </td>
+                    <td style={{ padding: "16px 28px", fontSize: "0.875rem", color: "oklch(0.48 0.025 50)", maxWidth: "180px" }}>
+                      <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {a.propertyAddress.split(",")[0]}
+                      </span>
+                    </td>
+                    <td style={{ padding: "16px 28px", fontSize: "0.875rem", fontWeight: 600, color: "oklch(0.28 0.04 45)" }}>
+                      RM {a.monthlyRent.toLocaleString()}
+                    </td>
+                    <td style={{ padding: "16px 28px" }}>
+                      <span style={{
+                        background: s.bg,
+                        color: s.color,
+                        padding: "3px 10px",
+                        borderRadius: "999px",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        whiteSpace: "nowrap",
+                      }}>
+                        {s.label}
+                      </span>
+                    </td>
+                    <td style={{ padding: "16px 28px", fontSize: "0.8125rem", color: "oklch(0.60 0.020 50)" }}>
+                      {new Date(a.createdAt).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}
+                    </td>
+                    <td style={{ padding: "16px 28px" }}>
+                      <Link href={`/dashboard/agreements/${a._id}`}>
+                        <button style={{
+                          color: "oklch(0.55 0.14 40)",
+                          background: "none",
+                          border: "none",
+                          fontSize: "0.8125rem",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          padding: "4px 8px",
+                          borderRadius: "8px",
+                          transition: "background 100ms ease-out",
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.93 0.05 40 / 0.2)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "none")}>
+                          Buka →
+                        </button>
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

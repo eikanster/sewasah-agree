@@ -1,45 +1,216 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useAppUser } from "@/hooks/use-app-user";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 
-// Stamp duty calculator (LHDN formula)
-function calculateStampDuty(monthlyRent: number, durationMonths: number): number {
-  const annualRent = monthlyRent * 12;
-  const taxableAmount = annualRent - 2400;
-  if (taxableAmount <= 0) return 0;
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function calcStampDuty(monthlyRent: number, durationMonths: number): number {
+  const annual = monthlyRent * 12;
+  const taxable = annual - 2400;
+  if (taxable <= 0) return 0;
   const rate = durationMonths > 36 ? 2 : 1;
-  return Math.ceil((taxableAmount / 250) * rate * 100) / 100;
+  return Math.ceil((taxable / 250) * rate * 100) / 100;
 }
 
-// Calculate expiry date
-function calculateEndDate(startDate: string, durationMonths: number): string {
-  if (!startDate) return "";
-  const date = new Date(startDate);
-  date.setMonth(date.getMonth() + durationMonths);
-  date.setDate(date.getDate() - 1);
-  return date.toISOString().split("T")[0];
+function calcEndDate(start: string, months: number): string {
+  if (!start) return "";
+  const d = new Date(start);
+  d.setMonth(d.getMonth() + months);
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split("T")[0];
 }
 
-// Generate AI flags based on form data
-function generateAiFlags(data: Record<string, unknown>): string[] {
-  const flags: string[] = [];
-  if (!data.petsAllowed) flags.push("Pet clause not included — confirmed no pets allowed");
-  if (data.tenantIsForeigner) flags.push("Expatriate clause activated — tenant is a foreigner");
-  if (data.isFurnished === "furnished") flags.push("Furnished unit — inventory list should be attached");
-  if ((data.airconUnits as number) > 0) flags.push(`${data.airconUnits} air-con unit(s) — tenant maintenance clause included`);
-  if (data.sublettingAllowed) flags.push("Subletting allowed — landlord consent clause modified");
-  return flags;
+function aiFlags(form: Record<string, unknown>): string[] {
+  const f: string[] = [];
+  if (!form.petsAllowed) f.push("Pet clause tidak disertakan — tiada haiwan peliharaan disahkan");
+  if (form.tenantIsForeigner) f.push("Klausa ekspatriat diaktifkan — penyewa warga asing");
+  if (form.isFurnished !== "unfurnished") f.push("Unit berperabot — senarai inventori perlu dilampirkan");
+  if ((form.airconUnits as number) > 0) f.push(`${form.airconUnits} unit penghawa dingin — klausa penyelenggaraan disertakan`);
+  return f;
 }
+
+// ─── Styled Input ─────────────────────────────────────────────────────────
+
+function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "oklch(0.35 0.04 45)" }}>
+        {label}
+      </label>
+      {children}
+      {hint && <p style={{ fontSize: "0.75rem", color: "oklch(0.60 0.020 50)" }}>{hint}</p>}
+    </div>
+  );
+}
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "11px 14px",
+  border: "1.5px solid oklch(0.87 0.016 55)",
+  borderRadius: "10px",
+  fontSize: "0.9375rem",
+  color: "oklch(0.13 0.025 45)",
+  background: "oklch(0.99 0.005 58)",
+  outline: "none",
+  transition: "border-color 150ms ease-out, box-shadow 150ms ease-out",
+  boxSizing: "border-box",
+};
+
+function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <input
+      {...props}
+      style={{
+        ...inputStyle,
+        borderColor: focused ? "oklch(0.55 0.14 40)" : "oklch(0.87 0.016 55)",
+        boxShadow: focused ? "0 0 0 3px oklch(0.55 0.14 40 / 0.12)" : "none",
+      }}
+      onFocus={e => { setFocused(true); props.onFocus?.(e); }}
+      onBlur={e => { setFocused(false); props.onBlur?.(e); }}
+    />
+  );
+}
+
+function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <select
+      {...props}
+      style={{
+        ...inputStyle,
+        cursor: "pointer",
+        appearance: "none",
+        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a08060' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "right 14px center",
+        paddingRight: "40px",
+        borderColor: focused ? "oklch(0.55 0.14 40)" : "oklch(0.87 0.016 55)",
+        boxShadow: focused ? "0 0 0 3px oklch(0.55 0.14 40 / 0.12)" : "none",
+      }}
+      onFocus={e => { setFocused(true); props.onFocus?.(e); }}
+      onBlur={e => { setFocused(false); props.onBlur?.(e); }}
+    />
+  );
+}
+
+// ─── Step Card ────────────────────────────────────────────────────────────
+
+function StepCard({ children, visible }: { children: React.ReactNode; visible: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (visible && ref.current) ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [visible]);
+
+  return (
+    <div ref={ref} style={{
+      background: "oklch(0.99 0.005 58)",
+      border: "1.5px solid oklch(0.87 0.016 55)",
+      borderRadius: "20px",
+      padding: "32px",
+      opacity: visible ? 1 : 0,
+      transform: visible ? "translateY(0)" : "translateY(12px)",
+      transition: "opacity 280ms cubic-bezier(0.16,1,0.3,1), transform 280ms cubic-bezier(0.16,1,0.3,1)",
+      pointerEvents: visible ? "auto" : "none",
+    }}>
+      {children}
+    </div>
+  );
+}
+
+// ─── Progress Bar ─────────────────────────────────────────────────────────
+
+const STEPS = ["Pihak", "Hartanah", "Terma", "Syarat", "Semak"];
+
+function ProgressBar({ step }: { step: number }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "0" }}>
+      {STEPS.map((label, i) => {
+        const done = i < step - 1;
+        const active = i === step - 1;
+        return (
+          <div key={i} style={{ display: "flex", alignItems: "center", flex: i < STEPS.length - 1 ? 1 : "none" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
+              <div style={{
+                width: "32px", height: "32px",
+                borderRadius: "50%",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "0.8125rem", fontWeight: 700,
+                background: done ? "oklch(0.42 0.09 145)" : active ? "oklch(0.55 0.14 40)" : "oklch(0.90 0.014 56)",
+                color: done || active ? "oklch(0.99 0.005 58)" : "oklch(0.55 0.025 50)",
+                boxShadow: active ? "0 0 0 4px oklch(0.55 0.14 40 / 0.18)" : "none",
+                transition: "all 250ms cubic-bezier(0.16,1,0.3,1)",
+                flexShrink: 0,
+              }}>
+                {done ? "✓" : i + 1}
+              </div>
+              <span style={{
+                fontSize: "0.6875rem", fontWeight: active ? 600 : 400,
+                color: active ? "oklch(0.55 0.14 40)" : done ? "oklch(0.42 0.09 145)" : "oklch(0.60 0.020 50)",
+                whiteSpace: "nowrap",
+                transition: "color 250ms ease-out",
+              }}>{label}</span>
+            </div>
+            {i < STEPS.length - 1 && (
+              <div style={{
+                flex: 1, height: "2px", margin: "0 6px", marginBottom: "20px",
+                background: done ? "oklch(0.42 0.09 145)" : "oklch(0.90 0.014 56)",
+                transition: "background 350ms ease-out",
+              }} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Checkbox ─────────────────────────────────────────────────────────────
+
+function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label style={{
+      display: "flex", alignItems: "center", gap: "12px",
+      cursor: "pointer", userSelect: "none",
+      padding: "12px 16px",
+      borderRadius: "12px",
+      border: `1.5px solid ${checked ? "oklch(0.55 0.14 40)" : "oklch(0.87 0.016 55)"}`,
+      background: checked ? "oklch(0.55 0.14 40 / 0.06)" : "oklch(0.99 0.005 58)",
+      transition: "all 150ms ease-out",
+    }}>
+      <div style={{
+        width: "20px", height: "20px", borderRadius: "6px", flexShrink: 0,
+        border: `2px solid ${checked ? "oklch(0.55 0.14 40)" : "oklch(0.75 0.020 50)"}`,
+        background: checked ? "oklch(0.55 0.14 40)" : "transparent",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        transition: "all 150ms ease-out",
+        fontSize: "0.6875rem", color: "oklch(0.99 0.005 58)", fontWeight: 700,
+      }}>
+        {checked ? "✓" : ""}
+      </div>
+      <span style={{ fontSize: "0.875rem", color: "oklch(0.28 0.04 45)", fontWeight: checked ? 500 : 400 }}>
+        {label}
+      </span>
+    </label>
+  );
+}
+
+// ─── Summary Row ──────────────────────────────────────────────────────────
+
+function SummaryRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid oklch(0.92 0.012 56)" }}>
+      <span style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)" }}>{label}</span>
+      <span style={{ fontSize: "0.875rem", fontWeight: highlight ? 700 : 600, color: highlight ? "oklch(0.55 0.14 40)" : "oklch(0.13 0.025 45)" }}>{value}</span>
+    </div>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────
 
 export default function NewAgreementPage() {
   const router = useRouter();
@@ -47,410 +218,359 @@ export default function NewAgreementPage() {
   const createAgreement = useMutation(api.agreements.create);
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
+
   const [form, setForm] = useState({
-    // Landlord
-    landlordName: "",
-    landlordIc: "",
-    landlordPhone: "",
-    landlordEmail: "",
-    // Tenant
-    tenantName: "",
-    tenantIc: "",
-    tenantPhone: "",
-    tenantEmail: "",
+    landlordName: "", landlordIc: "", landlordPhone: "", landlordEmail: "",
+    tenantName: "", tenantIc: "", tenantPhone: "", tenantEmail: "",
     tenantIsForeigner: false,
-    // Property
-    propertyAddress: "",
-    propertyType: "apartment",
-    isFurnished: "unfurnished",
-    // Terms
-    monthlyRent: "",
-    tenancyDuration: "12",
-    startDate: "",
-    paymentDueDay: "6",
+    propertyAddress: "", propertyType: "apartment", isFurnished: "unfurnished",
+    monthlyRent: "", tenancyDuration: "12", startDate: "", paymentDueDay: "6",
     utilitiesDeposit: "300",
-    // Special conditions
-    petsAllowed: false,
-    sublettingAllowed: false,
-    renovationAllowed: false,
+    petsAllowed: false, sublettingAllowed: false, renovationAllowed: false,
     airconUnits: "0",
-    // Bank
-    bankName: "",
-    bankAccountNo: "",
-    bankAccountName: "",
+    bankName: "", bankAccountNo: "", bankAccountName: "",
   });
 
-  const monthlyRent = parseFloat(form.monthlyRent) || 0;
-  const duration = parseInt(form.tenancyDuration) || 12;
-  const securityDeposit = monthlyRent * 2;
-  const stampDuty = calculateStampDuty(monthlyRent, duration);
-  const endDate = calculateEndDate(form.startDate, duration);
-  const aiFlags = generateAiFlags({ ...form, airconUnits: parseInt(form.airconUnits) });
+  const set = (k: string, v: string | boolean) => setForm(p => ({ ...p, [k]: v }));
 
-  const update = (field: string, value: string | boolean | null) =>
-    setForm((prev) => ({ ...prev, [field]: value ?? "" }));
+  const rent = parseFloat(form.monthlyRent) || 0;
+  const duration = parseInt(form.tenancyDuration) || 12;
+  const secDeposit = rent * 2;
+  const stampDuty = calcStampDuty(rent, duration);
+  const endDate = calcEndDate(form.startDate, duration);
+  const flags = aiFlags({ ...form, airconUnits: parseInt(form.airconUnits) });
 
   const handleSubmit = async () => {
     if (!appUser?.firmId || !appUser?._id) return;
     setSaving(true);
     try {
       await createAgreement({
-        firmId: appUser.firmId,
-        createdBy: appUser._id,
-        landlordName: form.landlordName,
-        landlordIc: form.landlordIc,
-        landlordPhone: form.landlordPhone,
-        landlordEmail: form.landlordEmail || undefined,
-        tenantName: form.tenantName,
-        tenantIc: form.tenantIc,
-        tenantPhone: form.tenantPhone,
-        tenantEmail: form.tenantEmail || undefined,
+        firmId: appUser.firmId, createdBy: appUser._id,
+        landlordName: form.landlordName, landlordIc: form.landlordIc,
+        landlordPhone: form.landlordPhone, landlordEmail: form.landlordEmail || undefined,
+        tenantName: form.tenantName, tenantIc: form.tenantIc,
+        tenantPhone: form.tenantPhone, tenantEmail: form.tenantEmail || undefined,
         tenantIsForeigner: form.tenantIsForeigner as boolean,
         propertyAddress: form.propertyAddress,
         propertyType: form.propertyType as "apartment" | "landed" | "room" | "commercial",
         isFurnished: form.isFurnished as "furnished" | "partially" | "unfurnished",
-        monthlyRent,
-        tenancyDuration: duration,
-        startDate: form.startDate,
-        endDate,
+        monthlyRent: rent, tenancyDuration: duration,
+        startDate: form.startDate, endDate,
         paymentDueDay: parseInt(form.paymentDueDay),
-        securityDeposit,
+        securityDeposit: secDeposit,
         utilitiesDeposit: parseFloat(form.utilitiesDeposit) || 300,
         petsAllowed: form.petsAllowed as boolean,
         sublettingAllowed: form.sublettingAllowed as boolean,
         renovationAllowed: form.renovationAllowed as boolean,
         airconUnits: parseInt(form.airconUnits),
-        bankName: form.bankName,
-        bankAccountNo: form.bankAccountNo,
+        bankName: form.bankName, bankAccountNo: form.bankAccountNo,
         bankAccountName: form.bankAccountName,
-        stampDuty,
-        aiFlags,
+        stampDuty, aiFlags: flags,
       });
       router.push("/dashboard");
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setSaving(false);
-    }
+    } catch (e) { console.error(e); }
+    finally { setSaving(false); }
+  };
+
+  const btnPrimary: React.CSSProperties = {
+    background: "oklch(0.55 0.14 40)", color: "oklch(0.99 0.005 58)",
+    border: "none", borderRadius: "12px", padding: "12px 28px",
+    fontSize: "0.9375rem", fontWeight: 600, cursor: "pointer",
+    transition: "background 150ms ease-out, transform 120ms ease-out",
+  };
+  const btnGhost: React.CSSProperties = {
+    background: "transparent", color: "oklch(0.55 0.025 50)",
+    border: "1.5px solid oklch(0.87 0.016 55)", borderRadius: "12px",
+    padding: "12px 24px", fontSize: "0.9375rem", fontWeight: 500, cursor: "pointer",
+    transition: "border-color 150ms ease-out, color 150ms ease-out",
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div style={{ maxWidth: "680px" }}>
+
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <button onClick={() => router.back()} className="text-gray-400 hover:text-gray-600 text-sm">
-          ← Back
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "32px" }}>
+        <button onClick={() => router.back()} style={{
+          background: "none", border: "none", cursor: "pointer",
+          fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", padding: "6px",
+          borderRadius: "8px", transition: "background 120ms ease-out",
+        }}
+        onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.90 0.014 56)")}
+        onMouseLeave={e => (e.currentTarget.style.background = "none")}>
+          ← Kembali
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">New Tenancy Agreement</h1>
+        <div>
+          <h1 style={{ fontSize: "1.375rem", fontWeight: 800, color: "oklch(0.13 0.025 45)", letterSpacing: "-0.02em", margin: 0 }}>
+            Perjanjian Baru
+          </h1>
+        </div>
       </div>
 
-      {/* Step Indicators */}
-      <div className="flex gap-2">
-        {["Parties", "Property", "Terms", "Conditions", "Review"].map((label, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold
-              ${step === i + 1 ? "bg-black text-white" : step > i + 1 ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500"}`}>
-              {step > i + 1 ? "✓" : i + 1}
-            </div>
-            <span className={`text-xs ${step === i + 1 ? "font-medium text-gray-900" : "text-gray-400"}`}>{label}</span>
-            {i < 4 && <div className="w-6 h-px bg-gray-200" />}
+      {/* Progress */}
+      <div style={{ marginBottom: "32px" }}>
+        <ProgressBar step={step} />
+      </div>
+
+      {/* Steps */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+
+        {/* Step 1 — Parties */}
+        <StepCard visible={step === 1}>
+          <div style={{ marginBottom: "24px" }}>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Maklumat Pihak</h2>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Maklumat tuan rumah dan penyewa</p>
           </div>
-        ))}
-      </div>
 
-      {/* Step 1 — Parties */}
-      {step === 1 && (
-        <Card>
-          <CardHeader><CardTitle>Party Details</CardTitle></CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <h3 className="font-medium text-gray-900 mb-3">Landlord</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2 space-y-1">
-                  <Label>Full Name (as per IC) *</Label>
-                  <Input value={form.landlordName} onChange={(e) => update("landlordName", e.target.value)} placeholder="e.g. Ahmad bin Rosli" />
-                </div>
-                <div className="space-y-1">
-                  <Label>IC Number *</Label>
-                  <Input value={form.landlordIc} onChange={(e) => update("landlordIc", e.target.value)} placeholder="e.g. 820122-02-5032" />
-                </div>
-                <div className="space-y-1">
-                  <Label>Phone *</Label>
-                  <Input value={form.landlordPhone} onChange={(e) => update("landlordPhone", e.target.value)} placeholder="e.g. 0123456789" />
-                </div>
-                <div className="col-span-2 space-y-1">
-                  <Label>Email (optional)</Label>
-                  <Input value={form.landlordEmail} onChange={(e) => update("landlordEmail", e.target.value)} placeholder="ahmad@email.com" />
-                </div>
+          <div style={{ marginBottom: "8px" }}>
+            <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.14 40)", marginBottom: "16px" }}>Tuan Rumah</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
+              <Field label="Nama Penuh (seperti dalam IC) *">
+                <Input value={form.landlordName} onChange={e => set("landlordName", e.target.value)} placeholder="cth. Ahmad bin Rosli" />
+              </Field>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <Field label="No. IC *">
+                  <Input value={form.landlordIc} onChange={e => set("landlordIc", e.target.value)} placeholder="820122-02-5032" />
+                </Field>
+                <Field label="No. Telefon *">
+                  <Input value={form.landlordPhone} onChange={e => set("landlordPhone", e.target.value)} placeholder="0123456789" />
+                </Field>
               </div>
+              <Field label="E-mel (pilihan)">
+                <Input value={form.landlordEmail} onChange={e => set("landlordEmail", e.target.value)} placeholder="ahmad@email.com" />
+              </Field>
             </div>
+          </div>
 
-            <div className="border-t pt-6">
-              <h3 className="font-medium text-gray-900 mb-3">Tenant</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2 space-y-1">
-                  <Label>Full Name (as per IC) *</Label>
-                  <Input value={form.tenantName} onChange={(e) => update("tenantName", e.target.value)} placeholder="e.g. Siti binti Aminah" />
-                </div>
-                <div className="space-y-1">
-                  <Label>IC Number *</Label>
-                  <Input value={form.tenantIc} onChange={(e) => update("tenantIc", e.target.value)} placeholder="e.g. 900515-10-1234" />
-                </div>
-                <div className="space-y-1">
-                  <Label>Phone *</Label>
-                  <Input value={form.tenantPhone} onChange={(e) => update("tenantPhone", e.target.value)} placeholder="e.g. 0198765432" />
-                </div>
-                <div className="col-span-2 space-y-1">
-                  <Label>Email (optional)</Label>
-                  <Input value={form.tenantEmail} onChange={(e) => update("tenantEmail", e.target.value)} placeholder="siti@email.com" />
-                </div>
-                <div className="col-span-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={form.tenantIsForeigner}
-                      onChange={(e) => update("tenantIsForeigner", e.target.checked as boolean)}
-                      className="w-4 h-4" />
-                    <span className="text-sm text-gray-700">Tenant is a foreigner with work permit (activates Expatriate Clause)</span>
-                  </label>
-                </div>
+          <div style={{ height: "1px", background: "oklch(0.90 0.014 56)", margin: "24px 0" }} />
+
+          <div>
+            <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.14 40)", marginBottom: "16px" }}>Penyewa</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
+              <Field label="Nama Penuh (seperti dalam IC) *">
+                <Input value={form.tenantName} onChange={e => set("tenantName", e.target.value)} placeholder="cth. Siti binti Aminah" />
+              </Field>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <Field label="No. IC *">
+                  <Input value={form.tenantIc} onChange={e => set("tenantIc", e.target.value)} placeholder="900515-10-1234" />
+                </Field>
+                <Field label="No. Telefon *">
+                  <Input value={form.tenantPhone} onChange={e => set("tenantPhone", e.target.value)} placeholder="0198765432" />
+                </Field>
               </div>
+              <Field label="E-mel (pilihan)">
+                <Input value={form.tenantEmail} onChange={e => set("tenantEmail", e.target.value)} placeholder="siti@email.com" />
+              </Field>
+              <Toggle label="Penyewa adalah warga asing dengan permit kerja (aktifkan Klausa Ekspatriat)" checked={form.tenantIsForeigner as boolean} onChange={v => set("tenantIsForeigner", v)} />
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </StepCard>
 
-      {/* Step 2 — Property */}
-      {step === 2 && (
-        <Card>
-          <CardHeader><CardTitle>Property Details</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1">
-              <Label>Full Property Address *</Label>
-              <Input value={form.propertyAddress} onChange={(e) => update("propertyAddress", e.target.value)}
-                placeholder="e.g. Unit 2-12, Tingkat 2, Pangsapuri Suria Subang, 40150 Shah Alam, Selangor" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label>Property Type</Label>
-                <Select value={form.propertyType} onValueChange={(v) => update("propertyType", v)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="apartment">Apartment / Condo</SelectItem>
-                    <SelectItem value="landed">Landed (House)</SelectItem>
-                    <SelectItem value="room">Room</SelectItem>
-                    <SelectItem value="commercial">Commercial</SelectItem>
-                  </SelectContent>
+        {/* Step 2 — Property */}
+        <StepCard visible={step === 2}>
+          <div style={{ marginBottom: "24px" }}>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Maklumat Hartanah</h2>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Alamat dan jenis hartanah</p>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            <Field label="Alamat Penuh Hartanah *">
+              <Input value={form.propertyAddress} onChange={e => set("propertyAddress", e.target.value)} placeholder="cth. Unit 2-12, Tingkat 2, Pangsapuri Suria Subang, 40150 Shah Alam" />
+            </Field>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <Field label="Jenis Hartanah">
+                <Select value={form.propertyType} onChange={e => set("propertyType", e.target.value)}>
+                  <option value="apartment">Apartment / Kondominium</option>
+                  <option value="landed">Rumah Teres / Banglo</option>
+                  <option value="room">Bilik</option>
+                  <option value="commercial">Komersial</option>
                 </Select>
-              </div>
-              <div className="space-y-1">
-                <Label>Furnishing</Label>
-                <Select value={form.isFurnished} onValueChange={(v) => update("isFurnished", v)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="furnished">Fully Furnished</SelectItem>
-                    <SelectItem value="partially">Partially Furnished</SelectItem>
-                    <SelectItem value="unfurnished">Unfurnished</SelectItem>
-                  </SelectContent>
+              </Field>
+              <Field label="Kelengkapan">
+                <Select value={form.isFurnished} onChange={e => set("isFurnished", e.target.value)}>
+                  <option value="furnished">Perabot Lengkap</option>
+                  <option value="partially">Perabot Separa</option>
+                  <option value="unfurnished">Tanpa Perabot</option>
                 </Select>
-              </div>
+              </Field>
             </div>
             {form.isFurnished !== "unfurnished" && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
-                ⚠️ Furnished unit — remember to attach an inventory list to this agreement.
+              <div style={{
+                padding: "12px 16px", borderRadius: "12px",
+                background: "oklch(0.93 0.06 72 / 0.4)",
+                border: "1px solid oklch(0.85 0.08 72)",
+                fontSize: "0.875rem", color: "oklch(0.38 0.10 65)",
+                animation: "expand 200ms cubic-bezier(0.16,1,0.3,1)",
+              }}>
+                ⚠️ Unit berperabot — senarai inventori perlu dilampirkan pada perjanjian.
               </div>
             )}
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </StepCard>
 
-      {/* Step 3 — Terms */}
-      {step === 3 && (
-        <Card>
-          <CardHeader><CardTitle>Tenancy Terms</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label>Monthly Rent (RM) *</Label>
-                <Input type="number" value={form.monthlyRent}
-                  onChange={(e) => update("monthlyRent", e.target.value)} placeholder="e.g. 2500" />
-              </div>
-              <div className="space-y-1">
-                <Label>Duration</Label>
-                <Select value={form.tenancyDuration} onValueChange={(v) => update("tenancyDuration", v)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="12">1 Year (12 months)</SelectItem>
-                    <SelectItem value="24">2 Years (24 months)</SelectItem>
-                    <SelectItem value="36">3 Years (36 months)</SelectItem>
-                  </SelectContent>
+        {/* Step 3 — Terms */}
+        <StepCard visible={step === 3}>
+          <div style={{ marginBottom: "24px" }}>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Terma Sewaan</h2>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Kadar sewa, tempoh, dan deposit</p>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <Field label="Sewa Bulanan (RM) *">
+                <Input type="number" value={form.monthlyRent} onChange={e => set("monthlyRent", e.target.value)} placeholder="2500" />
+              </Field>
+              <Field label="Tempoh Sewaan">
+                <Select value={form.tenancyDuration} onChange={e => set("tenancyDuration", e.target.value)}>
+                  <option value="12">1 Tahun (12 bulan)</option>
+                  <option value="24">2 Tahun (24 bulan)</option>
+                  <option value="36">3 Tahun (36 bulan)</option>
                 </Select>
-              </div>
-              <div className="space-y-1">
-                <Label>Start Date *</Label>
-                <Input type="date" value={form.startDate} onChange={(e) => update("startDate", e.target.value)} />
-              </div>
-              <div className="space-y-1">
-                <Label>End Date (auto)</Label>
-                <Input value={endDate || "—"} disabled className="bg-gray-50 text-gray-500" />
-              </div>
-              <div className="space-y-1">
-                <Label>Payment Due Day</Label>
-                <Select value={form.paymentDueDay} onValueChange={(v) => update("paymentDueDay", v)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {[1,5,6,7,10,15].map(d => (
-                      <SelectItem key={d} value={String(d)}>{d}th of each month</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1">
-                <Label>Utilities Deposit (RM)</Label>
-                <Input type="number" value={form.utilitiesDeposit}
-                  onChange={(e) => update("utilitiesDeposit", e.target.value)} />
-              </div>
-            </div>
-
-            {/* Auto-calculated summary */}
-            {monthlyRent > 0 && (
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
-                <p className="font-medium text-gray-700">Auto-calculated</p>
-                <div className="flex justify-between"><span className="text-gray-500">Security Deposit (2 months)</span><span className="font-medium">RM {securityDeposit.toLocaleString()}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Stamp Duty (LHDN)</span><span className="font-medium">RM {stampDuty.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">eDutiSetem Fee</span><span className="font-medium">RM 10.00</span></div>
-                <div className="border-t pt-2 flex justify-between"><span className="font-medium text-gray-700">Service Fee (charged to client)</span><span className="font-bold text-green-700">RM 50.00</span></div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Step 4 — Special Conditions */}
-      {step === 4 && (
-        <Card>
-          <CardHeader><CardTitle>Special Conditions & Bank Details</CardTitle></CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3">
-              <p className="font-medium text-gray-900">Special Conditions</p>
-              {[
-                { key: "petsAllowed", label: "Pets allowed" },
-                { key: "sublettingAllowed", label: "Subletting allowed (with landlord consent)" },
-                { key: "renovationAllowed", label: "Renovation allowed (with landlord consent)" },
-              ].map(({ key, label }) => (
-                <label key={key} className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form[key as keyof typeof form] as boolean}
-                    onChange={(e) => update(key, e.target.checked)} className="w-4 h-4" />
-                  <span className="text-sm text-gray-700">{label}</span>
-                </label>
-              ))}
-              <div className="space-y-1">
-                <Label>Number of Air-con Units</Label>
-                <Select value={form.airconUnits} onValueChange={(v) => update("airconUnits", v)}>
-                  <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {[0,1,2,3,4,5].map(n => (
-                      <SelectItem key={n} value={String(n)}>{n}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="border-t pt-6 space-y-4">
-              <p className="font-medium text-gray-900">Landlord Bank Details (for rental payment)</p>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <Label>Bank Name *</Label>
-                  <Select value={form.bankName} onValueChange={(v) => update("bankName", v)}>
-                    <SelectTrigger><SelectValue placeholder="Select bank" /></SelectTrigger>
-                    <SelectContent>
-                      {["Maybank", "CIMB", "Public Bank", "RHB", "Hong Leong", "AmBank", "Bank Islam", "BSN"].map(b => (
-                        <SelectItem key={b} value={b}>{b}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              </Field>
+              <Field label="Tarikh Mula *">
+                <Input type="date" value={form.startDate} onChange={e => set("startDate", e.target.value)} />
+              </Field>
+              <Field label="Tarikh Tamat (auto)">
+                <div style={{ ...inputStyle, color: "oklch(0.55 0.025 50)", background: "oklch(0.93 0.012 58)" }}>
+                  {endDate || "—"}
                 </div>
-                <div className="space-y-1">
-                  <Label>Account Number *</Label>
-                  <Input value={form.bankAccountNo} onChange={(e) => update("bankAccountNo", e.target.value)} placeholder="e.g. 1234567890" />
-                </div>
-                <div className="col-span-2 space-y-1">
-                  <Label>Account Name *</Label>
-                  <Input value={form.bankAccountName} onChange={(e) => update("bankAccountName", e.target.value)} placeholder="e.g. Ahmad bin Rosli" />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Step 5 — Review */}
-      {step === 5 && (
-        <Card>
-          <CardHeader><CardTitle>Review & Generate</CardTitle></CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-2 gap-6 text-sm">
-              <div>
-                <p className="font-medium text-gray-500 mb-2">LANDLORD</p>
-                <p className="font-medium">{form.landlordName}</p>
-                <p className="text-gray-500">{form.landlordIc}</p>
-                <p className="text-gray-500">{form.landlordPhone}</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-500 mb-2">TENANT</p>
-                <p className="font-medium">{form.tenantName}</p>
-                <p className="text-gray-500">{form.tenantIc}</p>
-                <p className="text-gray-500">{form.tenantPhone}</p>
-                {form.tenantIsForeigner && <Badge variant="outline" className="mt-1">Foreigner</Badge>}
-              </div>
-              <div className="col-span-2">
-                <p className="font-medium text-gray-500 mb-2">PROPERTY</p>
-                <p>{form.propertyAddress}</p>
-                <p className="text-gray-500 capitalize">{form.propertyType} · {form.isFurnished}</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-500 mb-2">TERMS</p>
-                <p>RM {monthlyRent.toLocaleString()} / month</p>
-                <p className="text-gray-500">{form.startDate} → {endDate}</p>
-                <p className="text-gray-500">Due: {form.paymentDueDay}th of each month</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-500 mb-2">DEPOSITS</p>
-                <p>Security: RM {securityDeposit.toLocaleString()}</p>
-                <p className="text-gray-500">Utilities: RM {form.utilitiesDeposit}</p>
-                <p className="text-gray-500">Stamp Duty: RM {stampDuty.toFixed(2)}</p>
-              </div>
-            </div>
-
-            {/* AI Flags */}
-            {aiFlags.length > 0 && (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                <p className="font-medium text-amber-800 mb-2">⚠️ AI Flags — Review Before Sending to Lawyer</p>
-                <ul className="space-y-1">
-                  {aiFlags.map((flag, i) => (
-                    <li key={i} className="text-sm text-amber-700">• {flag}</li>
+              </Field>
+              <Field label="Tarikh Bayaran">
+                <Select value={form.paymentDueDay} onChange={e => set("paymentDueDay", e.target.value)}>
+                  {[1, 5, 6, 7, 10, 15].map(d => (
+                    <option key={d} value={String(d)}>{d} haribulan setiap bulan</option>
                   ))}
-                </ul>
+                </Select>
+              </Field>
+              <Field label="Deposit Utiliti (RM)">
+                <Input type="number" value={form.utilitiesDeposit} onChange={e => set("utilitiesDeposit", e.target.value)} />
+              </Field>
+            </div>
+
+            {rent > 0 && (
+              <div style={{
+                marginTop: "8px", padding: "20px", borderRadius: "14px",
+                background: "oklch(0.96 0.018 58)",
+                border: "1px solid oklch(0.87 0.016 55)",
+                animation: "expand 200ms cubic-bezier(0.16,1,0.3,1)",
+              }}>
+                <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.025 50)", marginBottom: "12px" }}>Pengiraan Auto</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                  <SummaryRow label="Deposit Keselamatan (2 bulan)" value={`RM ${secDeposit.toLocaleString()}`} />
+                  <SummaryRow label="Duti Setem (LHDN)" value={`RM ${stampDuty.toFixed(2)}`} />
+                  <SummaryRow label="Yuran eDutiSetem" value="RM 10.00" />
+                  <SummaryRow label="Yuran Perkhidmatan" value="RM 50.00" highlight />
+                </div>
               </div>
             )}
+          </div>
+        </StepCard>
 
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-800">
-              ✅ Agreement will be generated and sent to lawyer for approval.
+        {/* Step 4 — Conditions */}
+        <StepCard visible={step === 4}>
+          <div style={{ marginBottom: "24px" }}>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Syarat Khas & Bank</h2>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Syarat tambahan dan maklumat pembayaran</p>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.025 50)", marginBottom: "4px" }}>Syarat Khas</p>
+            <Toggle label="Haiwan peliharaan dibenarkan" checked={form.petsAllowed as boolean} onChange={v => set("petsAllowed", v)} />
+            <Toggle label="Penyewaan semula dibenarkan (dengan kebenaran bertulis)" checked={form.sublettingAllowed as boolean} onChange={v => set("sublettingAllowed", v)} />
+            <Toggle label="Pengubahsuaian dibenarkan (dengan kebenaran bertulis)" checked={form.renovationAllowed as boolean} onChange={v => set("renovationAllowed", v)} />
+
+            <Field label="Bilangan Unit Penghawa Dingin">
+              <Select value={form.airconUnits} onChange={e => set("airconUnits", e.target.value)} style={{ width: "160px" }}>
+                {[0, 1, 2, 3, 4, 5].map(n => <option key={n} value={String(n)}>{n} unit</option>)}
+              </Select>
+            </Field>
+
+            <div style={{ height: "1px", background: "oklch(0.90 0.014 56)", margin: "8px 0" }} />
+
+            <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.025 50)", marginBottom: "4px" }}>Maklumat Bank (Pembayaran Sewa)</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <Field label="Nama Bank *">
+                <Select value={form.bankName} onChange={e => set("bankName", e.target.value)}>
+                  <option value="">Pilih bank</option>
+                  {["Maybank", "CIMB", "Public Bank", "RHB", "Hong Leong", "AmBank", "Bank Islam", "BSN"].map(b => (
+                    <option key={b} value={b}>{b}</option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label="No. Akaun *">
+                <Input value={form.bankAccountNo} onChange={e => set("bankAccountNo", e.target.value)} placeholder="1234567890" />
+              </Field>
+              <Field label="Nama Akaun *" >
+                <Input value={form.bankAccountName} onChange={e => set("bankAccountName", e.target.value)} placeholder="Ahmad bin Rosli" />
+              </Field>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </StepCard>
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={() => step > 1 ? setStep(step - 1) : router.back()}>
-          {step === 1 ? "Cancel" : "← Back"}
-        </Button>
+        {/* Step 5 — Review */}
+        <StepCard visible={step === 5}>
+          <div style={{ marginBottom: "24px" }}>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Semak & Jana</h2>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Sahkan maklumat sebelum menghantar kepada peguam</p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
+            {[
+              { label: "Tuan Rumah", lines: [form.landlordName, form.landlordIc, form.landlordPhone] },
+              { label: "Penyewa", lines: [form.tenantName, form.tenantIc, form.tenantPhone] },
+            ].map(({ label, lines }) => (
+              <div key={label} style={{ padding: "16px", background: "oklch(0.96 0.014 58)", borderRadius: "12px" }}>
+                <p style={{ fontSize: "0.6875rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.14 40)", marginBottom: "8px" }}>{label}</p>
+                {lines.map((l, i) => (
+                  <p key={i} style={{ fontSize: "0.875rem", color: i === 0 ? "oklch(0.13 0.025 45)" : "oklch(0.55 0.025 50)", fontWeight: i === 0 ? 600 : 400, marginBottom: "2px" }}>{l}</p>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginBottom: "20px" }}>
+            <SummaryRow label="Hartanah" value={form.propertyAddress.split(",")[0]} />
+            <SummaryRow label="Sewa Bulanan" value={`RM ${rent.toLocaleString()}`} />
+            <SummaryRow label="Tempoh" value={`${duration} bulan`} />
+            <SummaryRow label="Mula → Tamat" value={`${form.startDate} → ${endDate}`} />
+            <SummaryRow label="Deposit Keselamatan" value={`RM ${secDeposit.toLocaleString()}`} />
+            <SummaryRow label="Duti Setem" value={`RM ${stampDuty.toFixed(2)}`} highlight />
+          </div>
+
+          {flags.length > 0 && (
+            <div style={{
+              padding: "16px", borderRadius: "12px",
+              background: "oklch(0.93 0.06 72 / 0.3)",
+              border: "1px solid oklch(0.85 0.08 72)",
+              marginBottom: "8px",
+            }}>
+              <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: "oklch(0.38 0.10 65)", marginBottom: "8px" }}>⚠️ Bendera AI untuk Peguam</p>
+              {flags.map((f, i) => (
+                <p key={i} style={{ fontSize: "0.8125rem", color: "oklch(0.45 0.10 65)", marginBottom: "4px" }}>• {f}</p>
+              ))}
+            </div>
+          )}
+        </StepCard>
+      </div>
+
+      {/* Navigation */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "24px", paddingTop: "24px", borderTop: "1px solid oklch(0.87 0.016 55)" }}>
+        <button style={btnGhost}
+          onClick={() => step > 1 ? setStep(step - 1) : router.back()}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.14 40)"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.87 0.016 55)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.025 50)"; }}>
+          {step === 1 ? "Batal" : "← Kembali"}
+        </button>
+
         {step < 5 ? (
-          <Button onClick={() => setStep(step + 1)}>Next →</Button>
+          <button style={btnPrimary}
+            onClick={() => setStep(step + 1)}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "oklch(0.38 0.08 45)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.transform = ""; }}>
+            Seterusnya →
+          </button>
         ) : (
-          <Button onClick={handleSubmit} disabled={saving} className="bg-green-600 hover:bg-green-700">
-            {saving ? "Saving..." : "Generate & Send to Lawyer →"}
-          </Button>
+          <button style={{ ...btnPrimary, background: saving ? "oklch(0.42 0.09 145)" : "oklch(0.42 0.09 145)" }}
+            disabled={saving}
+            onClick={handleSubmit}
+            onMouseEnter={e => { if (!saving) (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = ""}>
+            {saving ? "Menyimpan..." : "Jana & Hantar ke Peguam →"}
+          </button>
         )}
       </div>
     </div>
