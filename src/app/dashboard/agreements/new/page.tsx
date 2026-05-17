@@ -310,8 +310,11 @@ export default function NewAgreementPage() {
         <ProgressBar step={step} />
       </div>
 
-      {/* Steps — two column layout */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "24px", alignItems: "start" }}>
+      {/* Two column layout */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "24px", alignItems: "start" }}>
+
+      {/* Left — form + nav */}
+      <div>
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 
         {/* Step 1 — Parties */}
@@ -547,8 +550,10 @@ export default function NewAgreementPage() {
         </StepCard>
       </div>
 
-      {/* Navigation */}
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "24px", paddingTop: "24px", borderTop: "1px solid oklch(0.87 0.016 55)" }}>
+      </div>
+
+      {/* Navigation buttons — inside left column, below form */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px", paddingTop: "20px", borderTop: "1px solid oklch(0.87 0.016 55)" }}>
         <button style={btnGhost}
           onClick={() => step > 1 ? goToStep(step - 1) : router.back()}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.14 40)"; }}
