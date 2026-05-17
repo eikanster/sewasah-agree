@@ -5,14 +5,15 @@ import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useAppUser } from "@/hooks/use-app-user";
 
-const statusMap: Record<string, { label: string; bg: string; color: string }> = {
-  draft:             { label: "Draft",          bg: "oklch(0.90 0.014 56)",   color: "oklch(0.38 0.025 50)" },
-  pending_review:    { label: "Pending Review", bg: "oklch(0.93 0.07 72)",    color: "oklch(0.38 0.12 65)" },
-  changes_requested: { label: "Changes Needed", bg: "oklch(0.93 0.06 27)",    color: "oklch(0.38 0.12 27)" },
-  approved:          { label: "Approved",        bg: "oklch(0.90 0.07 145)",   color: "oklch(0.32 0.10 145)" },
-  pending_stamp:     { label: "Awaiting Stamp", bg: "oklch(0.91 0.05 290)",   color: "oklch(0.38 0.10 290)" },
-  stamped:           { label: "Stamped",         bg: "oklch(0.90 0.07 145)",   color: "oklch(0.32 0.10 145)" },
-  completed:         { label: "Completed",       bg: "oklch(0.38 0.09 145)",   color: "oklch(0.97 0.008 58)" },
+// ── Status config ──────────────────────────────────────────────────────────
+const STATUS: Record<string, { label: string; bg: string; fg: string; pulse: boolean }> = {
+  draft:             { label: "Draf",           bg: "var(--status-draft-bg)",    fg: "var(--status-draft-fg)",    pulse: false },
+  pending_review:    { label: "Menunggu Semak", bg: "var(--status-pending-bg)",  fg: "var(--status-pending-fg)",  pulse: true  },
+  changes_requested: { label: "Perlu Pindaan",  bg: "oklch(0.93 0.06 27)",       fg: "oklch(0.38 0.12 27)",       pulse: false },
+  approved:          { label: "Diluluskan",     bg: "var(--status-approved-bg)", fg: "var(--status-approved-fg)", pulse: false },
+  pending_stamp:     { label: "Tunggu Setem",   bg: "var(--status-stamp-bg)",    fg: "var(--status-stamp-fg)",    pulse: true  },
+  stamped:           { label: "Disetem",        bg: "var(--status-approved-bg)", fg: "var(--status-approved-fg)", pulse: false },
+  completed:         { label: "Selesai",        bg: "var(--status-done-bg)",     fg: "var(--status-done-fg)",     pulse: false },
 };
 
 function greeting() {
@@ -22,6 +23,54 @@ function greeting() {
   return "Selamat malam";
 }
 
+function today() {
+  return new Date().toLocaleDateString("ms-MY", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+}
+
+// ── Stat card ──────────────────────────────────────────────────────────────
+function StatCard({
+  value, label, sub, terracotta, delay,
+}: { value: number; label: string; sub: string; terracotta?: boolean; delay: number }) {
+  const bg   = terracotta && value > 0 ? "oklch(0.55 0.14 40)" : "oklch(0.975 0.010 58)";
+  const num  = terracotta && value > 0 ? "oklch(0.99 0.005 58)" : "oklch(0.13 0.025 45)";
+  const lbl  = terracotta && value > 0 ? "oklch(0.88 0.05 40)"  : "oklch(0.28 0.040 45)";
+  const hint = terracotta && value > 0 ? "oklch(0.78 0.08 40)"  : "oklch(0.55 0.025 50)";
+  const bdr  = terracotta && value > 0 ? "transparent"           : "oklch(0.875 0.016 55)";
+  const shd  = terracotta && value > 0
+    ? "0 8px 24px oklch(0.55 0.14 40 / 0.28), 0 2px 6px oklch(0.55 0.14 40 / 0.18)"
+    : "0 1px 3px oklch(0.14 0.038 43 / 0.06)";
+
+  return (
+    <div className="card-lift count-in" style={{
+      background: bg,
+      border: `1.5px solid ${bdr}`,
+      borderRadius: "18px",
+      padding: "24px",
+      boxShadow: shd,
+      animationDelay: `${delay}ms`,
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      {/* Subtle inner ring for depth */}
+      {!(terracotta && value > 0) && (
+        <div style={{
+          position: "absolute", inset: 0, borderRadius: "18px",
+          boxShadow: "inset 0 1px 0 oklch(0.99 0.005 58 / 0.8)",
+          pointerEvents: "none",
+        }} />
+      )}
+      <p className="count-in" style={{
+        fontSize: "2.75rem", fontWeight: 800,
+        letterSpacing: "-0.04em", lineHeight: 1,
+        color: num, animationDelay: `${delay + 60}ms`,
+      }}>{value}</p>
+      <p style={{ fontSize: "0.875rem", fontWeight: 600, marginTop: "10px", color: lbl }}>{label}</p>
+      <p style={{ fontSize: "0.75rem", marginTop: "3px", color: hint }}>{sub}</p>
+    </div>
+  );
+}
+
+// ── Main ───────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const { appUser } = useAppUser();
 
@@ -29,244 +78,191 @@ export default function DashboardPage() {
     api.agreements.listByFirm,
     appUser?.firmId ? { firmId: appUser.firmId } : "skip"
   );
-
   const counts = useQuery(
     api.agreements.getDashboardCounts,
     appUser?.firmId ? { firmId: appUser.firmId } : "skip"
   );
 
-  return (
-    <div className="space-y-10">
+  const firstName = appUser?.name?.split(" ")[0] ?? "";
 
-      {/* Header */}
-      <div className="flex items-end justify-between">
+  return (
+    <div className="page-enter" style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+
+      {/* ── Header ── */}
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
         <div>
-          <p className="text-xs font-medium uppercase tracking-widest mb-2" style={{ color: "oklch(0.55 0.14 40)" }}>
-            {new Date().toLocaleDateString("en-MY", { weekday: "long", day: "numeric", month: "long" })}
-          </p>
+          <p style={{
+            fontSize: "0.6875rem", fontWeight: 600, letterSpacing: "0.08em",
+            textTransform: "uppercase", color: "oklch(0.55 0.14 40)",
+            marginBottom: "6px",
+          }}>{today()}</p>
           <h1 style={{
-            fontSize: "2.25rem",
-            fontWeight: 800,
-            letterSpacing: "-0.03em",
-            lineHeight: 1.1,
-            color: "oklch(0.13 0.025 45)"
+            fontSize: "2.5rem", fontWeight: 800,
+            letterSpacing: "-0.035em", lineHeight: 1.05,
+            color: "oklch(0.13 0.025 45)", margin: 0,
           }}>
-            {greeting()},<br />
-            <span style={{ color: "oklch(0.55 0.14 40)" }}>
-              {appUser?.name?.split(" ")[0] ?? "selamat datang"}.
-            </span>
+            {greeting()}{firstName ? "," : "."}<br />
+            {firstName && (
+              <span style={{ color: "oklch(0.55 0.14 40)" }}>{firstName}.</span>
+            )}
           </h1>
         </div>
+
         <Link href="/dashboard/agreements/new">
-          <button style={{
-            background: "oklch(0.55 0.14 40)",
-            color: "oklch(0.99 0.005 58)",
-            border: "none",
-            borderRadius: "14px",
-            padding: "12px 24px",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "background 150ms ease-out, transform 150ms ease-out",
-            letterSpacing: "-0.01em",
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.background = "oklch(0.38 0.08 45)";
-            (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.background = "oklch(0.55 0.14 40)";
-            (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-          }}>
-            + Perjanjian Baru
-          </button>
+          <button className="btn-brand">+ Perjanjian Baru</button>
         </Link>
       </div>
 
-      {/* Stats — four columns, varied visual weight */}
-      <div className="grid grid-cols-4 gap-4">
-        {[
-          { label: "Pending Review", value: counts?.pendingReview ?? 0, sub: "Tunggu peguam", accent: true },
-          { label: "Awaiting Stamp", value: counts?.pendingStamp ?? 0, sub: "Sedia hantar", accent: false },
-          { label: "Completed", value: counts?.completed ?? 0, sub: "Bulan ini", accent: false },
-          { label: "Total", value: counts?.totalThisMonth ?? 0, sub: "Perjanjian bulan ini", accent: false },
-        ].map((s, i) => (
-          <div key={i} style={{
-            background: s.accent && (counts?.pendingReview ?? 0) > 0
-              ? "oklch(0.55 0.14 40)"
-              : "oklch(0.97 0.012 58)",
-            border: `1px solid ${s.accent && (counts?.pendingReview ?? 0) > 0 ? "transparent" : "oklch(0.87 0.016 55)"}`,
-            borderRadius: "18px",
-            padding: "24px",
-            transition: "box-shadow 150ms ease-out",
-          }}
-          onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 4px 16px oklch(0.16 0.04 45 / 0.10)")}
-          onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}>
-            <p style={{
-              fontSize: "2.5rem",
-              fontWeight: 800,
-              letterSpacing: "-0.04em",
-              lineHeight: 1,
-              color: s.accent && (counts?.pendingReview ?? 0) > 0
-                ? "oklch(0.99 0.005 58)"
-                : "oklch(0.13 0.025 45)",
-            }}>{s.value}</p>
-            <p style={{
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              marginTop: "8px",
-              color: s.accent && (counts?.pendingReview ?? 0) > 0
-                ? "oklch(0.90 0.04 40)"
-                : "oklch(0.28 0.04 45)",
-            }}>{s.label}</p>
-            <p style={{
-              fontSize: "0.75rem",
-              marginTop: "2px",
-              color: s.accent && (counts?.pendingReview ?? 0) > 0
-                ? "oklch(0.80 0.06 40)"
-                : "oklch(0.55 0.025 50)",
-            }}>{s.sub}</p>
-          </div>
-        ))}
+      {/* ── Stats ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px" }}>
+        <StatCard value={counts?.pendingReview  ?? 0} label="Menunggu Semak" sub="Perlu tindakan peguam"  terracotta delay={0}   />
+        <StatCard value={counts?.pendingStamp   ?? 0} label="Tunggu Setem"   sub="Sedia untuk eDutiSetem" delay={60}  />
+        <StatCard value={counts?.completed      ?? 0} label="Selesai"        sub="Bulan ini"              delay={120} />
+        <StatCard value={counts?.totalThisMonth ?? 0} label="Jumlah"         sub="Perjanjian bulan ini"   delay={180} />
       </div>
 
-      {/* Agreements table */}
+      {/* ── Table ── */}
       <div style={{
-        background: "oklch(0.99 0.005 58)",
-        border: "1px solid oklch(0.87 0.016 55)",
+        background: "oklch(0.975 0.010 58)",
+        border: "1.5px solid oklch(0.875 0.016 55)",
         borderRadius: "20px",
         overflow: "hidden",
+        boxShadow: "0 1px 3px oklch(0.14 0.038 43 / 0.06), inset 0 1px 0 oklch(0.99 0.005 58 / 0.7)",
       }}>
-        {/* Table header */}
+
+        {/* Table topbar */}
         <div style={{
-          padding: "18px 28px",
-          borderBottom: "1px solid oklch(0.90 0.014 56)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          padding: "16px 28px",
+          borderBottom: "1px solid oklch(0.895 0.014 56)",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          background: "oklch(0.965 0.012 58)",
         }}>
-          <p style={{ fontWeight: 700, fontSize: "0.9375rem", color: "oklch(0.13 0.025 45)" }}>
-            Senarai Perjanjian
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <p style={{ fontWeight: 700, fontSize: "0.9375rem", color: "oklch(0.13 0.025 45)", margin: 0 }}>
+              Senarai Perjanjian
+            </p>
+            {(agreements?.length ?? 0) > 0 && (
+              <span style={{
+                fontSize: "0.6875rem", fontWeight: 600,
+                background: "oklch(0.905 0.014 56)",
+                color: "oklch(0.48 0.025 50)",
+                padding: "2px 8px", borderRadius: "999px",
+              }}>{agreements?.length} rekod</span>
+            )}
+          </div>
+          <p style={{ fontSize: "0.8125rem", color: "oklch(0.60 0.020 50)", margin: 0 }}>
+            {new Date().toLocaleDateString("ms-MY", { month: "long", year: "numeric" })}
           </p>
-          <span style={{
-            fontSize: "0.75rem",
-            fontWeight: 500,
-            color: "oklch(0.55 0.025 50)",
-            background: "oklch(0.90 0.014 56)",
-            padding: "3px 10px",
-            borderRadius: "999px",
-          }}>
-            {agreements?.length ?? 0} rekod
-          </span>
         </div>
 
-        {!agreements || agreements.length === 0 ? (
-          <div style={{ padding: "64px 28px", textAlign: "center" }}>
+        {/* Empty state */}
+        {(!agreements || agreements.length === 0) && (
+          <div style={{ padding: "72px 40px", textAlign: "center" }}>
             <div style={{
-              width: "56px", height: "56px",
-              background: "oklch(0.93 0.02 58)",
-              borderRadius: "16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 16px",
-              fontSize: "1.5rem",
+              width: "56px", height: "56px", margin: "0 auto 20px",
+              background: "oklch(0.910 0.014 56)", borderRadius: "16px",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "1.625rem",
             }}>📄</div>
-            <p style={{ fontWeight: 600, color: "oklch(0.28 0.04 45)", fontSize: "0.9375rem" }}>
+            <p style={{ fontWeight: 700, fontSize: "1rem", color: "oklch(0.22 0.035 45)", marginBottom: "6px" }}>
               Tiada perjanjian lagi
             </p>
-            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px", marginBottom: "20px" }}>
-              Cipta perjanjian pertama untuk bermula.
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginBottom: "24px", maxWidth: "280px", margin: "0 auto 24px" }}>
+              Cipta perjanjian pertama untuk memulakan.
             </p>
             <Link href="/dashboard/agreements/new">
-              <button style={{
-                background: "oklch(0.55 0.14 40)",
-                color: "oklch(0.99 0.005 58)",
-                border: "none",
-                borderRadius: "12px",
-                padding: "10px 20px",
-                fontSize: "0.875rem",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}>
+              <button className="btn-brand" style={{ fontSize: "0.875rem", padding: "10px 20px" }}>
                 + Perjanjian Baru
               </button>
             </Link>
           </div>
-        ) : (
+        )}
+
+        {/* Rows */}
+        {agreements && agreements.length > 0 && (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ borderBottom: "1px solid oklch(0.90 0.014 56)" }}>
-                {["Tuan Rumah", "Penyewa", "Hartanah", "Sewa", "Status", "Tarikh", ""].map((h) => (
-                  <th key={h} style={{
-                    padding: "10px 28px",
+              <tr style={{ background: "oklch(0.955 0.013 57)" }}>
+                {[
+                  { label: "Tuan Rumah", w: "18%" },
+                  { label: "Penyewa",    w: "18%" },
+                  { label: "Hartanah",   w: "22%" },
+                  { label: "Sewa",       w: "12%" },
+                  { label: "Status",     w: "18%" },
+                  { label: "Tarikh",     w: "10%" },
+                  { label: "",           w: "2%"  },
+                ].map(({ label, w }) => (
+                  <th key={label} style={{
+                    padding: "10px 20px",
                     textAlign: "left",
                     fontSize: "0.6875rem",
                     fontWeight: 600,
                     letterSpacing: "0.07em",
                     textTransform: "uppercase",
-                    color: "oklch(0.60 0.025 50)",
-                    background: "oklch(0.97 0.012 58)",
-                  }}>{h}</th>
+                    color: "oklch(0.58 0.022 50)",
+                    borderBottom: "1px solid oklch(0.880 0.015 55)",
+                    width: w,
+                  }}>{label}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {agreements.map((a, idx) => {
-                const s = statusMap[a.status] ?? statusMap.draft;
+                const s = STATUS[a.status] ?? STATUS.draft;
+                const even = idx % 2 === 0;
                 return (
                   <tr key={a._id}
                     style={{
-                      borderBottom: idx < agreements.length - 1 ? "1px solid oklch(0.92 0.012 56)" : "none",
+                      background: even ? "oklch(0.985 0.007 58)" : "oklch(0.975 0.010 58)",
+                      borderBottom: idx < agreements.length - 1
+                        ? "1px solid oklch(0.918 0.012 57)" : "none",
                       transition: "background 100ms ease-out",
                       cursor: "default",
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.95 0.016 58)")}
-                    onMouseLeave={e => (e.currentTarget.style.background = "")}>
-                    <td style={{ padding: "16px 28px", fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.13 0.025 45)" }}>
+                    onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.950 0.018 58)")}
+                    onMouseLeave={e => (e.currentTarget.style.background = even ? "oklch(0.985 0.007 58)" : "oklch(0.975 0.010 58)")}>
+
+                    <td style={{ padding: "15px 20px", fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.13 0.025 45)" }}>
                       {a.landlordName}
                     </td>
-                    <td style={{ padding: "16px 28px", fontSize: "0.875rem", color: "oklch(0.48 0.025 50)" }}>
+                    <td style={{ padding: "15px 20px", fontSize: "0.875rem", color: "oklch(0.45 0.025 50)" }}>
                       {a.tenantName}
                     </td>
-                    <td style={{ padding: "16px 28px", fontSize: "0.875rem", color: "oklch(0.48 0.025 50)", maxWidth: "180px" }}>
+                    <td style={{ padding: "15px 20px", fontSize: "0.875rem", color: "oklch(0.45 0.025 50)", maxWidth: "200px" }}>
                       <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {a.propertyAddress.split(",")[0]}
                       </span>
                     </td>
-                    <td style={{ padding: "16px 28px", fontSize: "0.875rem", fontWeight: 600, color: "oklch(0.28 0.04 45)" }}>
+                    <td style={{ padding: "15px 20px", fontSize: "0.875rem", fontWeight: 700, color: "oklch(0.28 0.040 45)", letterSpacing: "-0.01em" }}>
                       RM {a.monthlyRent.toLocaleString()}
                     </td>
-                    <td style={{ padding: "16px 28px" }}>
-                      <span style={{
+                    <td style={{ padding: "15px 20px" }}>
+                      <span className={s.pulse ? "pulse-dot" : ""} style={{
                         background: s.bg,
-                        color: s.color,
-                        padding: "3px 10px",
+                        color: s.fg,
+                        padding: "4px 10px",
                         borderRadius: "999px",
                         fontSize: "0.75rem",
                         fontWeight: 600,
                         whiteSpace: "nowrap",
-                      }}>
-                        {s.label}
-                      </span>
+                        display: "inline-flex",
+                        alignItems: "center",
+                      }}>{s.label}</span>
                     </td>
-                    <td style={{ padding: "16px 28px", fontSize: "0.8125rem", color: "oklch(0.60 0.020 50)" }}>
-                      {new Date(a.createdAt).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}
+                    <td style={{ padding: "15px 20px", fontSize: "0.8125rem", color: "oklch(0.60 0.020 50)", whiteSpace: "nowrap" }}>
+                      {new Date(a.createdAt).toLocaleDateString("ms-MY", { day: "numeric", month: "short" })}
                     </td>
-                    <td style={{ padding: "16px 28px" }}>
+                    <td style={{ padding: "15px 20px" }}>
                       <Link href={`/dashboard/agreements/${a._id}`}>
                         <button style={{
+                          background: "none", border: "none",
                           color: "oklch(0.55 0.14 40)",
-                          background: "none",
-                          border: "none",
-                          fontSize: "0.8125rem",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                          padding: "4px 8px",
+                          fontSize: "0.8125rem", fontWeight: 600,
+                          cursor: "pointer", padding: "5px 10px",
                           borderRadius: "8px",
-                          transition: "background 100ms ease-out",
+                          transition: "background 120ms ease-out",
                         }}
-                        onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.93 0.05 40 / 0.2)")}
+                        onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.55 0.14 40 / 0.10)")}
                         onMouseLeave={e => (e.currentTarget.style.background = "none")}>
                           Buka →
                         </button>
