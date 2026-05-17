@@ -34,13 +34,17 @@ export default function LawyerPage() {
   const handlePreview = async (agreement: typeof pending extends (infer T)[] | null | undefined ? T : never) => {
     if (!agreement) return;
     const data: AgreementData = {
+      agreementRef: agreement.agreementRef,
       agreementDate: new Date(agreement.createdAt).toISOString().split("T")[0],
       landlordName: agreement.landlordName, landlordIc: agreement.landlordIc,
       landlordPhone: agreement.landlordPhone, landlordEmail: agreement.landlordEmail,
+      landlordAddress: agreement.landlordAddress ?? "",
       tenantName: agreement.tenantName, tenantIc: agreement.tenantIc,
       tenantPhone: agreement.tenantPhone, tenantEmail: agreement.tenantEmail,
+      tenantAddress: agreement.tenantAddress ?? "",
       tenantIsForeigner: agreement.tenantIsForeigner,
       propertyAddress: agreement.propertyAddress, propertyType: agreement.propertyType,
+      useOfPremises: (agreement.useOfPremises ?? "residential") as "residential" | "commercial",
       isFurnished: agreement.isFurnished, monthlyRent: agreement.monthlyRent,
       tenancyDuration: agreement.tenancyDuration, startDate: agreement.startDate,
       endDate: agreement.endDate, paymentDueDay: agreement.paymentDueDay,

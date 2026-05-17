@@ -68,10 +68,12 @@ export const create = mutation({
     landlordIc: v.string(),
     landlordPhone: v.string(),
     landlordEmail: v.optional(v.string()),
+    landlordAddress: v.string(),
     tenantName: v.string(),
     tenantIc: v.string(),
     tenantPhone: v.string(),
     tenantEmail: v.optional(v.string()),
+    tenantAddress: v.string(),
     tenantIsForeigner: v.boolean(),
     propertyAddress: v.string(),
     propertyType: v.union(
@@ -80,6 +82,7 @@ export const create = mutation({
       v.literal("room"),
       v.literal("commercial")
     ),
+    useOfPremises: v.union(v.literal("residential"), v.literal("commercial")),
     isFurnished: v.union(
       v.literal("furnished"),
       v.literal("partially"),
@@ -104,8 +107,15 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
+    const existing = await ctx.db
+      .query("agreements")
+      .withIndex("by_firm", (q) => q.eq("firmId", args.firmId))
+      .collect();
+    const year = new Date().getFullYear();
+    const agreementRef = `SA-${year}-${String(existing.length + 1).padStart(4, "0")}`;
     return await ctx.db.insert("agreements", {
       ...args,
+      agreementRef,
       status: "draft",
       renewalReminderSent: false,
       createdAt: now,

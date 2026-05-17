@@ -221,9 +221,12 @@ export default function NewAgreementPage() {
 
   const [form, setForm] = useState({
     landlordName: "", landlordIc: "", landlordPhone: "", landlordEmail: "",
+    landlordAddress: "",
     tenantName: "", tenantIc: "", tenantPhone: "", tenantEmail: "",
+    tenantAddress: "",
     tenantIsForeigner: false,
-    propertyAddress: "", propertyType: "apartment", isFurnished: "unfurnished",
+    propertyAddress: "", propertyType: "apartment",
+    useOfPremises: "residential", isFurnished: "unfurnished",
     monthlyRent: "", tenancyDuration: "12", startDate: "", paymentDueDay: "6",
     utilitiesDeposit: "300",
     petsAllowed: false, sublettingAllowed: false, renovationAllowed: false,
@@ -248,11 +251,14 @@ export default function NewAgreementPage() {
         firmId: appUser.firmId, createdBy: appUser._id,
         landlordName: form.landlordName, landlordIc: form.landlordIc,
         landlordPhone: form.landlordPhone, landlordEmail: form.landlordEmail || undefined,
+        landlordAddress: form.landlordAddress,
         tenantName: form.tenantName, tenantIc: form.tenantIc,
         tenantPhone: form.tenantPhone, tenantEmail: form.tenantEmail || undefined,
+        tenantAddress: form.tenantAddress,
         tenantIsForeigner: form.tenantIsForeigner as boolean,
         propertyAddress: form.propertyAddress,
         propertyType: form.propertyType as "apartment" | "landed" | "room" | "commercial",
+        useOfPremises: form.useOfPremises as "residential" | "commercial",
         isFurnished: form.isFurnished as "furnished" | "partially" | "unfurnished",
         monthlyRent: rent, tenancyDuration: duration,
         startDate: form.startDate, endDate,
@@ -343,6 +349,9 @@ export default function NewAgreementPage() {
               <Field label="E-mel (pilihan)">
                 <Input value={form.landlordEmail} onChange={e => set("landlordEmail", e.target.value)} placeholder="ahmad@email.com" />
               </Field>
+              <Field label="Alamat (seperti dalam IC) *">
+                <Input value={form.landlordAddress} onChange={e => set("landlordAddress", e.target.value)} placeholder="cth. No. 12, Jalan Maju, 50000 Kuala Lumpur" />
+              </Field>
             </div>
           </div>
 
@@ -364,6 +373,9 @@ export default function NewAgreementPage() {
               </div>
               <Field label="E-mel (pilihan)">
                 <Input value={form.tenantEmail} onChange={e => set("tenantEmail", e.target.value)} placeholder="siti@email.com" />
+              </Field>
+              <Field label="Alamat (seperti dalam IC) *">
+                <Input value={form.tenantAddress} onChange={e => set("tenantAddress", e.target.value)} placeholder="cth. No. 57, Jalan Damai, 40150 Shah Alam" />
               </Field>
               <Toggle label="Penyewa adalah warga asing dengan permit kerja (aktifkan Klausa Ekspatriat)" checked={form.tenantIsForeigner as boolean} onChange={v => set("tenantIsForeigner", v)} />
             </div>
@@ -387,6 +399,12 @@ export default function NewAgreementPage() {
                   <option value="landed">Rumah Teres / Banglo</option>
                   <option value="room">Bilik</option>
                   <option value="commercial">Komersial</option>
+                </Select>
+              </Field>
+              <Field label="Kegunaan Premis (Section J)">
+                <Select value={form.useOfPremises} onChange={e => set("useOfPremises", e.target.value)}>
+                  <option value="residential">Kediaman (Residential)</option>
+                  <option value="commercial">Komersial (Commercial)</option>
                 </Select>
               </Field>
               <Field label="Kelengkapan">
@@ -471,11 +489,13 @@ export default function NewAgreementPage() {
         {/* Step 4 — Conditions */}
         <StepCard visible={step === 4}>
           <div style={{ marginBottom: "24px" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Syarat Khas & Bank</h2>
-            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Syarat tambahan dan maklumat pembayaran</p>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Klausa Tambahan & Bank</h2>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Klausa pilihan akan disertakan dalam Jadual Tambahan perjanjian</p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.025 50)", marginBottom: "4px" }}>Syarat Khas</p>
+            <div style={{ padding: "10px 14px", borderRadius: "10px", background: "oklch(0.93 0.012 58)", border: "1px solid oklch(0.87 0.016 55)", fontSize: "0.8125rem", color: "oklch(0.45 0.025 50)", marginBottom: "4px" }}>
+              Klausa yang diaktifkan akan dimasukkan ke dalam <strong>Jadual Tambahan</strong> perjanjian secara automatik.
+            </div>
             <Toggle label="Haiwan peliharaan dibenarkan" checked={form.petsAllowed as boolean} onChange={v => set("petsAllowed", v)} />
             <Toggle label="Penyewaan semula dibenarkan (dengan kebenaran bertulis)" checked={form.sublettingAllowed as boolean} onChange={v => set("sublettingAllowed", v)} />
             <Toggle label="Pengubahsuaian dibenarkan (dengan kebenaran bertulis)" checked={form.renovationAllowed as boolean} onChange={v => set("renovationAllowed", v)} />
