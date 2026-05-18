@@ -64,6 +64,15 @@ export const create = mutation({
   args: {
     firmId: v.id("firms"),
     createdBy: v.id("users"),
+    agreementType: v.union(
+      v.literal("residential"),
+      v.literal("room"),
+      v.literal("short_term"),
+      v.literal("commercial")
+    ),
+    roomIdentifier: v.optional(v.string()),
+    utilitiesHandling: v.optional(v.string()),
+    utilitiesIncluded: v.optional(v.boolean()),
     landlordName: v.string(),
     landlordIc: v.string(),
     landlordPhone: v.string(),

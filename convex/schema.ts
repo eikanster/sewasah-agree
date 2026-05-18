@@ -48,6 +48,21 @@ export default defineSchema({
     // Agreement reference
     agreementRef: v.string(), // e.g. SA-2026-0001
 
+    // Agreement type
+    agreementType: v.union(
+      v.literal("residential"),
+      v.literal("room"),
+      v.literal("short_term"),
+      v.literal("commercial")
+    ),
+
+    // Room rental extras
+    roomIdentifier: v.optional(v.string()),       // e.g. "Master Bedroom"
+    utilitiesHandling: v.optional(v.string()),    // "split" | "landlord" | "submeter"
+
+    // Short-term extras
+    utilitiesIncluded: v.optional(v.boolean()),   // rent includes utilities
+
     // Landlord details
     landlordName: v.string(),
     landlordIc: v.string(),

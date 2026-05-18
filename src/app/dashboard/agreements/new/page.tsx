@@ -206,10 +206,100 @@ function SummaryRow({ label, value, highlight }: { label: string; value: string;
 
 // ─── Main Page ────────────────────────────────────────────────────────────
 
+// ─── Template types ───────────────────────────────────────────────────────
+
+type AgreementType = "residential" | "room" | "short_term" | "commercial";
+
+const TEMPLATES: {
+  type: AgreementType; label: string; labelMs: string;
+  desc: string; icon: string; soon?: boolean;
+}[] = [
+  { type: "residential", label: "Standard Residential", labelMs: "Kediaman Standard",
+    desc: "Sewaan unit penuh — apartment, rumah teres, banglo.", icon: "🏠" },
+  { type: "room",        label: "Room Rental",          labelMs: "Bilik Sewa",
+    desc: "Sewaan satu bilik sahaja dalam unit yang dikongsi.", icon: "🚪" },
+  { type: "short_term",  label: "Short-Term",           labelMs: "Jangka Pendek",
+    desc: "Tempoh 1–6 bulan, termasuk opsi utilities & internet.", icon: "📅" },
+  { type: "commercial",  label: "Commercial / Shop",    labelMs: "Komersial / Kedai",
+    desc: "Lot kedai, pejabat, ruang perniagaan.", icon: "🏪", soon: true },
+];
+
+// ─── Template Selector ────────────────────────────────────────────────────
+
+function TemplateSelector({ onSelect }: { onSelect: (t: AgreementType) => void }) {
+  return (
+    <div style={{ maxWidth: "860px" }}>
+      <div style={{ marginBottom: "32px" }}>
+        <p style={{ fontSize: "0.6875rem", fontWeight: 600, letterSpacing: "0.08em",
+          textTransform: "uppercase", color: "oklch(0.55 0.14 40)", marginBottom: "6px" }}>
+          Langkah pertama
+        </p>
+        <h1 style={{ fontSize: "1.75rem", fontWeight: 800, letterSpacing: "-0.02em",
+          color: "oklch(0.09 0.006 264)", margin: 0 }}>
+          Pilih Jenis Perjanjian
+        </h1>
+        <p style={{ fontSize: "0.9375rem", color: "oklch(0.50 0.003 264)", marginTop: "6px" }}>
+          Setiap jenis mempunyai klausa dan format yang berbeza.
+        </p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+        {TEMPLATES.map(t => (
+          <button key={t.type} onClick={() => !t.soon && onSelect(t.type)}
+            disabled={t.soon}
+            style={{
+              background: t.soon ? "oklch(0.963 0.002 264)" : "oklch(0.998 0 0)",
+              border: `1.5px solid ${t.soon ? "oklch(0.876 0.003 264)" : "oklch(0.876 0.003 264)"}`,
+              borderRadius: "18px", padding: "28px",
+              textAlign: "left", cursor: t.soon ? "not-allowed" : "pointer",
+              opacity: t.soon ? 0.6 : 1,
+              transition: "border-color 150ms ease-out, box-shadow 150ms ease-out, transform 150ms ease-out",
+              boxShadow: "0 1px 3px oklch(0.12 0.006 264 / 0.05)",
+            }}
+            onMouseEnter={e => {
+              if (!t.soon) {
+                (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.55 0.14 40)";
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 16px oklch(0.55 0.14 40 / 0.12)";
+                (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+              }
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.876 0.003 264)";
+              (e.currentTarget as HTMLElement).style.boxShadow = "0 1px 3px oklch(0.12 0.006 264 / 0.05)";
+              (e.currentTarget as HTMLElement).style.transform = "";
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+              <span style={{ fontSize: "2rem", lineHeight: 1 }}>{t.icon}</span>
+              {t.soon && (
+                <span style={{
+                  fontSize: "0.625rem", fontWeight: 700, letterSpacing: "0.08em",
+                  textTransform: "uppercase", color: "oklch(0.54 0.003 264)",
+                  background: "oklch(0.938 0.002 264)", padding: "3px 8px", borderRadius: "999px",
+                }}>Akan Datang</span>
+              )}
+            </div>
+            <p style={{ fontSize: "1rem", fontWeight: 700, color: "oklch(0.09 0.006 264)", margin: "0 0 4px" }}>
+              {t.labelMs}
+            </p>
+            <p style={{ fontSize: "0.75rem", color: "oklch(0.44 0.003 264)", fontWeight: 400, margin: 0, lineHeight: 1.5 }}>
+              {t.label}
+            </p>
+            <p style={{ fontSize: "0.8125rem", color: "oklch(0.50 0.003 264)", margin: "10px 0 0", lineHeight: 1.5 }}>
+              {t.desc}
+            </p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function NewAgreementPage() {
   const router = useRouter();
   const { appUser } = useAppUser();
   const createAgreement = useMutation(api.agreements.create);
+  const [templateType, setTemplateType] = useState<AgreementType | "">("");
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
 
@@ -228,6 +318,11 @@ export default function NewAgreementPage() {
     propertyAddress: "", propertyType: "apartment",
     useOfPremises: "residential", isFurnished: "unfurnished",
     propertyLegalDesc: "",
+    // Room rental
+    roomIdentifier: "",
+    utilitiesHandling: "split",
+    // Short-term
+    utilitiesIncluded: false,
     monthlyRent: "", maintenanceFee: "", tenancyDuration: "12", startDate: "", paymentDueDay: "6",
     utilitiesDeposit: "300",
     petsAllowed: false, sublettingAllowed: false, renovationAllowed: false,
@@ -250,6 +345,10 @@ export default function NewAgreementPage() {
     try {
       await createAgreement({
         firmId: appUser.firmId, createdBy: appUser._id,
+        agreementType: (templateType || "residential") as "residential" | "room" | "short_term" | "commercial",
+        roomIdentifier: form.roomIdentifier || undefined,
+        utilitiesHandling: templateType === "room" ? form.utilitiesHandling : undefined,
+        utilitiesIncluded: templateType === "short_term" ? form.utilitiesIncluded as boolean : undefined,
         landlordName: form.landlordName, landlordIc: form.landlordIc,
         landlordPhone: form.landlordPhone, landlordEmail: form.landlordEmail || undefined,
         landlordAddress: form.landlordAddress,
@@ -294,13 +393,35 @@ export default function NewAgreementPage() {
     transition: "border-color 150ms ease-out, color 150ms ease-out",
   };
 
+  // Show template selector if no type chosen yet
+  if (!templateType) {
+    return (
+      <div>
+        <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "32px" }}>
+          <button onClick={() => router.back()} style={{
+            background: "none", border: "none", cursor: "pointer",
+            fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", padding: "6px 10px",
+            borderRadius: "8px", transition: "background 120ms ease-out",
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.938 0.002 264)")}
+          onMouseLeave={e => (e.currentTarget.style.background = "none")}>
+            ← Kembali
+          </button>
+        </div>
+        <TemplateSelector onSelect={t => { setTemplateType(t); setStep(1); }} />
+      </div>
+    );
+  }
+
+  const selectedTemplate = TEMPLATES.find(t => t.type === templateType)!;
+
   return (
     <div style={{ maxWidth: "860px" }}>
 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-          <button onClick={() => router.back()} style={{
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <button onClick={() => setTemplateType("")} style={{
             background: "none", border: "none", cursor: "pointer",
             fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", padding: "6px 10px",
             borderRadius: "8px", transition: "background 120ms ease-out",
@@ -312,6 +433,11 @@ export default function NewAgreementPage() {
           <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "oklch(0.09 0.006 264)", letterSpacing: "-0.02em", margin: 0 }}>
             Perjanjian Baru
           </h1>
+          <span style={{
+            fontSize: "0.6875rem", fontWeight: 600, color: "oklch(0.55 0.14 40)",
+            background: "oklch(0.55 0.14 40 / 0.08)", border: "1px solid oklch(0.55 0.14 40 / 0.2)",
+            padding: "3px 10px", borderRadius: "999px",
+          }}>{selectedTemplate.icon} {selectedTemplate.labelMs}</span>
         </div>
         <span style={{
           fontSize: "0.75rem", fontWeight: 600, color: "oklch(0.50 0.003 264)",
@@ -392,6 +518,11 @@ export default function NewAgreementPage() {
             <p style={{ fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", marginTop: "4px" }}>Alamat dan jenis hartanah</p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            {templateType === "room" && (
+              <Field label="Pengenalan Bilik *" hint="cth. Bilik Utama, Bilik 2, Bilik Belakang">
+                <Input value={form.roomIdentifier} onChange={e => set("roomIdentifier", e.target.value)} placeholder="cth. Bilik Utama (Master Bedroom)" />
+              </Field>
+            )}
             <Field label="Alamat Penuh Hartanah *">
               <Input value={form.propertyAddress} onChange={e => set("propertyAddress", e.target.value)} placeholder="cth. No. 64, Jalan Karyawan Bestari, Puncak Bestari, 42300 Bandar Puncak Alam, Selangor" />
             </Field>
@@ -421,6 +552,15 @@ export default function NewAgreementPage() {
                 </Select>
               </Field>
             </div>
+            {templateType === "room" && (
+              <Field label="Pengendalian Utiliti">
+                <Select value={form.utilitiesHandling} onChange={e => set("utilitiesHandling", e.target.value)}>
+                  <option value="split">Dikongsi sama rata antara semua penyewa</option>
+                  <option value="landlord">Tuan rumah tanggung (termasuk dalam sewa)</option>
+                  <option value="submeter">Sub-meter berasingan setiap bilik</option>
+                </Select>
+              </Field>
+            )}
             {form.isFurnished !== "unfurnished" && (
               <div style={{
                 padding: "12px 16px", borderRadius: "12px",
@@ -451,9 +591,20 @@ export default function NewAgreementPage() {
               </Field>
               <Field label="Tempoh Sewaan">
                 <Select value={form.tenancyDuration} onChange={e => set("tenancyDuration", e.target.value)}>
-                  <option value="12">1 Tahun (12 bulan)</option>
-                  <option value="24">2 Tahun (24 bulan)</option>
-                  <option value="36">3 Tahun (36 bulan)</option>
+                  {templateType === "short_term" ? (
+                    <>
+                      <option value="1">1 Bulan</option>
+                      <option value="2">2 Bulan</option>
+                      <option value="3">3 Bulan</option>
+                      <option value="6">6 Bulan</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="12">1 Tahun (12 bulan)</option>
+                      <option value="24">2 Tahun (24 bulan)</option>
+                      <option value="36">3 Tahun (36 bulan)</option>
+                    </>
+                  )}
                 </Select>
               </Field>
               <Field label="Tarikh Mula *">
@@ -505,6 +656,9 @@ export default function NewAgreementPage() {
             <div style={{ padding: "10px 14px", borderRadius: "10px", background: "oklch(0.938 0.002 264)", border: "1px solid oklch(0.876 0.003 264)", fontSize: "0.8125rem", color: "oklch(0.42 0.003 264)", marginBottom: "4px" }}>
               Klausa yang diaktifkan akan dimasukkan ke dalam <strong>Jadual Tambahan</strong> perjanjian secara automatik.
             </div>
+            {templateType === "short_term" && (
+              <Toggle label="Utiliti & internet termasuk dalam sewa bulanan" checked={form.utilitiesIncluded as boolean} onChange={v => set("utilitiesIncluded", v)} />
+            )}
             <Toggle label="Haiwan peliharaan dibenarkan" checked={form.petsAllowed as boolean} onChange={v => set("petsAllowed", v)} />
             <Toggle label="Penyewaan semula dibenarkan (dengan kebenaran bertulis)" checked={form.sublettingAllowed as boolean} onChange={v => set("sublettingAllowed", v)} />
             <Toggle label="Pengubahsuaian dibenarkan (dengan kebenaran bertulis)" checked={form.renovationAllowed as boolean} onChange={v => set("renovationAllowed", v)} />
