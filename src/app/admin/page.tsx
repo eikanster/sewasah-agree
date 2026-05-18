@@ -180,12 +180,16 @@ export default function AdminPage() {
                     </td>
 
                     <td style={{ padding: "14px 18px" }}>
-                      <span style={{
-                        fontSize: "0.8125rem", fontWeight: 600,
-                        color: "oklch(0.30 0.100 148)",
-                        background: "oklch(0.900 0.068 148)",
-                        padding: "3px 10px", borderRadius: "999px",
-                      }}>{firm.completedAgreements}</span>
+                      {firm.completedAgreements > 0 ? (
+                        <span style={{
+                          fontSize: "0.8125rem", fontWeight: 600,
+                          color: "oklch(0.30 0.100 148)",
+                          background: "oklch(0.900 0.068 148)",
+                          padding: "3px 10px", borderRadius: "999px",
+                        }}>{firm.completedAgreements}</span>
+                      ) : (
+                        <span style={{ fontSize: "0.8125rem", color: "oklch(0.70 0.003 264)" }}>—</span>
+                      )}
                     </td>
 
                     <td style={{ padding: "14px 18px" }}>
