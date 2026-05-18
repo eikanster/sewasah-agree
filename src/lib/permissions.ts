@@ -3,8 +3,12 @@
 export type AppRole = "super_admin" | "firm_owner" | "lawyer" | "admin" | "user";
 
 export const PERMISSIONS = {
-  // Nav items visible
-  canViewDashboard:    (r: AppRole) => r !== "user",
+  // Platform-level (super_admin only)
+  canViewPlatformAdmin: (r: AppRole) => r === "super_admin",
+  canViewAllFirms:      (r: AppRole) => r === "super_admin",
+
+  // Firm-level nav
+  canViewDashboard:    (r: AppRole) => !["user"].includes(r),
   canCreateAgreement:  (r: AppRole) => ["super_admin", "firm_owner", "admin"].includes(r),
   canReviewAgreements: (r: AppRole) => ["super_admin", "firm_owner", "lawyer"].includes(r),
   canViewSettings:     (r: AppRole) => ["super_admin", "firm_owner"].includes(r),

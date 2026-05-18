@@ -6,7 +6,9 @@ import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useAppUser } from "@/hooks/use-app-user";
 import { PERMISSIONS, AppRole } from "@/lib/permissions";
-import { Home, ClipboardCheck, Plus, FolderOpen, Settings } from "lucide-react";
+import { Home, ClipboardCheck, Plus, FolderOpen, Settings, LayoutGrid } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "@convex/_generated/api";
 
 type TopNavItem = { href: string; label: string; show: (r: AppRole) => boolean };
 type BotItem = {
@@ -55,6 +57,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   const role = (appUser?.role ?? "user") as AppRole;
+  const firm = useQuery(api.firms.getById, appUser?.firmId ? { id: appUser.firmId } : "skip");
 
   // "user" role — show waiting screen
   if (role === "user") {
@@ -154,7 +157,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
 
           {/* Right */}
-          <div style={{ display: "flex", alignItems: "center", gap: "14px", flexShrink: 0, marginLeft: "auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0, marginLeft: "auto" }}>
+            {/* Firm context pill */}
+            {firm && (
+              <span style={{
+                fontSize: "0.75rem", fontWeight: 500,
+                color: "oklch(0.60 0.003 264)",
+                background: "oklch(0.20 0.006 264)",
+                padding: "4px 12px", borderRadius: "999px",
+                whiteSpace: "nowrap", maxWidth: "180px",
+                overflow: "hidden", textOverflow: "ellipsis",
+              }}>{firm.name}</span>
+            )}
+            {/* Platform admin shortcut for super_admin */}
+            {role === "super_admin" && (
+              <Link href="/admin" style={{ textDecoration: "none" }}>
+                <div style={{
+                  display: "flex", alignItems: "center", gap: "5px",
+                  fontSize: "0.75rem", fontWeight: 600,
+                  color: "oklch(0.55 0.14 40)",
+                  background: "oklch(0.55 0.14 40 / 0.12)",
+                  border: "1px solid oklch(0.55 0.14 40 / 0.25)",
+                  padding: "4px 10px", borderRadius: "999px",
+                  cursor: "pointer", whiteSpace: "nowrap",
+                  transition: "background 150ms ease-out",
+                }}>
+                  <LayoutGrid size={11} />
+                  Platform
+                </div>
+              </Link>
+            )}
             <span className="flag-badge" style={{
               fontSize: "0.75rem", color: "oklch(0.48 0.003 264)",
               background: "oklch(0.18 0.006 264)",

@@ -25,6 +25,34 @@ export const list = query({
   },
 });
 
+// Get all firms with stats (super admin dashboard)
+export const listWithStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const firms = await ctx.db.query("firms").collect();
+    const results = await Promise.all(firms.map(async (firm) => {
+      const agreements = await ctx.db
+        .query("agreements")
+        .withIndex("by_firm", q => q.eq("firmId", firm._id))
+        .collect();
+      const users = await ctx.db
+        .query("users")
+        .filter(q => q.eq(q.field("firmId"), firm._id))
+        .collect();
+      const lastAgreement = agreements.sort((a, b) => b.createdAt - a.createdAt)[0];
+      return {
+        ...firm,
+        totalAgreements: agreements.length,
+        completedAgreements: agreements.filter(a => a.status === "completed").length,
+        pendingReview: agreements.filter(a => a.status === "pending_review").length,
+        totalUsers: users.length,
+        lastActivity: lastAgreement?.createdAt ?? firm.createdAt,
+      };
+    }));
+    return results.sort((a, b) => b.lastActivity - a.lastActivity);
+  },
+});
+
 // Update firm settings
 export const update = mutation({
   args: {
