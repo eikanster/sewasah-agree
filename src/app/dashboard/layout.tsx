@@ -48,6 +48,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (el) el.scrollTop = 0;
   }, [pathname]);
 
+  // All hooks must be called before any conditional returns
+  const role = (appUser?.role ?? "user") as AppRole;
+  const firm = useQuery(api.firms.getById, appUser?.firmId ? { id: appUser.firmId } : "skip");
+  const counts = useQuery(api.agreements.getDashboardCounts, appUser?.firmId ? { firmId: appUser.firmId } : "skip");
+  const pendingReview = counts?.pendingReview ?? 0;
+
   if (!isLoaded) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "oklch(0.998 0 0)" }}>
@@ -55,11 +61,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
     );
   }
-
-  const role = (appUser?.role ?? "user") as AppRole;
-  const firm = useQuery(api.firms.getById, appUser?.firmId ? { id: appUser.firmId } : "skip");
-  const counts = useQuery(api.agreements.getDashboardCounts, appUser?.firmId ? { firmId: appUser.firmId } : "skip");
-  const pendingReview = counts?.pendingReview ?? 0;
 
   // "user" role — show waiting screen
   if (role === "user") {
