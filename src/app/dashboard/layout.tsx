@@ -5,12 +5,13 @@ import { useRouter, usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useAppUser } from "@/hooks/use-app-user";
-import { Home, ClipboardCheck, Plus, FolderOpen } from "lucide-react";
+import { Home, ClipboardCheck, Plus, FolderOpen, Settings } from "lucide-react";
 
 const TOP_NAV = [
   { href: "/dashboard",                label: "Dashboard"       },
   { href: "/dashboard/agreements/new", label: "Perjanjian Baru" },
   { href: "/dashboard/lawyer",         label: "Semakan Peguam"  },
+  { href: "/dashboard/settings",       label: "Tetapan"         },
 ];
 
 type BotItem = {
@@ -46,6 +47,12 @@ const BOTTOM_NAV: BotItem[] = [
     label: "Fail",
     Icon: FolderOpen,
     check: (p) => p.startsWith("/dashboard/agreements/") && !p.includes("/new"),
+  },
+  {
+    href: "/dashboard/settings",
+    label: "Tetapan",
+    Icon: Settings,
+    check: (p) => p.startsWith("/dashboard/settings"),
   },
 ];
 

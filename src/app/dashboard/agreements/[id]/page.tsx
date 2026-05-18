@@ -7,6 +7,7 @@ import { Id } from "@convex/_generated/dataModel";
 import { AgreementData } from "@/lib/generate-pdf";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAppUser } from "@/hooks/use-app-user";
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   draft:             { label: "Draft",           color: "bg-gray-100 text-gray-600" },
@@ -23,9 +24,9 @@ const statusFlow = ["draft", "pending_review", "approved", "pending_stamp", "sta
 export default function AgreementDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const agreement = useQuery(api.agreements.getById, {
-    id: id as Id<"agreements">,
-  });
+  const { appUser } = useAppUser();
+  const agreement = useQuery(api.agreements.getById, { id: id as Id<"agreements"> });
+  const firm = useQuery(api.firms.getById, appUser?.firmId ? { id: appUser.firmId } : "skip");
   const updateStatus = useMutation(api.agreements.updateStatus);
 
   if (!agreement) {
@@ -89,7 +90,16 @@ export default function AgreementDetailPage() {
     const res = await fetch("/api/generate-pdf", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...data, agreementType: agreement.agreementType ?? "residential" }),
+      body: JSON.stringify({
+        ...data,
+        agreementType: agreement.agreementType ?? "residential",
+        firmName: firm?.name,
+        firmAddress: firm?.address,
+        firmPhone: firm?.phone,
+        firmEmail: firm?.email,
+        lawyerName: firm?.lawyerName,
+        lawyerBarNo: firm?.barNo,
+      }),
     });
     const html = await res.text();
     const blob = new Blob([html], { type: "text/html" });

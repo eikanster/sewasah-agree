@@ -17,6 +17,23 @@ export const list = query({
   },
 });
 
+// Update firm settings
+export const update = mutation({
+  args: {
+    id: v.id("firms"),
+    name: v.optional(v.string()),
+    address: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    email: v.optional(v.string()),
+    lawyerName: v.optional(v.string()),
+    barNo: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    await ctx.db.patch(id, updates);
+  },
+});
+
 // Create a new firm
 export const create = mutation({
   args: {

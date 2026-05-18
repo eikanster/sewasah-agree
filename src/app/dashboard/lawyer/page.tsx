@@ -6,11 +6,14 @@ import { Id } from "@convex/_generated/dataModel";
 import { useAppUser } from "@/hooks/use-app-user";
 import { AgreementData } from "@/lib/generate-pdf";
 import { useState } from "react";
+import { api as convexApi } from "@convex/_generated/api";
 
 export default function LawyerPage() {
   const { appUser } = useAppUser();
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<string | null>(null);
+
+  const firm = useQuery(convexApi.firms.getById, appUser?.firmId ? { id: appUser.firmId } : "skip");
 
   const pending = useQuery(
     api.agreements.listPendingReview,
@@ -57,7 +60,16 @@ export default function LawyerPage() {
       maintenanceFee: agreement.maintenanceFee,
       stampDuty: agreement.stampDuty,
     };
-    const res = await fetch("/api/generate-pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, agreementType: agreement.agreementType ?? "residential" }) });
+    const res = await fetch("/api/generate-pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+      ...data,
+      agreementType: agreement.agreementType ?? "residential",
+      firmName: firm?.name,
+      firmAddress: firm?.address,
+      firmPhone: firm?.phone,
+      firmEmail: firm?.email,
+      lawyerName: firm?.lawyerName,
+      lawyerBarNo: firm?.barNo,
+    }) });
     const html = await res.text();
     window.open(URL.createObjectURL(new Blob([html], { type: "text/html" })), "_blank");
   };

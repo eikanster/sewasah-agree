@@ -10,6 +10,8 @@ export default defineSchema({
     address: v.optional(v.string()),
     phone: v.optional(v.string()),
     email: v.optional(v.string()),
+    lawyerName: v.optional(v.string()),
+    barNo: v.optional(v.string()),
     isActive: v.boolean(),
     createdAt: v.number(),
   }),

@@ -56,8 +56,12 @@ export interface AgreementData {
   // Calculated
   stampDuty: number;
 
-  // Firm (optional — for header)
+  // Firm details for PDF header
   firmName?: string;
+  firmAddress?: string;
+  firmPhone?: string;
+  firmEmail?: string;
+  lawyerName?: string;
   lawyerBarNo?: string;
 }
 
@@ -196,6 +200,16 @@ export function buildAgreementHtml(data: AgreementData): string {
 </head>
 <body>
 
+${data.firmName ? `
+<div style="text-align:center;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid #000;">
+  <p style="font-size:14pt;font-weight:bold;margin:0 0 4px;">${data.firmName}</p>
+  ${data.firmAddress ? `<p style="font-size:10pt;margin:2px 0;">${data.firmAddress}</p>` : ""}
+  <p style="font-size:10pt;margin:2px 0;">
+    ${[data.firmPhone, data.firmEmail].filter(Boolean).join("  |  ")}
+  </p>
+  ${data.lawyerName ? `<p style="font-size:10pt;margin:6px 0 0;"><em>${data.lawyerName}${data.lawyerBarNo ? ` (No. Bar: ${data.lawyerBarNo})` : ""}</em></p>` : ""}
+</div>
+` : ""}
 <div class="draft-banner">⚠ DRAF — Menunggu semakan peguam dan pengesahan eDutiSetem</div>
 ${data.agreementRef ? `<div class="ref-line">Rujukan: ${data.agreementRef}</div>` : ""}
 
