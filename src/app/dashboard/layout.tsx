@@ -40,8 +40,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { needsSetup, isLoaded, appUser } = useAppUser();
 
   useEffect(() => {
-    if (isLoaded && needsSetup) router.push("/setup");
-  }, [isLoaded, needsSetup, router]);
+    if (!isLoaded) return;
+    if (needsSetup) { router.push("/setup"); return; }
+    // Role-based landing redirect (only from /dashboard root)
+    if (pathname === "/dashboard") {
+      if (appUser?.role === "super_admin") router.push("/admin");
+      else if (appUser?.role === "lawyer") router.push("/dashboard/lawyer");
+    }
+  }, [isLoaded, needsSetup, appUser?.role, pathname, router]);
 
   useEffect(() => {
     const el = document.getElementById("main-scroll");

@@ -17,6 +17,17 @@ export const getFirst = query({
   },
 });
 
+// Get firm by invite code (slug)
+export const getByInviteCode = query({
+  args: { code: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("firms")
+      .filter(q => q.eq(q.field("slug"), args.code.toLowerCase().trim()))
+      .first();
+  },
+});
+
 // Get all firms (super admin only)
 export const list = query({
   args: {},

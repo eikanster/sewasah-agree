@@ -267,6 +267,41 @@ export default function SettingsPage() {
         </div>
       )}
 
+      {/* Invite Code */}
+      <div style={{
+        background: "oklch(0.998 0 0)", border: "1px solid oklch(0.876 0.003 264)",
+        borderRadius: "18px", overflow: "hidden",
+        boxShadow: "0 1px 3px oklch(0.12 0.006 264 / 0.05)", marginBottom: "16px",
+      }}>
+        <div style={{ padding: "20px 24px", borderBottom: "1px solid oklch(0.895 0.002 264)", background: "oklch(0.963 0.002 264)" }}>
+          <p style={{ fontWeight: 700, fontSize: "0.875rem", color: "oklch(0.09 0.006 264)", margin: 0 }}>
+            Kod Jemputan Firma
+          </p>
+        </div>
+        <div style={{ padding: "20px 24px" }}>
+          <p style={{ fontSize: "0.8125rem", color: "oklch(0.56 0.003 264)", margin: "0 0 12px", lineHeight: 1.5 }}>
+            Kongsi kod ini kepada kakitangan atau peguam yang ingin menyertai firma anda.
+          </p>
+          <div style={{
+            display: "flex", alignItems: "center", gap: "12px",
+            background: "oklch(0.963 0.002 264)", border: "1px solid oklch(0.876 0.003 264)",
+            borderRadius: "10px", padding: "12px 16px",
+          }}>
+            <code style={{ flex: 1, fontSize: "0.9375rem", fontWeight: 600, color: "oklch(0.55 0.14 40)", fontFamily: "monospace", letterSpacing: "0.02em" }}>
+              {firm?.slug ?? "—"}
+            </code>
+            <button
+              onClick={() => { if (firm?.slug) navigator.clipboard.writeText(firm.slug); }}
+              style={{ background: "none", border: "1px solid oklch(0.876 0.003 264)", borderRadius: "8px", padding: "5px 12px", fontSize: "0.8125rem", cursor: "pointer", color: "oklch(0.44 0.003 264)", transition: "all 150ms ease-out" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.14 40)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.876 0.003 264)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.44 0.003 264)"; }}
+            >
+              Salin
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* PDF Preview Note */}
       <div style={{
         padding: "16px 20px", borderRadius: "12px",
