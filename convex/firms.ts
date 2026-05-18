@@ -70,6 +70,16 @@ export const update = mutation({
   },
 });
 
+// Toggle firm active/inactive (super_admin only — never hard delete)
+export const toggleActive = mutation({
+  args: { id: v.id("firms") },
+  handler: async (ctx, args) => {
+    const firm = await ctx.db.get(args.id);
+    if (!firm) throw new Error("Firm not found");
+    await ctx.db.patch(args.id, { isActive: !firm.isActive });
+  },
+});
+
 // Create a new firm
 export const create = mutation({
   args: {
