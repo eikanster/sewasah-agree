@@ -27,44 +27,44 @@
 }
 
 :root {
-  /* ── The Modern Kedai ───────────────────────────────────────────────── */
-  --background:        oklch(0.935 0.018 58);   /* warm sand page */
-  --foreground:        oklch(0.13  0.025 45);   /* kedai ink */
+  /* ── Clean Minimalist ───────────────────────────────────────────────── */
+  --background:        oklch(0.998 0 0);        /* pure white page */
+  --foreground:        oklch(0.09  0.006 264);  /* deep ink */
 
-  --card:              oklch(0.975 0.010 58);   /* kedai cream */
-  --card-foreground:   oklch(0.13  0.025 45);
+  --card:              oklch(0.963 0.002 264);  /* cool light grey */
+  --card-foreground:   oklch(0.09  0.006 264);
 
-  --popover:           oklch(0.990 0.005 58);
-  --popover-foreground:oklch(0.13  0.025 45);
+  --popover:           oklch(0.998 0 0);
+  --popover-foreground:oklch(0.09  0.006 264);
 
   --primary:           oklch(0.55  0.140 40);   /* terracotta */
-  --primary-foreground:oklch(0.990 0.005 58);
+  --primary-foreground:oklch(0.998 0 0);
 
   --secondary:         oklch(0.895 0.018 55);
-  --secondary-foreground:oklch(0.28 0.040 45);
+  --secondary-foreground:oklch(0.20 0.004 264);
 
-  --muted:             oklch(0.910 0.014 56);
-  --muted-foreground:  oklch(0.48  0.025 50);
+  --muted:             oklch(0.938 0.002 264);
+  --muted-foreground:  oklch(0.44  0.003 264);
 
   --accent:            oklch(0.895 0.018 55);
-  --accent-foreground: oklch(0.28  0.040 45);
+  --accent-foreground: oklch(0.20  0.004 264);
 
   --destructive:       oklch(0.48  0.180 27);
 
-  --border:            oklch(0.875 0.016 55);   /* kedai mist */
-  --input:             oklch(0.990 0.005 58);   /* warm white */
+  --border:            oklch(0.876 0.003 264);  /* cool mist */
+  --input:             oklch(0.998 0 0);        /* pure white */
   --ring:              oklch(0.55  0.140 40);
 
   --radius: 1rem;
 
   /* sidebar */
-  --sidebar:           oklch(0.145 0.038 43);
-  --sidebar-foreground:oklch(0.920 0.012 58);
-  --sidebar-border:    oklch(0.225 0.032 43);
+  --sidebar:           oklch(0.118 0.008 264);
+  --sidebar-foreground:oklch(0.930 0.002 264);
+  --sidebar-border:    oklch(0.22  0.006 264);
 
   /* semantic status */
-  --status-draft-bg:   oklch(0.910 0.014 56);
-  --status-draft-fg:   oklch(0.42  0.025 50);
+  --status-draft-bg:   oklch(0.938 0.002 264);
+  --status-draft-fg:   oklch(0.38  0.003 264);
   --status-pending-bg: oklch(0.930 0.065 72);
   --status-pending-fg: oklch(0.38  0.120 65);
   --status-approved-bg:oklch(0.900 0.068 148);
@@ -125,8 +125,8 @@
                 transform   180ms cubic-bezier(0.16,1,0.3,1);
   }
   .card-lift:hover {
-    box-shadow: 0 4px 20px oklch(0.14 0.038 43 / 0.12),
-                0 1px  4px oklch(0.14 0.038 43 / 0.06);
+    box-shadow: 0 4px 20px oklch(0.12 0.006 264 / 0.12),
+                0 1px  4px oklch(0.12 0.006 264 / 0.06);
     transform: translateY(-2px);
   }
 
@@ -150,7 +150,7 @@
   /* Brand button */
   .btn-brand {
     background: oklch(0.55 0.14 40);
-    color: oklch(0.990 0.005 58);
+    color: oklch(0.998 0 0);
     border: none;
     border-radius: 14px;
     padding: 11px 24px;
@@ -175,8 +175,8 @@
   /* Ghost button */
   .btn-ghost {
     background: transparent;
-    color: oklch(0.48 0.025 50);
-    border: 1.5px solid oklch(0.875 0.016 55);
+    color: oklch(0.44 0.003 264);
+    border: 1.5px solid oklch(0.876 0.003 264);
     border-radius: 12px;
     padding: 10px 20px;
     font-size: 0.9375rem;
@@ -232,8 +232,8 @@
     display: none;
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    background: oklch(0.145 0.038 43);
-    border-top: 1px solid oklch(0.225 0.032 43);
+    background: oklch(0.118 0.008 264);
+    border-top: 1px solid oklch(0.22 0.006 264);
     z-index: 100;
     align-items: stretch;
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -246,7 +246,7 @@
     justify-content: center;
     padding: 9px 0 7px;
     gap: 4px;
-    color: oklch(0.50 0.018 48);
+    color: oklch(0.48 0.003 264);
     cursor: pointer;
     transition: color 150ms ease-out;
     text-decoration: none;
@@ -276,10 +276,10 @@
     background: oklch(0.55 0.14 40);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    color: oklch(0.99 0.005 58);
+    color: oklch(0.998 0 0);
     box-shadow: 0 4px 16px oklch(0.55 0.14 40 / 0.45),
-                0 0 0 3px oklch(0.145 0.038 43),
-                0 0 0 4px oklch(0.225 0.032 43);
+                0 0 0 3px oklch(0.118 0.008 264),
+                0 0 0 4px oklch(0.22 0.006 264);
     margin-bottom: 2px;
     transition: transform 150ms cubic-bezier(0.16,1,0.3,1),
                 box-shadow 150ms ease-out;
@@ -287,8 +287,8 @@
   .bottom-nav-center-btn:active {
     transform: scale(0.94);
     box-shadow: 0 2px 8px oklch(0.55 0.14 40 / 0.35),
-                0 0 0 3px oklch(0.145 0.038 43),
-                0 0 0 4px oklch(0.225 0.032 43);
+                0 0 0 3px oklch(0.118 0.008 264),
+                0 0 0 4px oklch(0.22 0.006 264);
   }
 
   /* ── Mobile breakpoint ───────────────────────────────────────────────────── */

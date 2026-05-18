@@ -38,11 +38,11 @@ function aiFlags(form: Record<string, unknown>): string[] {
 function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-      <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "oklch(0.35 0.04 45)" }}>
+      <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "oklch(0.28 0.003 264)" }}>
         {label}
       </label>
       {children}
-      {hint && <p style={{ fontSize: "0.75rem", color: "oklch(0.60 0.020 50)" }}>{hint}</p>}
+      {hint && <p style={{ fontSize: "0.75rem", color: "oklch(0.56 0.003 264)" }}>{hint}</p>}
     </div>
   );
 }
@@ -50,11 +50,11 @@ function Field({ label, children, hint }: { label: string; children: React.React
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "11px 14px",
-  border: "1.5px solid oklch(0.87 0.016 55)",
+  border: "1.5px solid oklch(0.876 0.003 264)",
   borderRadius: "10px",
   fontSize: "0.9375rem",
-  color: "oklch(0.13 0.025 45)",
-  background: "oklch(0.99 0.005 58)",
+  color: "oklch(0.09 0.006 264)",
+  background: "oklch(0.998 0 0)",
   outline: "none",
   transition: "border-color 150ms ease-out, box-shadow 150ms ease-out",
   boxSizing: "border-box",
@@ -67,7 +67,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
       {...props}
       style={{
         ...inputStyle,
-        borderColor: focused ? "oklch(0.55 0.14 40)" : "oklch(0.87 0.016 55)",
+        borderColor: focused ? "oklch(0.55 0.14 40)" : "oklch(0.876 0.003 264)",
         boxShadow: focused ? "0 0 0 3px oklch(0.55 0.14 40 / 0.12)" : "none",
       }}
       onFocus={e => { setFocused(true); props.onFocus?.(e); }}
@@ -89,7 +89,7 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
         backgroundRepeat: "no-repeat",
         backgroundPosition: "right 14px center",
         paddingRight: "40px",
-        borderColor: focused ? "oklch(0.55 0.14 40)" : "oklch(0.87 0.016 55)",
+        borderColor: focused ? "oklch(0.55 0.14 40)" : "oklch(0.876 0.003 264)",
         boxShadow: focused ? "0 0 0 3px oklch(0.55 0.14 40 / 0.12)" : "none",
       }}
       onFocus={e => { setFocused(true); props.onFocus?.(e); }}
@@ -104,12 +104,12 @@ function StepCard({ children, visible }: { children: React.ReactNode; visible: b
   if (!visible) return null;
   return (
     <div style={{
-      background: "oklch(0.99 0.005 58)",
-      border: "1.5px solid oklch(0.875 0.016 55)",
+      background: "oklch(0.998 0 0)",
+      border: "1.5px solid oklch(0.876 0.003 264)",
       borderRadius: "20px",
       padding: "32px 36px",
       animation: "pageIn 260ms cubic-bezier(0.16,1,0.3,1) both",
-      boxShadow: "0 1px 3px oklch(0.14 0.038 43 / 0.05), inset 0 1px 0 oklch(0.99 0.005 58 / 0.8)",
+      boxShadow: "0 1px 3px oklch(0.12 0.006 264 / 0.05), inset 0 1px 0 oklch(0.998 0 0 / 0.8)",
     }}>
       {children}
     </div>
@@ -134,8 +134,8 @@ function ProgressBar({ step }: { step: number }) {
                 borderRadius: "50%",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: "0.8125rem", fontWeight: 700,
-                background: done ? "oklch(0.42 0.09 145)" : active ? "oklch(0.55 0.14 40)" : "oklch(0.90 0.014 56)",
-                color: done || active ? "oklch(0.99 0.005 58)" : "oklch(0.55 0.025 50)",
+                background: done ? "oklch(0.42 0.09 145)" : active ? "oklch(0.55 0.14 40)" : "oklch(0.938 0.002 264)",
+                color: done || active ? "oklch(0.998 0 0)" : "oklch(0.50 0.003 264)",
                 boxShadow: active ? "0 0 0 4px oklch(0.55 0.14 40 / 0.18)" : "none",
                 transition: "all 250ms cubic-bezier(0.16,1,0.3,1)",
                 flexShrink: 0,
@@ -144,7 +144,7 @@ function ProgressBar({ step }: { step: number }) {
               </div>
               <span style={{
                 fontSize: "0.6875rem", fontWeight: active ? 600 : 400,
-                color: active ? "oklch(0.55 0.14 40)" : done ? "oklch(0.42 0.09 145)" : "oklch(0.60 0.020 50)",
+                color: active ? "oklch(0.55 0.14 40)" : done ? "oklch(0.42 0.09 145)" : "oklch(0.56 0.003 264)",
                 whiteSpace: "nowrap",
                 transition: "color 250ms ease-out",
               }}>{label}</span>
@@ -152,7 +152,7 @@ function ProgressBar({ step }: { step: number }) {
             {i < STEPS.length - 1 && (
               <div style={{
                 flex: 1, height: "2px", margin: "0 6px", marginBottom: "20px",
-                background: done ? "oklch(0.42 0.09 145)" : "oklch(0.90 0.014 56)",
+                background: done ? "oklch(0.42 0.09 145)" : "oklch(0.938 0.002 264)",
                 transition: "background 350ms ease-out",
               }} />
             )}
@@ -172,8 +172,8 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
       cursor: "pointer", userSelect: "none",
       padding: "12px 16px",
       borderRadius: "12px",
-      border: `1.5px solid ${checked ? "oklch(0.55 0.14 40)" : "oklch(0.87 0.016 55)"}`,
-      background: checked ? "oklch(0.55 0.14 40 / 0.06)" : "oklch(0.99 0.005 58)",
+      border: `1.5px solid ${checked ? "oklch(0.55 0.14 40)" : "oklch(0.876 0.003 264)"}`,
+      background: checked ? "oklch(0.55 0.14 40 / 0.06)" : "oklch(0.998 0 0)",
       transition: "all 150ms ease-out",
     }}>
       <div style={{
@@ -182,11 +182,11 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
         background: checked ? "oklch(0.55 0.14 40)" : "transparent",
         display: "flex", alignItems: "center", justifyContent: "center",
         transition: "all 150ms ease-out",
-        fontSize: "0.6875rem", color: "oklch(0.99 0.005 58)", fontWeight: 700,
+        fontSize: "0.6875rem", color: "oklch(0.998 0 0)", fontWeight: 700,
       }}>
         {checked ? "✓" : ""}
       </div>
-      <span style={{ fontSize: "0.875rem", color: "oklch(0.28 0.04 45)", fontWeight: checked ? 500 : 400 }}>
+      <span style={{ fontSize: "0.875rem", color: "oklch(0.20 0.004 264)", fontWeight: checked ? 500 : 400 }}>
         {label}
       </span>
     </label>
@@ -197,9 +197,9 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
 
 function SummaryRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid oklch(0.92 0.012 56)" }}>
-      <span style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)" }}>{label}</span>
-      <span style={{ fontSize: "0.875rem", fontWeight: highlight ? 700 : 600, color: highlight ? "oklch(0.55 0.14 40)" : "oklch(0.13 0.025 45)" }}>{value}</span>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid oklch(0.918 0.002 264)" }}>
+      <span style={{ fontSize: "0.875rem", color: "oklch(0.50 0.003 264)" }}>{label}</span>
+      <span style={{ fontSize: "0.875rem", fontWeight: highlight ? 700 : 600, color: highlight ? "oklch(0.55 0.14 40)" : "oklch(0.09 0.006 264)" }}>{value}</span>
     </div>
   );
 }
@@ -282,14 +282,14 @@ export default function NewAgreementPage() {
   };
 
   const btnPrimary: React.CSSProperties = {
-    background: "oklch(0.55 0.14 40)", color: "oklch(0.99 0.005 58)",
+    background: "oklch(0.55 0.14 40)", color: "oklch(0.998 0 0)",
     border: "none", borderRadius: "12px", padding: "12px 28px",
     fontSize: "0.9375rem", fontWeight: 600, cursor: "pointer",
     transition: "background 150ms ease-out, transform 120ms ease-out",
   };
   const btnGhost: React.CSSProperties = {
-    background: "transparent", color: "oklch(0.55 0.025 50)",
-    border: "1.5px solid oklch(0.87 0.016 55)", borderRadius: "12px",
+    background: "transparent", color: "oklch(0.50 0.003 264)",
+    border: "1.5px solid oklch(0.876 0.003 264)", borderRadius: "12px",
     padding: "12px 24px", fontSize: "0.9375rem", fontWeight: 500, cursor: "pointer",
     transition: "border-color 150ms ease-out, color 150ms ease-out",
   };
@@ -302,20 +302,20 @@ export default function NewAgreementPage() {
         <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
           <button onClick={() => router.back()} style={{
             background: "none", border: "none", cursor: "pointer",
-            fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", padding: "6px 10px",
+            fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", padding: "6px 10px",
             borderRadius: "8px", transition: "background 120ms ease-out",
           }}
-          onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.90 0.014 56)")}
+          onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.938 0.002 264)")}
           onMouseLeave={e => (e.currentTarget.style.background = "none")}>
             ← Kembali
           </button>
-          <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "oklch(0.13 0.025 45)", letterSpacing: "-0.02em", margin: 0 }}>
+          <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "oklch(0.09 0.006 264)", letterSpacing: "-0.02em", margin: 0 }}>
             Perjanjian Baru
           </h1>
         </div>
         <span style={{
-          fontSize: "0.75rem", fontWeight: 600, color: "oklch(0.55 0.025 50)",
-          background: "oklch(0.90 0.014 56)", padding: "4px 12px", borderRadius: "999px",
+          fontSize: "0.75rem", fontWeight: 600, color: "oklch(0.50 0.003 264)",
+          background: "oklch(0.938 0.002 264)", padding: "4px 12px", borderRadius: "999px",
         }}>Langkah {step} / 5</span>
       </div>
 
@@ -331,8 +331,8 @@ export default function NewAgreementPage() {
         {/* Step 1 — Parties */}
         <StepCard visible={step === 1}>
           <div style={{ marginBottom: "24px" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Maklumat Pihak</h2>
-            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Maklumat tuan rumah dan penyewa</p>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.09 0.006 264)", margin: 0 }}>Maklumat Pihak</h2>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", marginTop: "4px" }}>Maklumat tuan rumah dan penyewa</p>
           </div>
 
           <div style={{ marginBottom: "8px" }}>
@@ -358,7 +358,7 @@ export default function NewAgreementPage() {
             </div>
           </div>
 
-          <div style={{ height: "1px", background: "oklch(0.90 0.014 56)", margin: "24px 0" }} />
+          <div style={{ height: "1px", background: "oklch(0.938 0.002 264)", margin: "24px 0" }} />
 
           <div>
             <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.14 40)", marginBottom: "16px" }}>Penyewa</p>
@@ -388,8 +388,8 @@ export default function NewAgreementPage() {
         {/* Step 2 — Property */}
         <StepCard visible={step === 2}>
           <div style={{ marginBottom: "24px" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Maklumat Hartanah</h2>
-            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Alamat dan jenis hartanah</p>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.09 0.006 264)", margin: 0 }}>Maklumat Hartanah</h2>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", marginTop: "4px" }}>Alamat dan jenis hartanah</p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
             <Field label="Alamat Penuh Hartanah *">
@@ -438,8 +438,8 @@ export default function NewAgreementPage() {
         {/* Step 3 — Terms */}
         <StepCard visible={step === 3}>
           <div style={{ marginBottom: "24px" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Terma Sewaan</h2>
-            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Kadar sewa, tempoh, dan deposit</p>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.09 0.006 264)", margin: 0 }}>Terma Sewaan</h2>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", marginTop: "4px" }}>Kadar sewa, tempoh, dan deposit</p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
@@ -460,7 +460,7 @@ export default function NewAgreementPage() {
                 <Input type="date" value={form.startDate} onChange={e => set("startDate", e.target.value)} />
               </Field>
               <Field label="Tarikh Tamat (auto)">
-                <div style={{ ...inputStyle, color: "oklch(0.55 0.025 50)", background: "oklch(0.93 0.012 58)" }}>
+                <div style={{ ...inputStyle, color: "oklch(0.50 0.003 264)", background: "oklch(0.938 0.002 264)" }}>
                   {endDate || "—"}
                 </div>
               </Field>
@@ -479,11 +479,11 @@ export default function NewAgreementPage() {
             {rent > 0 && (
               <div style={{
                 marginTop: "8px", padding: "20px", borderRadius: "14px",
-                background: "oklch(0.96 0.018 58)",
-                border: "1px solid oklch(0.87 0.016 55)",
+                background: "oklch(0.955 0.002 264)",
+                border: "1px solid oklch(0.876 0.003 264)",
                 animation: "expand 200ms cubic-bezier(0.16,1,0.3,1)",
               }}>
-                <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.025 50)", marginBottom: "12px" }}>Pengiraan Auto</p>
+                <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.50 0.003 264)", marginBottom: "12px" }}>Pengiraan Auto</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                   <SummaryRow label="Deposit Keselamatan (2 bulan)" value={`RM ${secDeposit.toLocaleString()}`} />
                   <SummaryRow label="Duti Setem (LHDN)" value={`RM ${stampDuty.toFixed(2)}`} />
@@ -498,11 +498,11 @@ export default function NewAgreementPage() {
         {/* Step 4 — Conditions */}
         <StepCard visible={step === 4}>
           <div style={{ marginBottom: "24px" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Klausa Tambahan & Bank</h2>
-            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Klausa pilihan akan disertakan dalam Jadual Tambahan perjanjian</p>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.09 0.006 264)", margin: 0 }}>Klausa Tambahan & Bank</h2>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", marginTop: "4px" }}>Klausa pilihan akan disertakan dalam Jadual Tambahan perjanjian</p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <div style={{ padding: "10px 14px", borderRadius: "10px", background: "oklch(0.93 0.012 58)", border: "1px solid oklch(0.87 0.016 55)", fontSize: "0.8125rem", color: "oklch(0.45 0.025 50)", marginBottom: "4px" }}>
+            <div style={{ padding: "10px 14px", borderRadius: "10px", background: "oklch(0.938 0.002 264)", border: "1px solid oklch(0.876 0.003 264)", fontSize: "0.8125rem", color: "oklch(0.42 0.003 264)", marginBottom: "4px" }}>
               Klausa yang diaktifkan akan dimasukkan ke dalam <strong>Jadual Tambahan</strong> perjanjian secara automatik.
             </div>
             <Toggle label="Haiwan peliharaan dibenarkan" checked={form.petsAllowed as boolean} onChange={v => set("petsAllowed", v)} />
@@ -515,9 +515,9 @@ export default function NewAgreementPage() {
               </Select>
             </Field>
 
-            <div style={{ height: "1px", background: "oklch(0.90 0.014 56)", margin: "8px 0" }} />
+            <div style={{ height: "1px", background: "oklch(0.938 0.002 264)", margin: "8px 0" }} />
 
-            <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.025 50)", marginBottom: "4px" }}>Maklumat Bank (Pembayaran Sewa)</p>
+            <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.50 0.003 264)", marginBottom: "4px" }}>Maklumat Bank (Pembayaran Sewa)</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               <Field label="Nama Bank *">
                 <Select value={form.bankName} onChange={e => set("bankName", e.target.value)}>
@@ -540,18 +540,18 @@ export default function NewAgreementPage() {
         {/* Step 5 — Review */}
         <StepCard visible={step === 5}>
           <div style={{ marginBottom: "24px" }}>
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.13 0.025 45)", margin: 0 }}>Semak & Jana</h2>
-            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>Sahkan maklumat sebelum menghantar kepada peguam</p>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.09 0.006 264)", margin: 0 }}>Semak & Jana</h2>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", marginTop: "4px" }}>Sahkan maklumat sebelum menghantar kepada peguam</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
             {[
               { label: "Tuan Rumah", lines: [form.landlordName, form.landlordIc, form.landlordPhone] },
               { label: "Penyewa", lines: [form.tenantName, form.tenantIc, form.tenantPhone] },
             ].map(({ label, lines }) => (
-              <div key={label} style={{ padding: "16px", background: "oklch(0.96 0.014 58)", borderRadius: "12px" }}>
+              <div key={label} style={{ padding: "16px", background: "oklch(0.955 0.002 264)", borderRadius: "12px" }}>
                 <p style={{ fontSize: "0.6875rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.14 40)", marginBottom: "8px" }}>{label}</p>
                 {lines.map((l, i) => (
-                  <p key={i} style={{ fontSize: "0.875rem", color: i === 0 ? "oklch(0.13 0.025 45)" : "oklch(0.55 0.025 50)", fontWeight: i === 0 ? 600 : 400, marginBottom: "2px" }}>{l}</p>
+                  <p key={i} style={{ fontSize: "0.875rem", color: i === 0 ? "oklch(0.09 0.006 264)" : "oklch(0.50 0.003 264)", fontWeight: i === 0 ? 600 : 400, marginBottom: "2px" }}>{l}</p>
                 ))}
               </div>
             ))}
@@ -587,12 +587,12 @@ export default function NewAgreementPage() {
       <div style={{
         display: "flex", justifyContent: "space-between", alignItems: "center",
         marginTop: "16px",
-        background: "oklch(0.975 0.010 58)",
-        border: "1.5px solid oklch(0.875 0.016 55)",
+        background: "oklch(0.963 0.002 264)",
+        border: "1.5px solid oklch(0.876 0.003 264)",
         borderRadius: "16px",
         padding: "16px 24px",
       }}>
-        <div style={{ fontSize: "0.8125rem", color: "oklch(0.60 0.020 50)" }}>
+        <div style={{ fontSize: "0.8125rem", color: "oklch(0.56 0.003 264)" }}>
           {step < 5 ? `${5 - step} langkah lagi` : "Sedia untuk dihantar"}
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
@@ -600,7 +600,7 @@ export default function NewAgreementPage() {
             <button style={btnGhost}
               onClick={() => goToStep(step - 1)}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.14 40)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.87 0.016 55)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.025 50)"; }}>
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.876 0.003 264)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.50 0.003 264)"; }}>
               ← Kembali
             </button>
           )}

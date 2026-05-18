@@ -2,17 +2,15 @@
 name: Sewasah Agree
 description: AI-powered tenancy agreement platform for Malaysian law firms
 colors:
-  kedai-earth: "#3d2c1e"
-  kedai-terracotta: "#c4622d"
-  kedai-sand: "#f5ede0"
-  kedai-cream: "#faf6f0"
-  kedai-warm-white: "#fefcf9"
-  kedai-ink: "#1e1610"
-  kedai-mist: "#e8ddd0"
-  kedai-moss: "#4a6741"
-  kedai-amber: "#d4821a"
-  kedai-alert: "#b83c2b"
-  sidebar-deep: "#2a1f14"
+  sidebar-deep: "#0d0d14"
+  terracotta: "#c4622d"
+  pure-white: "#ffffff"
+  cool-light-grey: "#f4f4f6"
+  cool-mist: "#dddde3"
+  deep-ink: "#0d0d12"
+  moss: "#4a6741"
+  amber: "#d4821a"
+  alert: "#b83c2b"
 typography:
   display:
     fontFamily: "Geist, system-ui, sans-serif"
@@ -87,25 +85,26 @@ components:
 
 ## 1. Overview
 
-**Creative North Star: "The Modern Kedai"**
+**Creative North Star: "Clean Minimalist"**
 
-A kedai is a neighborhood shop — familiar, unpretentious, always there when you need it. The person behind the counter knows your name, handles things without fuss, and makes the complex feel manageable. Sewasah Agree carries this energy into a legal workflow tool: warm earthy tones of timber and terracotta, generous spacing that breathes, and type that guides without shouting.
+Pure white surfaces with deep ink typography — the aesthetic of tools that respect the user's work. Like Stripe or Notion, every surface exists to make content legible, not to express personality. Sewasah Agree carries this discipline into a legal workflow tool: cool neutral backgrounds, maximum contrast text, and a single terracotta accent that earns its place on every screen.
 
-The user is a 40-something admin or lawyer in a small Malaysian firm. They are not intimidated by Microsoft Word, but they have never used a proper SaaS tool before. Every screen must feel immediately readable: one clear primary action, supporting details at a glance, no hunting for what to do next. The warmth is functional — it lowers the stakes of handling legal documents.
+The user is a 40-something admin or lawyer in a small Malaysian firm. They are not intimidated by Microsoft Word, but they have never used a proper SaaS tool before. Every screen must feel immediately readable: one clear primary action, supporting details at a glance, no hunting for what to do next. The restraint is functional — clean surfaces lower the cognitive load of handling legal documents.
 
 This system rejects the grey utilitarian coldness of government portals (MyTax, LHDN), the formal navy-and-serif of corporate law firms, and the hollow gradient-metric aesthetic of generic SaaS dashboards. It also rejects the neon playfulness of consumer fintech — agreements are serious documents; the interface should feel trustworthy, not party-ready.
 
 **Key Characteristics:**
-- Earthy, warm neutrals anchored by terracotta and sand
-- Dark sidebar in deep kedai-earth tone, like a timber-paneled wall
-- Single saturated accent (terracotta) used with discipline
+- Pure white page background with cool light grey cards and panels
+- Deep ink text (near-black, cool-tinted) for maximum legibility
+- Dark sidebar in deep cool-neutral tone, creating a clear navigation boundary
+- Single saturated accent (terracotta) used with discipline — unchanged from original
 - Rounded but not bubbly — softness signals approachability, not immaturity
 - Flat surfaces with tonal layering; no decorative shadows
 - Subtle transitions confirm actions; nothing animates without purpose
 
-## 2. Colors: The Kedai Palette
+## 2. Colors: The Clean Minimalist Palette
 
-One saturated anchor (terracotta) against a field of warm earthy neutrals. Committed strategy: terracotta carries 20-30% of interactive surfaces.
+One saturated anchor (terracotta) against a field of pure white and cool grey neutrals. Committed strategy: terracotta carries 20-30% of interactive surfaces.
 
 ### Primary
 - **Kedai Terracotta** (oklch(0.55 0.14 40) / #c4622d): The action color. Used on primary buttons, active nav states, progress indicators, and key data points. Never used decoratively.
@@ -116,17 +115,16 @@ One saturated anchor (terracotta) against a field of warm earthy neutrals. Commi
 - **Kedai Amber** (oklch(0.62 0.12 65) / #d4821a): Warning and in-progress states. Warm amber reads as "attention needed" without alarm.
 
 ### Neutral
-- **Kedai Sand** (oklch(0.93 0.02 60) / #f5ede0): Page backgrounds. Warm, never stark.
-- **Kedai Cream** (oklch(0.96 0.015 60) / #faf6f0): Card and panel backgrounds. One step lighter than the page.
-- **Kedai Warm White** (oklch(0.99 0.005 60) / #fefcf9): Input backgrounds. The lightest surface in the system.
-- **Kedai Mist** (oklch(0.88 0.015 55) / #e8ddd0): Borders, dividers, disabled backgrounds. The quiet separator.
-- **Kedai Ink** (oklch(0.12 0.02 45) / #1e1610): Primary text. Warm black — never pure #000.
-- **Kedai Alert** (oklch(0.48 0.18 27) / #b83c2b): Destructive actions and error states only.
+- **Pure White** (oklch(0.998 0 0) / #ffffff): Page and input backgrounds. Crisp, high contrast.
+- **Cool Light Grey** (oklch(0.963 0.002 264) / ~#f4f4f6): Card and panel backgrounds. Barely-there cool tint.
+- **Cool Mist** (oklch(0.876 0.003 264) / ~#dddde3): Borders, dividers, disabled backgrounds. The quiet separator.
+- **Deep Ink** (oklch(0.09 0.006 264) / ~#0d0d12): Primary text. Near-black with a cool tint — never pure #000.
+- **Alert** (oklch(0.48 0.18 27) / #b83c2b): Destructive actions and error states only.
 
 ### Named Rules
 **The Terracotta Discipline Rule.** Terracotta appears on at most one primary action per screen. If two buttons are visible, one is terracotta, the other is ghost. Never two filled terracotta buttons side by side.
 
-**The Warm Neutrals Rule.** No pure white (#fff), no pure black (#000), no mid-grey (#888). Every neutral is tinted toward the 45-60° hue range. The interface should feel warm even when empty.
+**The Clean Neutrals Rule.** Page background is pure white. Cards step down to cool light grey. No warm tints in the neutral palette — only terracotta carries warmth, making it stand out with maximum contrast.
 
 ## 3. Typography
 
@@ -209,7 +207,7 @@ A horizontal progress bar unique to Sewasah Agree. Six named stages (Draft, Revi
 - **Do** transition interactive states at 150ms ease-out. Fast enough to feel responsive, slow enough to feel considered.
 
 ### Don't:
-- **Don't** use government portal grey. No `#808080`, no `#f2f2f2`, no `#cccccc`. Every surface is warm.
+- **Don't** use government portal grey. No `#808080`, no `#cccccc`. Neutral surfaces use the cool grey palette — not arbitrary mid-greys.
 - **Don't** use the sidebar's dark earth tone anywhere in the main content area. The sidebar darkness is the boundary between navigation and work.
 - **Don't** put gradient fills on text. Copy from PRODUCT.md: "Gradient text is decorative, never meaningful."
 - **Don't** use identical card grids with icon + heading + text repeated. The stat summary on the dashboard breaks this pattern deliberately; don't introduce new identical-card sections elsewhere.

@@ -65,19 +65,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!isLoaded) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "oklch(0.935 0.018 58)" }}>
-        <div style={{ color: "oklch(0.55 0.025 50)", fontSize: "0.875rem" }}>Memuatkan...</div>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "oklch(0.998 0 0)" }}>
+        <div style={{ color: "oklch(0.50 0.003 264)", fontSize: "0.875rem" }}>Memuatkan...</div>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "oklch(0.935 0.018 58)" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "oklch(0.998 0 0)" }}>
 
       {/* ── Top Nav Bar ── */}
       <header style={{
-        background: "oklch(0.145 0.038 43)",
-        boxShadow: "0 2px 16px oklch(0.10 0.03 43 / 0.25)",
+        background: "oklch(0.118 0.008 264)",
+        boxShadow: "0 2px 16px oklch(0.10 0.004 264 / 0.25)",
         position: "sticky", top: 0, zIndex: 50,
         flexShrink: 0,
       }}>
@@ -92,7 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div style={{
             display: "flex", alignItems: "center", gap: "10px",
             paddingRight: "20px",
-            borderRight: "1px solid oklch(0.225 0.032 43)",
+            borderRight: "1px solid oklch(0.22 0.006 264)",
             marginRight: "8px",
             height: "56px",
             flexShrink: 0,
@@ -103,13 +103,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               borderRadius: "9px",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "0.8125rem", fontWeight: 800,
-              color: "oklch(0.99 0.005 58)",
+              color: "oklch(0.998 0 0)",
               boxShadow: "0 2px 6px oklch(0.55 0.14 40 / 0.35)",
               flexShrink: 0,
             }}>SA</div>
             <span style={{
               fontWeight: 700, fontSize: "0.9375rem",
-              color: "oklch(0.96 0.008 58)",
+              color: "oklch(0.970 0.002 264)",
               letterSpacing: "-0.01em",
               whiteSpace: "nowrap",
             }}>Sewasah Agree</span>
@@ -129,7 +129,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     display: "flex", alignItems: "center",
                     fontSize: "0.875rem",
                     fontWeight: active ? 600 : 400,
-                    color: active ? "oklch(0.99 0.005 58)" : "oklch(0.58 0.018 48)",
+                    color: active ? "oklch(0.998 0 0)" : "oklch(0.54 0.003 264)",
                     borderBottom: active
                       ? "2.5px solid oklch(0.55 0.14 40)"
                       : "2.5px solid transparent",
@@ -141,7 +141,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     if (!active) (e.currentTarget as HTMLElement).style.color = "oklch(0.78 0.012 56)";
                   }}
                   onMouseLeave={e => {
-                    if (!active) (e.currentTarget as HTMLElement).style.color = "oklch(0.58 0.018 48)";
+                    if (!active) (e.currentTarget as HTMLElement).style.color = "oklch(0.54 0.003 264)";
                   }}>
                     {item.label}
                   </div>
@@ -153,8 +153,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Right */}
           <div style={{ display: "flex", alignItems: "center", gap: "14px", flexShrink: 0, marginLeft: "auto" }}>
             <span className="flag-badge" style={{
-              fontSize: "0.75rem", color: "oklch(0.50 0.018 46)",
-              background: "oklch(0.22 0.030 43)",
+              fontSize: "0.75rem", color: "oklch(0.48 0.003 264)",
+              background: "oklch(0.18 0.006 264)",
               padding: "4px 12px", borderRadius: "999px",
             }}>🇲🇾 Malaysia</span>
             <UserButton />
@@ -183,7 +183,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <div className={`bottom-nav-center-btn${active ? " active" : ""}`}>
                     <item.Icon size={22} />
                   </div>
-                  <span className="bottom-nav-label" style={{ color: active ? "oklch(0.55 0.14 40)" : "oklch(0.50 0.018 48)" }}>
+                  <span className="bottom-nav-label" style={{ color: active ? "oklch(0.55 0.14 40)" : "oklch(0.48 0.003 264)" }}>
                     {item.label}
                   </span>
                 </div>

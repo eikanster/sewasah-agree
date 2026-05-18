@@ -32,14 +32,14 @@ function StatCard({
   value, label, sub, terracotta, delay, large,
 }: { value: number; label: string; sub: string; terracotta?: boolean; delay: number; large?: boolean }) {
   const active = terracotta && value > 0;
-  const bg   = active ? "oklch(0.55 0.14 40)" : "oklch(0.975 0.010 58)";
-  const num  = active ? "oklch(0.99 0.005 58)" : "oklch(0.13 0.025 45)";
-  const lbl  = active ? "oklch(0.88 0.05 40)"  : "oklch(0.28 0.040 45)";
-  const hint = active ? "oklch(0.78 0.08 40)"  : "oklch(0.55 0.025 50)";
-  const bdr  = active ? "transparent"           : "oklch(0.875 0.016 55)";
+  const bg   = active ? "oklch(0.55 0.14 40)" : "oklch(0.963 0.002 264)";
+  const num  = active ? "oklch(0.998 0 0)" : "oklch(0.09 0.006 264)";
+  const lbl  = active ? "oklch(0.88 0.05 40)"  : "oklch(0.20 0.004 264)";
+  const hint = active ? "oklch(0.78 0.08 40)"  : "oklch(0.50 0.003 264)";
+  const bdr  = active ? "transparent"           : "oklch(0.876 0.003 264)";
   const shd  = active
     ? "0 8px 32px oklch(0.55 0.14 40 / 0.32), 0 2px 8px oklch(0.55 0.14 40 / 0.20)"
-    : "0 1px 3px oklch(0.14 0.038 43 / 0.06)";
+    : "0 1px 3px oklch(0.12 0.006 264 / 0.06)";
 
   return (
     <div className="card-lift count-in" style={{
@@ -57,7 +57,7 @@ function StatCard({
       {!active && (
         <div style={{
           position: "absolute", inset: 0, borderRadius: "18px",
-          boxShadow: "inset 0 1px 0 oklch(0.99 0.005 58 / 0.8)",
+          boxShadow: "inset 0 1px 0 oklch(0.998 0 0 / 0.8)",
           pointerEvents: "none",
         }} />
       )}
@@ -112,7 +112,7 @@ export default function DashboardPage() {
           <h1 style={{
             fontSize: "2.5rem", fontWeight: 800,
             letterSpacing: "-0.035em", lineHeight: 1.05,
-            color: "oklch(0.13 0.025 45)", margin: 0,
+            color: "oklch(0.09 0.006 264)", margin: 0,
           }}>
             {greeting()}{firstName ? "," : "."}<br />
             {firstName && (
@@ -136,34 +136,34 @@ export default function DashboardPage() {
 
       {/* ── Table ── */}
       <div style={{
-        background: "oklch(0.975 0.010 58)",
-        border: "1.5px solid oklch(0.875 0.016 55)",
+        background: "oklch(0.963 0.002 264)",
+        border: "1.5px solid oklch(0.876 0.003 264)",
         borderRadius: "20px",
         overflow: "hidden",
-        boxShadow: "0 1px 3px oklch(0.14 0.038 43 / 0.06), inset 0 1px 0 oklch(0.99 0.005 58 / 0.7)",
+        boxShadow: "0 1px 3px oklch(0.12 0.006 264 / 0.06), inset 0 1px 0 oklch(0.998 0 0 / 0.7)",
       }}>
 
         {/* Table topbar */}
         <div style={{
           padding: "16px 28px",
-          borderBottom: "1px solid oklch(0.895 0.014 56)",
+          borderBottom: "1px solid oklch(0.895 0.002 264)",
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          background: "oklch(0.965 0.012 58)",
+          background: "oklch(0.963 0.002 264)",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <p style={{ fontWeight: 700, fontSize: "0.9375rem", color: "oklch(0.13 0.025 45)", margin: 0 }}>
+            <p style={{ fontWeight: 700, fontSize: "0.9375rem", color: "oklch(0.09 0.006 264)", margin: 0 }}>
               Senarai Perjanjian
             </p>
             {(agreements?.length ?? 0) > 0 && (
               <span style={{
                 fontSize: "0.6875rem", fontWeight: 600,
-                background: "oklch(0.905 0.014 56)",
-                color: "oklch(0.48 0.025 50)",
+                background: "oklch(0.938 0.002 264)",
+                color: "oklch(0.44 0.003 264)",
                 padding: "2px 8px", borderRadius: "999px",
               }}>{agreements?.length} rekod</span>
             )}
           </div>
-          <p style={{ fontSize: "0.8125rem", color: "oklch(0.60 0.020 50)", margin: 0 }}>
+          <p style={{ fontSize: "0.8125rem", color: "oklch(0.56 0.003 264)", margin: 0 }}>
             {new Date().toLocaleDateString("ms-MY", { month: "long", year: "numeric" })}
           </p>
         </div>
@@ -173,14 +173,14 @@ export default function DashboardPage() {
           <div style={{ padding: "72px 40px", textAlign: "center" }}>
             <div style={{
               width: "56px", height: "56px", margin: "0 auto 20px",
-              background: "oklch(0.910 0.014 56)", borderRadius: "16px",
+              background: "oklch(0.938 0.002 264)", borderRadius: "16px",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "1.625rem",
             }}>📄</div>
-            <p style={{ fontWeight: 700, fontSize: "1rem", color: "oklch(0.22 0.035 45)", marginBottom: "6px" }}>
+            <p style={{ fontWeight: 700, fontSize: "1rem", color: "oklch(0.15 0.004 264)", marginBottom: "6px" }}>
               Tiada perjanjian lagi
             </p>
-            <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginBottom: "24px", maxWidth: "280px", margin: "0 auto 24px" }}>
+            <p style={{ fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", marginBottom: "24px", maxWidth: "280px", margin: "0 auto 24px" }}>
               Cipta perjanjian pertama untuk memulakan.
             </p>
             <Link href="/dashboard/agreements/new">
@@ -195,7 +195,7 @@ export default function DashboardPage() {
         {agreements && agreements.length > 0 && (
           <table className="mobile-card-table" style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "oklch(0.955 0.013 57)" }}>
+              <tr style={{ background: "oklch(0.952 0.002 264)" }}>
                 {[
                   { label: "Tuan Rumah", w: "18%",  hide: false },
                   { label: "Penyewa",    w: "18%",  hide: true  },
@@ -212,8 +212,8 @@ export default function DashboardPage() {
                     fontWeight: 600,
                     letterSpacing: "0.07em",
                     textTransform: "uppercase",
-                    color: "oklch(0.58 0.022 50)",
-                    borderBottom: "1px solid oklch(0.880 0.015 55)",
+                    color: "oklch(0.54 0.003 264)",
+                    borderBottom: "1px solid oklch(0.880 0.002 264)",
                     width: w,
                   }}>{label}</th>
                 ))}
@@ -226,27 +226,27 @@ export default function DashboardPage() {
                 return (
                   <tr key={a._id}
                     style={{
-                      background: even ? "oklch(0.985 0.007 58)" : "oklch(0.975 0.010 58)",
+                      background: even ? "oklch(0.980 0.001 264)" : "oklch(0.963 0.002 264)",
                       borderBottom: idx < agreements.length - 1
-                        ? "1px solid oklch(0.918 0.012 57)" : "none",
+                        ? "1px solid oklch(0.918 0.002 264)" : "none",
                       transition: "background 100ms ease-out",
                       cursor: "default",
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.950 0.018 58)")}
-                    onMouseLeave={e => (e.currentTarget.style.background = even ? "oklch(0.985 0.007 58)" : "oklch(0.975 0.010 58)")}>
+                    onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.945 0.002 264)")}
+                    onMouseLeave={e => (e.currentTarget.style.background = even ? "oklch(0.980 0.001 264)" : "oklch(0.963 0.002 264)")}>
 
-                    <td style={{ padding: "15px 20px", fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.13 0.025 45)" }}>
+                    <td style={{ padding: "15px 20px", fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.09 0.006 264)" }}>
                       {a.landlordName}
                     </td>
-                    <td className="col-hide-mobile" style={{ padding: "15px 20px", fontSize: "0.875rem", color: "oklch(0.45 0.025 50)" }}>
+                    <td className="col-hide-mobile" style={{ padding: "15px 20px", fontSize: "0.875rem", color: "oklch(0.42 0.003 264)" }}>
                       {a.tenantName}
                     </td>
-                    <td className="col-hide-mobile" style={{ padding: "15px 20px", fontSize: "0.875rem", color: "oklch(0.45 0.025 50)", maxWidth: "200px" }}>
+                    <td className="col-hide-mobile" style={{ padding: "15px 20px", fontSize: "0.875rem", color: "oklch(0.42 0.003 264)", maxWidth: "200px" }}>
                       <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {a.propertyAddress.split(",")[0]}
                       </span>
                     </td>
-                    <td style={{ padding: "15px 20px", fontSize: "0.875rem", fontWeight: 700, color: "oklch(0.28 0.040 45)", letterSpacing: "-0.01em" }}>
+                    <td style={{ padding: "15px 20px", fontSize: "0.875rem", fontWeight: 700, color: "oklch(0.20 0.004 264)", letterSpacing: "-0.01em" }}>
                       RM {a.monthlyRent.toLocaleString()}
                     </td>
                     <td style={{ padding: "15px 20px" }}>
@@ -262,7 +262,7 @@ export default function DashboardPage() {
                         alignItems: "center",
                       }}>{s.label}</span>
                     </td>
-                    <td className="col-hide-mobile" style={{ padding: "15px 20px", fontSize: "0.8125rem", color: "oklch(0.60 0.020 50)", whiteSpace: "nowrap" }}>
+                    <td className="col-hide-mobile" style={{ padding: "15px 20px", fontSize: "0.8125rem", color: "oklch(0.56 0.003 264)", whiteSpace: "nowrap" }}>
                       {new Date(a.createdAt).toLocaleDateString("ms-MY", { day: "numeric", month: "short" })}
                     </td>
                     <td style={{ padding: "15px 20px" }}>

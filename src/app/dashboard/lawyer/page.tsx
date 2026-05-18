@@ -70,10 +70,10 @@ export default function LawyerPage() {
         <p style={{ fontSize: "0.6875rem", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "oklch(0.55 0.14 40)", marginBottom: "6px" }}>
           Semakan Peguam
         </p>
-        <h1 style={{ fontSize: "2rem", fontWeight: 800, letterSpacing: "-0.03em", color: "oklch(0.13 0.025 45)", margin: 0 }}>
+        <h1 style={{ fontSize: "2rem", fontWeight: 800, letterSpacing: "-0.03em", color: "oklch(0.09 0.006 264)", margin: 0 }}>
           Menunggu Kelulusan
         </h1>
-        <p style={{ fontSize: "0.9375rem", color: "oklch(0.55 0.025 50)", marginTop: "6px" }}>
+        <p style={{ fontSize: "0.9375rem", color: "oklch(0.50 0.003 264)", marginTop: "6px" }}>
           {pending?.length ?? 0} perjanjian menunggu semakan anda
         </p>
       </div>
@@ -81,11 +81,11 @@ export default function LawyerPage() {
       {/* Empty state */}
       {(!pending || pending.length === 0) && (
         <div style={{
-          background: "oklch(0.975 0.010 58)",
-          border: "1.5px solid oklch(0.875 0.016 55)",
+          background: "oklch(0.963 0.002 264)",
+          border: "1.5px solid oklch(0.876 0.003 264)",
           borderRadius: "20px", padding: "64px 40px",
           textAlign: "center",
-          boxShadow: "0 1px 3px oklch(0.14 0.038 43 / 0.06)",
+          boxShadow: "0 1px 3px oklch(0.12 0.006 264 / 0.06)",
         }}>
           <div style={{
             width: "56px", height: "56px", margin: "0 auto 16px",
@@ -94,8 +94,8 @@ export default function LawyerPage() {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: "1.5rem",
           }}>✓</div>
-          <p style={{ fontWeight: 700, fontSize: "1rem", color: "oklch(0.22 0.035 45)" }}>Semua selesai!</p>
-          <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>
+          <p style={{ fontWeight: 700, fontSize: "1rem", color: "oklch(0.15 0.004 264)" }}>Semua selesai!</p>
+          <p style={{ fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", marginTop: "4px" }}>
             Tiada perjanjian menunggu semakan anda.
           </p>
         </div>
@@ -105,19 +105,19 @@ export default function LawyerPage() {
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         {pending?.map((a) => (
           <div key={a._id} style={{
-            background: "oklch(0.975 0.010 58)",
-            border: "1.5px solid oklch(0.875 0.016 55)",
+            background: "oklch(0.963 0.002 264)",
+            border: "1.5px solid oklch(0.876 0.003 264)",
             borderRadius: "20px", overflow: "hidden",
-            boxShadow: "0 1px 3px oklch(0.14 0.038 43 / 0.06), inset 0 1px 0 oklch(0.99 0.005 58 / 0.7)",
+            boxShadow: "0 1px 3px oklch(0.12 0.006 264 / 0.06), inset 0 1px 0 oklch(0.998 0 0 / 0.7)",
           }}>
 
             {/* Card header */}
-            <div style={{ padding: "20px 24px", borderBottom: "1px solid oklch(0.895 0.014 56)", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid oklch(0.895 0.002 264)", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
               <div>
-                <p style={{ fontWeight: 700, fontSize: "1rem", color: "oklch(0.13 0.025 45)", margin: 0 }}>
+                <p style={{ fontWeight: 700, fontSize: "1rem", color: "oklch(0.09 0.006 264)", margin: 0 }}>
                   {a.landlordName} → {a.tenantName}
                 </p>
-                <p style={{ fontSize: "0.875rem", color: "oklch(0.55 0.025 50)", marginTop: "4px" }}>
+                <p style={{ fontSize: "0.875rem", color: "oklch(0.50 0.003 264)", marginTop: "4px" }}>
                   {a.propertyAddress.split(",")[0]}
                 </p>
                 <div style={{ display: "flex", gap: "8px", marginTop: "10px", flexWrap: "wrap" }}>
@@ -128,8 +128,8 @@ export default function LawyerPage() {
                   ].map(tag => (
                     <span key={tag} style={{
                       fontSize: "0.75rem", fontWeight: 500,
-                      background: "oklch(0.910 0.014 56)",
-                      color: "oklch(0.42 0.025 50)",
+                      background: "oklch(0.938 0.002 264)",
+                      color: "oklch(0.38 0.003 264)",
                       padding: "3px 10px", borderRadius: "999px",
                     }}>{tag}</span>
                   ))}
@@ -144,7 +144,7 @@ export default function LawyerPage() {
                 <p style={{ fontWeight: 800, fontSize: "1.25rem", color: "oklch(0.55 0.14 40)", letterSpacing: "-0.02em", margin: 0 }}>
                   RM {a.monthlyRent.toLocaleString()}
                 </p>
-                <p style={{ fontSize: "0.75rem", color: "oklch(0.60 0.020 50)" }}>/bulan</p>
+                <p style={{ fontSize: "0.75rem", color: "oklch(0.56 0.003 264)" }}>/bulan</p>
               </div>
             </div>
 
@@ -159,7 +159,7 @@ export default function LawyerPage() {
             )}
 
             {/* Key details */}
-            <div style={{ padding: "16px 24px", borderBottom: "1px solid oklch(0.895 0.014 56)", display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "12px" }}>
+            <div style={{ padding: "16px 24px", borderBottom: "1px solid oklch(0.895 0.002 264)", display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "12px" }}>
               {[
                 { label: "Tarikh Mula", value: a.startDate },
                 { label: "Tarikh Tamat", value: a.endDate },
@@ -167,15 +167,15 @@ export default function LawyerPage() {
                 { label: "Duti Setem", value: `RM ${a.stampDuty.toFixed(2)}` },
               ].map(({ label, value }) => (
                 <div key={label}>
-                  <p style={{ fontSize: "0.6875rem", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "oklch(0.60 0.020 50)", marginBottom: "4px" }}>{label}</p>
-                  <p style={{ fontSize: "0.9375rem", fontWeight: 600, color: "oklch(0.22 0.035 45)" }}>{value}</p>
+                  <p style={{ fontSize: "0.6875rem", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "oklch(0.56 0.003 264)", marginBottom: "4px" }}>{label}</p>
+                  <p style={{ fontSize: "0.9375rem", fontWeight: 600, color: "oklch(0.15 0.004 264)" }}>{value}</p>
                 </div>
               ))}
             </div>
 
             {/* Notes */}
-            <div style={{ padding: "16px 24px", borderBottom: "1px solid oklch(0.895 0.014 56)" }}>
-              <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "oklch(0.60 0.020 50)", marginBottom: "8px" }}>
+            <div style={{ padding: "16px 24px", borderBottom: "1px solid oklch(0.895 0.002 264)" }}>
+              <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "oklch(0.56 0.003 264)", marginBottom: "8px" }}>
                 Nota (pilihan)
               </p>
               <textarea
@@ -185,16 +185,16 @@ export default function LawyerPage() {
                 rows={2}
                 style={{
                   width: "100%", padding: "10px 14px",
-                  border: "1.5px solid oklch(0.875 0.016 55)",
+                  border: "1.5px solid oklch(0.876 0.003 264)",
                   borderRadius: "10px", fontSize: "0.875rem",
-                  color: "oklch(0.13 0.025 45)",
-                  background: "oklch(0.99 0.005 58)",
+                  color: "oklch(0.09 0.006 264)",
+                  background: "oklch(0.998 0 0)",
                   resize: "none", outline: "none",
                   fontFamily: "inherit",
                   transition: "border-color 150ms ease-out",
                 }}
                 onFocus={e => (e.target.style.borderColor = "oklch(0.55 0.14 40)")}
-                onBlur={e => (e.target.style.borderColor = "oklch(0.875 0.016 55)")}
+                onBlur={e => (e.target.style.borderColor = "oklch(0.876 0.003 264)")}
               />
             </div>
 
