@@ -58,6 +58,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const role = (appUser?.role ?? "user") as AppRole;
   const firm = useQuery(api.firms.getById, appUser?.firmId ? { id: appUser.firmId } : "skip");
+  const counts = useQuery(api.agreements.getDashboardCounts, appUser?.firmId ? { firmId: appUser.firmId } : "skip");
+  const pendingReview = counts?.pendingReview ?? 0;
 
   // "user" role — show waiting screen
   if (role === "user") {
@@ -150,6 +152,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = "oklch(0.78 0.012 56)"; }}
                   onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = "oklch(0.54 0.003 264)"; }}>
                     {item.label}
+                    {item.href === "/dashboard/lawyer" && pendingReview > 0 && (
+                      <span style={{
+                        display: "inline-flex", alignItems: "center", justifyContent: "center",
+                        minWidth: "18px", height: "18px", padding: "0 5px",
+                        background: "oklch(0.55 0.14 40)", color: "oklch(0.998 0 0)",
+                        borderRadius: "999px", fontSize: "0.625rem", fontWeight: 700,
+                        marginLeft: "6px", lineHeight: 1,
+                      }}>{pendingReview}</span>
+                    )}
                   </div>
                 </Link>
               );
@@ -228,8 +239,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           return (
             <Link key={item.href + item.label} href={item.href} style={{ flex: 1, textDecoration: "none", display: "flex" }}>
-              <div className={`bottom-nav-item${active ? " active" : ""}`}>
-                <item.Icon size={20} />
+              <div className={`bottom-nav-item${active ? " active" : ""}`} style={{ position: "relative" }}>
+                <div style={{ position: "relative", lineHeight: 0 }}>
+                  <item.Icon size={20} />
+                  {item.href === "/dashboard/lawyer" && pendingReview > 0 && (
+                    <span style={{
+                      position: "absolute", top: "-4px", right: "-6px",
+                      width: "8px", height: "8px", borderRadius: "50%",
+                      background: "oklch(0.55 0.14 40)",
+                      border: "1.5px solid oklch(0.118 0.008 264)",
+                    }} />
+                  )}
+                </div>
                 <span className="bottom-nav-label">{item.label}</span>
               </div>
             </Link>
