@@ -8,14 +8,18 @@ import { Id } from "@convex/_generated/dataModel";
 
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Admin",
-  lawyer: "Peguam",
-  admin: "Admin",
+  firm_owner:  "Pemilik Firma",
+  lawyer:      "Peguam",
+  admin:       "Admin",
+  user:        "Menunggu Peruntukan",
 };
 
 const ROLE_COLORS: Record<string, { bg: string; fg: string }> = {
   super_admin: { bg: "oklch(0.55 0.14 40 / 0.10)", fg: "oklch(0.42 0.12 40)" },
-  lawyer:      { bg: "oklch(0.910 0.050 292)",     fg: "oklch(0.36 0.105 292)" },
-  admin:       { bg: "oklch(0.938 0.002 264)",      fg: "oklch(0.38 0.003 264)" },
+  firm_owner:  { bg: "oklch(0.55 0.14 40 / 0.10)", fg: "oklch(0.42 0.12 40)" },
+  lawyer:      { bg: "oklch(0.910 0.050 292)",      fg: "oklch(0.36 0.105 292)" },
+  admin:       { bg: "oklch(0.938 0.002 264)",       fg: "oklch(0.38 0.003 264)" },
+  user:        { bg: "oklch(0.930 0.065 72)",        fg: "oklch(0.38 0.120 65)" },
 };
 
 function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
@@ -65,9 +69,9 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
 
-  const isSuperAdmin = appUser?.role === "super_admin";
+  const canManageUsers = appUser?.role === "super_admin" || appUser?.role === "firm_owner";
 
-  const handleRoleChange = async (userId: Id<"users">, role: "super_admin" | "lawyer" | "admin") => {
+  const handleRoleChange = async (userId: Id<"users">, role: "super_admin" | "firm_owner" | "lawyer" | "admin" | "user") => {
     setUpdatingRole(userId);
     await updateRole({ id: userId, role });
     setUpdatingRole(null);
@@ -191,7 +195,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Users & Roles — super_admin only */}
-      {isSuperAdmin && (
+      {canManageUsers && (
         <div style={{
           background: "oklch(0.998 0 0)", border: "1px solid oklch(0.876 0.003 264)",
           borderRadius: "18px", overflow: "hidden",
@@ -231,7 +235,7 @@ export default function SettingsPage() {
                       <select
                         value={u.role}
                         disabled={isMe}
-                        onChange={e => handleRoleChange(u._id, e.target.value as "super_admin" | "lawyer" | "admin")}
+                        onChange={e => handleRoleChange(u._id, e.target.value as "super_admin" | "firm_owner" | "lawyer" | "admin" | "user")}
                         style={{
                           padding: "5px 28px 5px 10px", borderRadius: "8px",
                           border: `1px solid ${colors.bg}`,
@@ -244,9 +248,10 @@ export default function SettingsPage() {
                           opacity: isMe ? 0.7 : 1,
                         }}
                       >
-                        <option value="super_admin">Super Admin</option>
+                        <option value="firm_owner">Pemilik Firma</option>
                         <option value="lawyer">Peguam</option>
                         <option value="admin">Admin</option>
+                        <option value="user">Menunggu Peruntukan</option>
                       </select>
                     )}
                   </div>

@@ -23,9 +23,11 @@ export default defineSchema({
     name: v.string(),
     email: v.string(),
     role: v.union(
-      v.literal("super_admin"),  // You (Sewasah owner)
-      v.literal("lawyer"),       // Lawyer who approves
-      v.literal("admin")         // Office staff who creates agreements
+      v.literal("super_admin"),  // Sewasah platform owner
+      v.literal("firm_owner"),   // Created the firm, manages users
+      v.literal("lawyer"),       // Reviews and approves agreements
+      v.literal("admin"),        // Creates agreements (office staff)
+      v.literal("user")          // Default — pending role assignment
     ),
     isActive: v.boolean(),
     createdAt: v.number(),

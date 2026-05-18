@@ -9,6 +9,14 @@ export const getById = query({
   },
 });
 
+// Get the first active firm (used for auto-registration of new users)
+export const getFirst = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("firms").filter(q => q.eq(q.field("isActive"), true)).first();
+  },
+});
+
 // Get all firms (super admin only)
 export const list = query({
   args: {},
