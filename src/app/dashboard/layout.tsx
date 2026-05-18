@@ -42,11 +42,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     if (!isLoaded) return;
     if (needsSetup) { router.push("/setup"); return; }
-    // Role-based landing redirect (only from /dashboard root)
     if (pathname === "/dashboard") {
-      if (appUser?.role === "super_admin") router.push("/admin");
-      else if (appUser?.role === "lawyer") router.push("/dashboard/lawyer");
+      // super_admin: redirect to /admin only on first visit (not when coming from /admin)
+      if (appUser?.role === "super_admin") {
+        const fromAdmin = sessionStorage.getItem("visited_dashboard");
+        if (!fromAdmin) router.push("/admin");
+      }
+      // lawyer: always go to review queue
+      if (appUser?.role === "lawyer") router.push("/dashboard/lawyer");
     }
+    sessionStorage.setItem("visited_dashboard", "1");
   }, [isLoaded, needsSetup, appUser?.role, pathname, router]);
 
   useEffect(() => {
