@@ -1,10 +1,19 @@
-import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+"use client";
 
-export default async function Home() {
-  const { userId } = await auth();
-  if (userId) redirect("/dashboard");
+import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+export default function Home() {
+  const { userId, isLoaded } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoaded && userId) router.push("/dashboard");
+  }, [isLoaded, userId, router]);
+
+  if (!isLoaded || userId) return null;
 
   return (
     <div style={{ minHeight: "100vh", background: "oklch(0.998 0 0)", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
