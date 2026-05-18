@@ -216,16 +216,12 @@
   .main-content { padding: 32px 32px 48px; }
   .col-hide-mobile { display: table-cell; }
 
-  /* Bento stat grid — asymmetric, not boring 4-equal */
+  /* Stats grid */
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
   }
-  /* Pending Review: dominant 2/3-wide card */
-  .stats-grid > div:nth-child(1) { grid-column: span 2; }
-  /* Total This Month: wide footer card */
-  .stats-grid > div:nth-child(4) { grid-column: span 2; }
 
   /* ── Bottom nav ──────────────────────────────────────────────────────────── */
   .bottom-nav {
@@ -296,12 +292,7 @@
     .bottom-nav { display: flex; }
     .top-nav-tabs { display: none !important; }
     .flag-badge { display: none; }
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-    .stats-grid > div:nth-child(1),
-    .stats-grid > div:nth-child(4) { grid-column: span 1; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .dashboard-header { flex-direction: column; align-items: flex-start; gap: 16px; }
     .main-content { padding: 20px 16px calc(80px + env(safe-area-inset-bottom, 12px)); }
     .col-hide-mobile { display: none; }
