@@ -39,7 +39,7 @@ export default function SetupPage() {
         name: user.fullName ?? user.primaryEmailAddress?.emailAddress ?? "Admin",
         email: user.primaryEmailAddress?.emailAddress ?? "",
         firmId,
-        role: "admin",
+        role: "super_admin",
       });
 
       router.push("/dashboard");

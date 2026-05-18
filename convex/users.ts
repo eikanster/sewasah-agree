@@ -12,6 +12,32 @@ export const getByClerkId = query({
   },
 });
 
+// Update user role
+export const updateRole = mutation({
+  args: {
+    id: v.id("users"),
+    role: v.union(
+      v.literal("super_admin"),
+      v.literal("lawyer"),
+      v.literal("admin")
+    ),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { role: args.role });
+  },
+});
+
+// List all users for a firm
+export const listByFirm = query({
+  args: { firmId: v.id("firms") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .filter(q => q.eq(q.field("firmId"), args.firmId))
+      .collect();
+  },
+});
+
 // Create or update user on sign in
 export const upsert = mutation({
   args: {

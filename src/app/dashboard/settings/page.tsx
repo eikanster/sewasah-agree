@@ -4,6 +4,19 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useAppUser } from "@/hooks/use-app-user";
+import { Id } from "@convex/_generated/dataModel";
+
+const ROLE_LABELS: Record<string, string> = {
+  super_admin: "Super Admin",
+  lawyer: "Peguam",
+  admin: "Admin",
+};
+
+const ROLE_COLORS: Record<string, { bg: string; fg: string }> = {
+  super_admin: { bg: "oklch(0.55 0.14 40 / 0.10)", fg: "oklch(0.42 0.12 40)" },
+  lawyer:      { bg: "oklch(0.910 0.050 292)",     fg: "oklch(0.36 0.105 292)" },
+  admin:       { bg: "oklch(0.938 0.002 264)",      fg: "oklch(0.38 0.003 264)" },
+};
 
 function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
   return (
@@ -45,9 +58,20 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
 export default function SettingsPage() {
   const { appUser } = useAppUser();
   const firm = useQuery(api.firms.getById, appUser?.firmId ? { id: appUser.firmId } : "skip");
+  const users = useQuery(api.users.listByFirm, appUser?.firmId ? { firmId: appUser.firmId } : "skip");
   const updateFirm = useMutation(api.firms.update);
+  const updateRole = useMutation(api.users.updateRole);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [updatingRole, setUpdatingRole] = useState<string | null>(null);
+
+  const isSuperAdmin = appUser?.role === "super_admin";
+
+  const handleRoleChange = async (userId: Id<"users">, role: "super_admin" | "lawyer" | "admin") => {
+    setUpdatingRole(userId);
+    await updateRole({ id: userId, role });
+    setUpdatingRole(null);
+  };
 
   const [form, setForm] = useState({
     name: "", address: "", phone: "", email: "",
@@ -165,6 +189,78 @@ export default function SettingsPage() {
           </Field>
         </div>
       </div>
+
+      {/* Users & Roles — super_admin only */}
+      {isSuperAdmin && (
+        <div style={{
+          background: "oklch(0.998 0 0)", border: "1px solid oklch(0.876 0.003 264)",
+          borderRadius: "18px", overflow: "hidden",
+          boxShadow: "0 1px 3px oklch(0.12 0.006 264 / 0.05)", marginBottom: "16px",
+        }}>
+          <div style={{ padding: "20px 24px", borderBottom: "1px solid oklch(0.895 0.002 264)",
+            background: "oklch(0.963 0.002 264)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: "oklch(0.09 0.006 264)", margin: 0 }}>
+              Pengurusan Pengguna
+            </p>
+            <span style={{ fontSize: "0.6875rem", color: "oklch(0.56 0.003 264)" }}>
+              {users?.length ?? 0} pengguna
+            </span>
+          </div>
+          <div style={{ padding: "8px 0" }}>
+            {users?.map(u => {
+              const colors = ROLE_COLORS[u.role] ?? ROLE_COLORS.admin;
+              const isMe = u._id === appUser?._id;
+              return (
+                <div key={u._id} style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "14px 24px",
+                  borderBottom: "1px solid oklch(0.938 0.002 264)",
+                }}>
+                  <div>
+                    <p style={{ fontSize: "0.9375rem", fontWeight: 600, color: "oklch(0.09 0.006 264)", margin: 0 }}>
+                      {u.name} {isMe && <span style={{ fontSize: "0.75rem", color: "oklch(0.56 0.003 264)", fontWeight: 400 }}>(anda)</span>}
+                    </p>
+                    <p style={{ fontSize: "0.8125rem", color: "oklch(0.56 0.003 264)", margin: "2px 0 0" }}>
+                      {u.email}
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    {updatingRole === u._id ? (
+                      <span style={{ fontSize: "0.75rem", color: "oklch(0.56 0.003 264)" }}>Menyimpan...</span>
+                    ) : (
+                      <select
+                        value={u.role}
+                        disabled={isMe}
+                        onChange={e => handleRoleChange(u._id, e.target.value as "super_admin" | "lawyer" | "admin")}
+                        style={{
+                          padding: "5px 28px 5px 10px", borderRadius: "8px",
+                          border: `1px solid ${colors.bg}`,
+                          background: colors.bg, color: colors.fg,
+                          fontSize: "0.8125rem", fontWeight: 600,
+                          cursor: isMe ? "not-allowed" : "pointer",
+                          outline: "none", appearance: "none",
+                          backgroundImage: isMe ? "none" : `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
+                          backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center",
+                          opacity: isMe ? 0.7 : 1,
+                        }}
+                      >
+                        <option value="super_admin">Super Admin</option>
+                        <option value="lawyer">Peguam</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+            {(!users || users.length === 0) && (
+              <p style={{ padding: "20px 24px", fontSize: "0.875rem", color: "oklch(0.56 0.003 264)" }}>
+                Tiada pengguna lain dalam firma ini.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* PDF Preview Note */}
       <div style={{
