@@ -57,7 +57,7 @@ export default function LawyerPage() {
       maintenanceFee: agreement.maintenanceFee,
       stampDuty: agreement.stampDuty,
     };
-    const res = await fetch("/api/generate-pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+    const res = await fetch("/api/generate-pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...data, agreementType: agreement.agreementType ?? "residential" }) });
     const html = await res.text();
     window.open(URL.createObjectURL(new Blob([html], { type: "text/html" })), "_blank");
   };
