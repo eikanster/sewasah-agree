@@ -17,14 +17,28 @@ export const getFirst = query({
   },
 });
 
-// Get firm by invite code (slug)
+// Get firm by invite code
 export const getByInviteCode = query({
   args: { code: v.string() },
   handler: async (ctx, args) => {
+    const code = args.code.toUpperCase().trim();
     return await ctx.db
       .query("firms")
-      .filter(q => q.eq(q.field("slug"), args.code.toLowerCase().trim()))
+      .filter(q => q.eq(q.field("inviteCode"), code))
       .first();
+  },
+});
+
+// Regenerate invite code
+export const regenerateInviteCode = mutation({
+  args: { id: v.id("firms") },
+  handler: async (ctx, args) => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const code = "SA-" + Array.from({ length: 6 }, () =>
+      chars[Math.floor(Math.random() * chars.length)]
+    ).join("");
+    await ctx.db.patch(args.id, { inviteCode: code });
+    return code;
   },
 });
 
@@ -101,8 +115,13 @@ export const create = mutation({
     address: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const inviteCode = "SA-" + Array.from({ length: 6 }, () =>
+      chars[Math.floor(Math.random() * chars.length)]
+    ).join("");
     return await ctx.db.insert("firms", {
       ...args,
+      inviteCode,
       isActive: true,
       createdAt: Date.now(),
     });

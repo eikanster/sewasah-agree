@@ -12,6 +12,7 @@ export default defineSchema({
     email: v.optional(v.string()),
     lawyerName: v.optional(v.string()),
     barNo: v.optional(v.string()),
+    inviteCode: v.optional(v.string()),
     isActive: v.boolean(),
     createdAt: v.number(),
   }),

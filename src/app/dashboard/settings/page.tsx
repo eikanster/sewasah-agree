@@ -65,9 +65,27 @@ export default function SettingsPage() {
   const users = useQuery(api.users.listByFirm, appUser?.firmId ? { firmId: appUser.firmId } : "skip");
   const updateFirm = useMutation(api.firms.update);
   const updateRole = useMutation(api.users.updateRole);
+  const regenCode = useMutation(api.firms.regenerateInviteCode);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
+  const [regenLoading, setRegenLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyCode = () => {
+    if (firm?.inviteCode) {
+      navigator.clipboard.writeText(firm.inviteCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleRegenCode = async () => {
+    if (!appUser?.firmId) return;
+    setRegenLoading(true);
+    await regenCode({ id: appUser.firmId });
+    setRegenLoading(false);
+  };
 
   const canManageUsers = appUser?.role === "super_admin" || appUser?.role === "firm_owner";
 
@@ -287,18 +305,21 @@ export default function SettingsPage() {
             background: "oklch(0.963 0.002 264)", border: "1px solid oklch(0.876 0.003 264)",
             borderRadius: "10px", padding: "12px 16px",
           }}>
-            <code style={{ flex: 1, fontSize: "0.9375rem", fontWeight: 600, color: "oklch(0.55 0.14 40)", fontFamily: "monospace", letterSpacing: "0.02em" }}>
-              {firm?.slug ?? "—"}
+            <code style={{ flex: 1, fontSize: "1.125rem", fontWeight: 700, color: "oklch(0.55 0.14 40)", fontFamily: "monospace", letterSpacing: "0.1em" }}>
+              {firm?.inviteCode ?? "—"}
             </code>
-            <button
-              onClick={() => { if (firm?.slug) navigator.clipboard.writeText(firm.slug); }}
-              style={{ background: "none", border: "1px solid oklch(0.876 0.003 264)", borderRadius: "8px", padding: "5px 12px", fontSize: "0.8125rem", cursor: "pointer", color: "oklch(0.44 0.003 264)", transition: "all 150ms ease-out" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.14 40)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.876 0.003 264)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.44 0.003 264)"; }}
-            >
-              Salin
+            <button onClick={handleCopyCode} style={{ background: copied ? "oklch(0.55 0.14 40)" : "none", color: copied ? "oklch(0.998 0 0)" : "oklch(0.44 0.003 264)", border: "1px solid oklch(0.876 0.003 264)", borderRadius: "8px", padding: "5px 12px", fontSize: "0.8125rem", cursor: "pointer", transition: "all 150ms ease-out" }}>
+              {copied ? "✓ Disalin" : "Salin"}
+            </button>
+            <button onClick={handleRegenCode} disabled={regenLoading} style={{ background: "none", border: "1px solid oklch(0.876 0.003 264)", borderRadius: "8px", padding: "5px 12px", fontSize: "0.8125rem", cursor: regenLoading ? "not-allowed" : "pointer", color: "oklch(0.44 0.003 264)", transition: "all 150ms ease-out" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.48 0.18 27)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.48 0.18 27)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.876 0.003 264)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.44 0.003 264)"; }}>
+              {regenLoading ? "..." : "Jana Semula"}
             </button>
           </div>
+          <p style={{ fontSize: "0.75rem", color: "oklch(0.56 0.003 264)", margin: "8px 0 0" }}>
+            Klik "Jana Semula" jika kod ini telah dikongsi secara tidak sengaja. Kod lama tidak akan berfungsi.
+          </p>
         </div>
       </div>
 

@@ -229,7 +229,7 @@ export default function SetupPage() {
               <input
                 value={inviteCode}
                 onChange={e => { setInviteCode(e.target.value); setError(""); }}
-                placeholder="cth. syairus-rohan-associates"
+                placeholder="cth. SA-X7K2P9"
                 style={inputStyle}
                 onFocus={e => (e.target.style.borderColor = "oklch(0.55 0.14 40)")}
                 onBlur={e => (e.target.style.borderColor = "oklch(0.876 0.003 264)")}
