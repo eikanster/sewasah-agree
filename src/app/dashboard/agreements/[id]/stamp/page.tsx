@@ -27,19 +27,24 @@ export default function StampPage() {
 
   const handlePreview = async () => {
     const data: AgreementData = {
+      agreementRef: agreement.agreementRef,
       agreementDate: new Date(agreement.createdAt).toISOString().split("T")[0],
       landlordName: agreement.landlordName,
       landlordIc: agreement.landlordIc,
       landlordPhone: agreement.landlordPhone,
       landlordEmail: agreement.landlordEmail,
+      landlordAddress: agreement.landlordAddress ?? "",
       tenantName: agreement.tenantName,
       tenantIc: agreement.tenantIc,
       tenantPhone: agreement.tenantPhone,
       tenantEmail: agreement.tenantEmail,
+      tenantAddress: agreement.tenantAddress ?? "",
       tenantIsForeigner: agreement.tenantIsForeigner,
       propertyAddress: agreement.propertyAddress,
       propertyType: agreement.propertyType,
+      useOfPremises: (agreement.useOfPremises ?? "residential") as "residential" | "commercial",
       isFurnished: agreement.isFurnished,
+      propertyLegalDesc: agreement.propertyLegalDesc,
       monthlyRent: agreement.monthlyRent,
       tenancyDuration: agreement.tenancyDuration,
       startDate: agreement.startDate,
@@ -54,6 +59,7 @@ export default function StampPage() {
       bankName: agreement.bankName,
       bankAccountNo: agreement.bankAccountNo,
       bankAccountName: agreement.bankAccountName,
+      maintenanceFee: agreement.maintenanceFee,
       stampDuty: agreement.stampDuty,
     };
     const res = await fetch("/api/generate-pdf", {
@@ -73,6 +79,29 @@ export default function StampPage() {
 
   const handleMarkCompleted = async () => {
     await updateStatus({ id: agreement._id, status: "completed" });
+
+    // Send notification emails
+    try {
+      await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agreementRef: agreement.agreementRef ?? `SA-${agreement._id.slice(-6).toUpperCase()}`,
+          landlordName: agreement.landlordName,
+          landlordEmail: agreement.landlordEmail,
+          tenantName: agreement.tenantName,
+          tenantEmail: agreement.tenantEmail,
+          propertyAddress: agreement.propertyAddress,
+          monthlyRent: agreement.monthlyRent,
+          startDate: agreement.startDate,
+          endDate: agreement.endDate,
+          stampDuty: agreement.stampDuty,
+        }),
+      });
+    } catch (e) {
+      console.error("Email send failed:", e);
+    }
+
     router.push(`/dashboard/agreements/${id}`);
   };
 
