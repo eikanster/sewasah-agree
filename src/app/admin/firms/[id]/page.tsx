@@ -466,21 +466,39 @@ export default function FirmDetailPage() {
       {/* Tab: Settings */}
       {tab === "settings" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <Section title="Maklumat Asas">
+          <Section title="Maklumat Firma">
             <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "14px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "oklch(0.28 0.003 264)" }}>Nama Firma</label>
-                <input
-                  defaultValue={firm.name}
-                  onBlur={async e => { if (e.target.value !== firm.name) await updateFirm({ id: firmId, name: e.target.value }); }}
-                  style={{
-                    padding: "10px 14px", border: "1.5px solid oklch(0.876 0.003 264)",
-                    borderRadius: "10px", fontSize: "0.9375rem",
-                    color: "oklch(0.09 0.006 264)", background: "oklch(0.998 0 0)", outline: "none",
-                  }}
-                  onFocus={e => (e.target.style.borderColor = "oklch(0.55 0.14 40)")}
-                />
-              </div>
+              {[
+                { label: "Nama Firma *",  field: "name",    value: firm.name,    placeholder: "cth. Syairus Rohan & Associates" },
+                { label: "E-mel",         field: "email",   value: firm.email,   placeholder: "cth. info@firma.com.my" },
+                { label: "No. Telefon",   field: "phone",   value: firm.phone,   placeholder: "cth. 03-2123 4567" },
+                { label: "Alamat",        field: "address", value: firm.address, placeholder: "cth. Suite 12-3, Menara ABC, KL" },
+              ].map(({ label, field, value, placeholder }) => (
+                <div key={field} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "oklch(0.28 0.003 264)" }}>{label}</label>
+                  <input
+                    key={`${firm._id}-${field}`}
+                    defaultValue={value ?? ""}
+                    placeholder={placeholder}
+                    onBlur={async e => {
+                      const newVal = e.target.value.trim() || undefined;
+                      const oldVal = value ?? undefined;
+                      if (newVal !== oldVal) await updateFirm({ id: firmId, [field]: newVal });
+                    }}
+                    style={{
+                      padding: "10px 14px", border: "1.5px solid oklch(0.876 0.003 264)",
+                      borderRadius: "10px", fontSize: "0.9375rem",
+                      color: "oklch(0.09 0.006 264)", background: "oklch(0.998 0 0)",
+                      outline: "none", width: "100%", boxSizing: "border-box" as const,
+                    }}
+                    onFocus={e => (e.target.style.borderColor = "oklch(0.55 0.14 40)")}
+                    onBlurCapture={e => (e.target.style.borderColor = "oklch(0.876 0.003 264)")}
+                  />
+                </div>
+              ))}
+              <p style={{ fontSize: "0.75rem", color: "oklch(0.56 0.003 264)", margin: 0 }}>
+                Perubahan disimpan secara automatik apabila anda klik di luar medan.
+              </p>
             </div>
           </Section>
 
