@@ -47,6 +47,12 @@ export interface AgreementData {
   bankAccountNo: string;
   bankAccountName: string;
 
+  // Optional maintenance fee (e.g. condo maintenance)
+  maintenanceFee?: number;
+
+  // Optional full legal property description (title, lot, mukim, etc.)
+  propertyLegalDesc?: string;
+
   // Calculated
   stampDuty: number;
 
@@ -214,7 +220,7 @@ ${data.agreementRef ? `<div class="ref-line">Rujukan: ${data.agreementRef}</div>
 <p>3.&nbsp;&nbsp;The Tenant hereby covenants with the Landlord as follows:</p>
 <ol class="alpha">
   <li>To pay the Rent reserved on the days and in the manner provided in Section G;</li>
-  <li>To pay all charges in respect of electricity and/or water and/or telephone and other telecommunications equipment that may be used in the said Demised Premises promptly and directly to the appropriate authorities. The receipts or copies of it for the aforesaid charges shall be produced to the Landlord within fourteen (14) days of its payment to the relevant authorities upon demand by the Landlord;</li>
+  <li>To pay all charges in respect of electricity and/or water and/or Indah Water and/or telephone and other telecommunications equipment that may be used in the said Demised Premises up to date and/or maintenance charges and/or Indah Water promptly and directly to the appropriate authorities. The receipts or copies of it for the aforesaid charges shall be produced to the Landlord within fourteen (14) days of its payment to the relevant authorities upon demand by the Landlord;</li>
   <li>In the event that the electricity and water is recorded on a meter used in common with other Tenants of the Landlord, the Tenant will pay such a proportion of the total charges incurred as shall be assessed by the Landlord whose decision shall be final and binding on the Tenant;</li>
   <li>To pay to the Landlord upon the execution of this Agreement the sum as specified in Section I of the Schedule only as deposit for water and electricity charges to be incurred during the tenancy of the said Demised Premises. The said sum less sums as may then be payable by the Tenant under this Agreement shall be refunded without interest to the Tenant on the termination of this tenancy;</li>
   <li>To keep the said Demised Premises, the flooring and interior plaster or other surface material or rendering on walls and ceilings and the Landlord's fixtures thereon including doors, windows, glass shutters, locks fastenings, electric wires, installations and fittings for the light and power and other fixtures and additions therein in good and tenantable repair and clean condition and to replace or repair any part of the said Demised Premises which shall be broken or damaged due to malicious, negligent or careless acts or omission of the Tenant, his servants, agents, invitees or otherwise;</li>
@@ -233,9 +239,10 @@ ${data.agreementRef ? `<div class="ref-line">Rujukan: ${data.agreementRef}</div>
   <li>At all times during the term hereby created to comply with all such requirements as may be imposed on the Tenant by any laws, bye-laws, Ordinance or Act or Enactment of Parliament now or hereafter in force;</li>
   <li>To bear and pay for all charges expenses fees and costs (including solicitor-client's costs on an indemnity basis) in the event the Landlord commences legal proceedings for the recovery of all or any arrears of rental and or for any breach of any of the terms and conditions contained in this agreement;</li>
   <li>Not to use the Demised Premises for any illegal, unlawful or immoral purpose or any religious or political gatherings;</li>
-  <li>At all times during the three (3) months immediately preceding the determination of the Term to permit the Landlord or its agents to affix and retain on a conspicuous part of the Demised Premises a notice for reletting or the sale thereof and to permit intending tenants and others with written authority from the Landlord or its agents at reasonable time of the day to view the Demised Premises;</li>
+  <li>At all times during the two (2) months immediately preceding the determination of the Term to permit the Landlord or its agents to affix and retain on a conspicuous part of the Demised Premises a notice for reletting or the sale thereof and to permit intending tenants and others with written authority from the Landlord or its agents at reasonable time of the day to view the Demised Premises;</li>
   <li>Not to permit any sale by auction to be held on the Demised Premises or any part thereof; and</li>
   <li>To adopt all measures and precautions available for the purpose of eradicating and/or controlling rodents insects and pests from multiplying on the Demised Premises.</li>
+  <li>That the Tenant will bear all the cost for repairing and cleaning of the said Demised Premises during the tenancy period.</li>
 </ol>
 
 <h2>Landlord's Covenants</h2>
@@ -251,7 +258,7 @@ ${data.agreementRef ? `<div class="ref-line">Rujukan: ${data.agreementRef}</div>
   <li>If the Rent hereby reserved or any part thereof shall at any time be unpaid for seven (7) days after the same shall have become due (whether formally demanded for or not) or any covenant on the Tenant's part herein contained shall not be performed or observed, then and in any such cases it shall be lawful for the Landlord at any time thereafter to re-enter upon the said Demised Premises or any part thereof in the name of the whole and thereupon the tenancy shall absolutely determine but without prejudice to the right of action of the Landlord in respect of any antecedent breach of the conditions on the part of the Tenant herein contained.</li>
   <li>The Landlord may at his absolute discretion at the written request of the Tenant made not less than two (2) months before the expiration of term hereby created and if there shall not at the time of such request be any existing breach or non-observance of any of the covenants on the part of the Tenant herein contained, grant to the Tenant an option to renew the Tenancy of the said Demised Premises for a further term and at the rental stipulated in Section K of the Schedule with and subject to the same covenants and conditions as in this present Tenancy reserved and contained (excluding this present covenant for renewal).</li>
   <li>In case the Demised Premises or any part thereof should at any time during the tenancy hereby created be destroyed or damaged by fire explosion lightning riot or any other cause or Act of God so as to be unfit for occupation or use, the Landlord shall not be bound or compelled to rebuild or reinstate the same. If the Landlord decides to rebuild and reinstate the Demised Premises then the rent payable herein or a fair and just proportion thereof shall be waived or suspended until the Demised Premises shall have again been rendered fit for occupation or use.</li>
-  <li>Notwithstanding any contrary provisions herein, either party to this Agreement shall be entitled at their absolute discretion to terminate this Agreement by giving the other Three (3) months' notice in writing upon expiry of which this tenancy shall absolutely determine but without prejudice to the right of action of the parties in respect of any antecedent breach.</li>
+  <li>Notwithstanding any contrary provisions herein, either party to this Agreement shall be entitled at their absolute discretion to terminate this Agreement by giving the other two (2) months' notice in writing upon expiry of which this tenancy shall absolutely determine but without prejudice to the right of action of the parties in respect of any antecedent breach.</li>
   <li>If the tenant fails to pay the rent for two (2) consecutive months, the Landlord has the right to terminate the tenancy agreement.</li>
   <li>The Tenancy Agreement can be renewed after the expiry of the term subject to the mutual agreement between the Tenant and the Landlord.</li>
 </ol>
@@ -278,6 +285,18 @@ ${hasAdditional ? `
 
 <h2>Successors Bound</h2>
 <p>${hasAdditional ? "12" : "11"}.&nbsp;&nbsp;This Agreement shall be binding upon the successors in title and assigns personal representatives and heirs of the Landlord and Tenant.</p>
+
+<h2>Definitions and Interpretation</h2>
+<p>${hasAdditional ? "13" : "12"}.&nbsp;&nbsp;In this Agreement, unless the contrary intention appears:</p>
+<ol class="alpha">
+  <li>a reference to this Agreement or another instrument includes any variation or replacement of either of them;</li>
+  <li>a reference to a statute, ordinance, code or other law includes regulations and other instrument under it and consolidations, amendments, revisions or replacements of any of them;</li>
+  <li>the masculine gender includes the feminine and neuter gender and vice versa;</li>
+  <li>the singular includes the plural and vice versa;</li>
+  <li>any agreement, covenant, representation or warranty on part of or in favour of two or more persons shall be binding on or enforceable by such person jointly and severally;</li>
+  <li>words applicable to natural persons include any body of persons, company, corporation, firm or partnership corporate or unincorporate and vice versa;</li>
+  <li>the schedules and appendices annexed hereto (if any) shall form an integral part of this Agreement.</li>
+</ol>
 
 <div class="divider"></div>
 
@@ -334,12 +353,12 @@ ${hasAdditional ? `
   <tr>
     <td>D</td>
     <td>Description of the Premises</td>
-    <td>${data.propertyAddress}</td>
+    <td>${data.propertyLegalDesc ? data.propertyLegalDesc + "<br><br>bearing postal address of " + data.propertyAddress : data.propertyAddress}</td>
   </tr>
   <tr>
     <td>E</td>
     <td>Description of the Demised Premises</td>
-    <td>${data.propertyAddress}</td>
+    <td>${data.propertyLegalDesc ? data.propertyLegalDesc + "<br><br>bearing postal address of " + data.propertyAddress : data.propertyAddress}</td>
   </tr>
   <tr>
     <td>F</td>
@@ -349,10 +368,13 @@ ${hasAdditional ? `
   <tr>
     <td>G</td>
     <td>The rate of monthly rental</td>
-    <td>${moneyInWords(data.monthlyRent)} (${formatMoney(data.monthlyRent)}) per month, payable on or before the ${ordinal(data.paymentDueDay)} day of each month to:<br><br>
-    Bank: ${data.bankName}<br>
-    Account No: ${data.bankAccountNo}<br>
-    Account Name: ${data.bankAccountName}</td>
+    <td>
+      ${moneyInWords(data.monthlyRent)} (${formatMoney(data.monthlyRent)}) per month
+      ${data.maintenanceFee ? `<br><br>AND<br><br>${moneyInWords(data.maintenanceFee)} (${formatMoney(data.maintenanceFee)}) per month <em>(maintenance fee)</em><br><br>Making a total sum of ${moneyInWords(data.monthlyRent + data.maintenanceFee)} (${formatMoney(data.monthlyRent + data.maintenanceFee)}) only` : ""}
+      <br><br>The rent aforesaid shall be payable in advance on or before the ${ordinal(data.paymentDueDay)} day of each and every succeeding month through:<br><br>
+      <strong>${data.bankName}</strong> Account No. ${data.bankAccountNo}<br>
+      in favour of <strong>${data.bankAccountName}</strong>
+    </td>
   </tr>
   <tr>
     <td>H</td>
@@ -361,7 +383,7 @@ ${hasAdditional ? `
   </tr>
   <tr>
     <td>I</td>
-    <td>Water and Electricity Deposit</td>
+    <td>Water, Electricity &amp; Other Utilities Deposit</td>
     <td>${moneyInWords(data.utilitiesDeposit)} (${formatMoney(data.utilitiesDeposit)})</td>
   </tr>
   <tr>

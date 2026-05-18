@@ -93,10 +93,16 @@ export default defineSchema({
     renovationAllowed: v.boolean(),
     airconUnits: v.number(),
 
+    // Optional property legal description (title, lot, mukim, daerah)
+    propertyLegalDesc: v.optional(v.string()),
+
     // Bank details
     bankName: v.string(),
     bankAccountNo: v.string(),
     bankAccountName: v.string(),
+
+    // Optional maintenance fee (condos etc.)
+    maintenanceFee: v.optional(v.number()),
 
     // Calculated fields
     stampDuty: v.number(),

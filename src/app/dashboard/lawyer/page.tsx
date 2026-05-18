@@ -51,8 +51,11 @@ export default function LawyerPage() {
       securityDeposit: agreement.securityDeposit, utilitiesDeposit: agreement.utilitiesDeposit,
       petsAllowed: agreement.petsAllowed, sublettingAllowed: agreement.sublettingAllowed,
       renovationAllowed: agreement.renovationAllowed, airconUnits: agreement.airconUnits,
+      propertyLegalDesc: agreement.propertyLegalDesc,
       bankName: agreement.bankName, bankAccountNo: agreement.bankAccountNo,
-      bankAccountName: agreement.bankAccountName, stampDuty: agreement.stampDuty,
+      bankAccountName: agreement.bankAccountName,
+      maintenanceFee: agreement.maintenanceFee,
+      stampDuty: agreement.stampDuty,
     };
     const res = await fetch("/api/generate-pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
     const html = await res.text();

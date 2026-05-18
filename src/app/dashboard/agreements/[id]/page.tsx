@@ -78,9 +78,11 @@ export default function AgreementDetailPage() {
       sublettingAllowed: agreement.sublettingAllowed,
       renovationAllowed: agreement.renovationAllowed,
       airconUnits: agreement.airconUnits,
+      propertyLegalDesc: agreement.propertyLegalDesc,
       bankName: agreement.bankName,
       bankAccountNo: agreement.bankAccountNo,
       bankAccountName: agreement.bankAccountName,
+      maintenanceFee: agreement.maintenanceFee,
       stampDuty: agreement.stampDuty,
     };
 

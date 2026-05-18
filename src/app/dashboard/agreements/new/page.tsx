@@ -227,7 +227,8 @@ export default function NewAgreementPage() {
     tenantIsForeigner: false,
     propertyAddress: "", propertyType: "apartment",
     useOfPremises: "residential", isFurnished: "unfurnished",
-    monthlyRent: "", tenancyDuration: "12", startDate: "", paymentDueDay: "6",
+    propertyLegalDesc: "",
+    monthlyRent: "", maintenanceFee: "", tenancyDuration: "12", startDate: "", paymentDueDay: "6",
     utilitiesDeposit: "300",
     petsAllowed: false, sublettingAllowed: false, renovationAllowed: false,
     airconUnits: "0",
@@ -269,8 +270,10 @@ export default function NewAgreementPage() {
         sublettingAllowed: form.sublettingAllowed as boolean,
         renovationAllowed: form.renovationAllowed as boolean,
         airconUnits: parseInt(form.airconUnits),
+        propertyLegalDesc: form.propertyLegalDesc || undefined,
         bankName: form.bankName, bankAccountNo: form.bankAccountNo,
         bankAccountName: form.bankAccountName,
+        maintenanceFee: form.maintenanceFee ? parseFloat(form.maintenanceFee) : undefined,
         stampDuty, aiFlags: flags,
       });
       router.push("/dashboard");
@@ -390,7 +393,10 @@ export default function NewAgreementPage() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
             <Field label="Alamat Penuh Hartanah *">
-              <Input value={form.propertyAddress} onChange={e => set("propertyAddress", e.target.value)} placeholder="cth. Unit 2-12, Tingkat 2, Pangsapuri Suria Subang, 40150 Shah Alam" />
+              <Input value={form.propertyAddress} onChange={e => set("propertyAddress", e.target.value)} placeholder="cth. No. 64, Jalan Karyawan Bestari, Puncak Bestari, 42300 Bandar Puncak Alam, Selangor" />
+            </Field>
+            <Field label="Perihal Hartanah Penuh (pilihan — untuk Section D/E)" hint="Untuk hartanah dengan nombor hakmilik, lot, mukim dan daerah. Biarkan kosong jika tidak berkenaan.">
+              <Input value={form.propertyLegalDesc} onChange={e => set("propertyLegalDesc", e.target.value)} placeholder="cth. H.S.(D) 22376, PT 21260, Mukim Ijok, Daerah Kuala Selangor, Negeri Selangor, 261 sq. metres, Double Storey Semi-D" />
             </Field>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               <Field label="Jenis Hartanah">
@@ -439,6 +445,9 @@ export default function NewAgreementPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               <Field label="Sewa Bulanan (RM) *">
                 <Input type="number" value={form.monthlyRent} onChange={e => set("monthlyRent", e.target.value)} placeholder="2500" />
+              </Field>
+              <Field label="Yuran Penyelenggaraan (RM/bulan)" hint="Biarkan kosong jika tiada">
+                <Input type="number" value={form.maintenanceFee} onChange={e => set("maintenanceFee", e.target.value)} placeholder="cth. 120" />
               </Field>
               <Field label="Tempoh Sewaan">
                 <Select value={form.tenancyDuration} onChange={e => set("tenancyDuration", e.target.value)}>
