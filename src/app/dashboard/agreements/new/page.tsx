@@ -33,11 +33,65 @@ function aiFlags(form: Record<string, unknown>): string[] {
   return f;
 }
 
+// ─── Validation ───────────────────────────────────────────────────────────
+
+type FormErrors = Record<string, string>;
+
+function validateStep(step: number, form: Record<string, unknown>, templateType: string): FormErrors {
+  const errors: FormErrors = {};
+  const req = (key: string, label: string) => {
+    if (!form[key] || String(form[key]).trim() === "") errors[key] = `${label} diperlukan`;
+  };
+  const icFormat = (key: string, label: string) => {
+    const val = String(form[key] ?? "").replace(/-/g, "");
+    if (val && !/^\d{12}$/.test(val)) errors[key] = `${label} mesti 12 digit (cth. 820122025032)`;
+  };
+  const phoneFormat = (key: string, label: string) => {
+    const val = String(form[key] ?? "");
+    if (val && !/^[0-9+\-\s]{8,15}$/.test(val)) errors[key] = `${label} tidak sah`;
+  };
+
+  if (step === 1) {
+    req("landlordName",    "Nama tuan rumah");
+    req("landlordIc",     "No. IC tuan rumah");
+    req("landlordPhone",  "No. telefon tuan rumah");
+    req("landlordAddress","Alamat tuan rumah");
+    req("tenantName",     "Nama penyewa");
+    req("tenantIc",       "No. IC penyewa");
+    req("tenantPhone",    "No. telefon penyewa");
+    req("tenantAddress",  "Alamat penyewa");
+    icFormat("landlordIc", "No. IC tuan rumah");
+    icFormat("tenantIc",   "No. IC penyewa");
+    phoneFormat("landlordPhone", "No. telefon tuan rumah");
+    phoneFormat("tenantPhone",   "No. telefon penyewa");
+  }
+  if (step === 2) {
+    req("propertyAddress", "Alamat hartanah");
+    if (templateType === "room") req("roomIdentifier", "Pengenalan bilik");
+  }
+  if (step === 3) {
+    req("monthlyRent", "Sewa bulanan");
+    req("startDate",   "Tarikh mula");
+    if (parseFloat(String(form.monthlyRent)) <= 0) errors.monthlyRent = "Sewa mesti lebih dari RM 0";
+  }
+  if (step === 4) {
+    req("bankName",        "Nama bank");
+    req("bankAccountNo",   "No. akaun");
+    req("bankAccountName", "Nama akaun");
+  }
+  return errors;
+}
+
 // ─── Styled Input ─────────────────────────────────────────────────────────
 
-function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
+function Field({ label, children, hint, error }: { label: string; children: React.ReactNode; hint?: string; error?: string }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      {error && (
+        <p style={{ fontSize: "0.75rem", color: "oklch(0.48 0.18 27)", margin: "0 0 2px", fontWeight: 500 }}>
+          ⚠ {error}
+        </p>
+      )}
       <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "oklch(0.28 0.003 264)" }}>
         {label}
       </label>
@@ -302,8 +356,18 @@ export default function NewAgreementPage() {
   const [templateType, setTemplateType] = useState<AgreementType | "">("");
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const goToStep = (n: number) => {
+    // Validate current step before advancing
+    if (n > step) {
+      const errs = validateStep(step, form as Record<string, unknown>, templateType);
+      if (Object.keys(errs).length > 0) {
+        setErrors(errs);
+        return;
+      }
+    }
+    setErrors({});
     setStep(n);
     const el = document.getElementById("main-scroll");
     if (el) el.scrollTop = 0;
@@ -330,7 +394,10 @@ export default function NewAgreementPage() {
     bankName: "", bankAccountNo: "", bankAccountName: "",
   });
 
-  const set = (k: string, v: string | boolean) => setForm(p => ({ ...p, [k]: v }));
+  const set = (k: string, v: string | boolean) => {
+    setForm(p => ({ ...p, [k]: v }));
+    setErrors(e => { const n = { ...e }; delete n[k]; return n; });
+  };
 
   const rent = parseFloat(form.monthlyRent) || 0;
   const duration = parseInt(form.tenancyDuration) || 12;
@@ -464,21 +531,21 @@ export default function NewAgreementPage() {
           <div style={{ marginBottom: "8px" }}>
             <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.14 40)", marginBottom: "16px" }}>Tuan Rumah</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
-              <Field label="Nama Penuh (seperti dalam IC) *">
+              <Field label="Nama Penuh (seperti dalam IC) *" error={errors.landlordName}>
                 <Input value={form.landlordName} onChange={e => set("landlordName", e.target.value)} placeholder="cth. Ahmad bin Rosli" />
               </Field>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                <Field label="No. IC *">
-                  <Input value={form.landlordIc} onChange={e => set("landlordIc", e.target.value)} placeholder="820122-02-5032" />
+                <Field label="No. IC *" error={errors.landlordIc}>
+                  <Input value={form.landlordIc} onChange={e => set("landlordIc", e.target.value)} placeholder="820122025032" />
                 </Field>
-                <Field label="No. Telefon *">
+                <Field label="No. Telefon *" error={errors.landlordPhone}>
                   <Input value={form.landlordPhone} onChange={e => set("landlordPhone", e.target.value)} placeholder="0123456789" />
                 </Field>
               </div>
               <Field label="E-mel (pilihan)">
                 <Input value={form.landlordEmail} onChange={e => set("landlordEmail", e.target.value)} placeholder="ahmad@email.com" />
               </Field>
-              <Field label="Alamat (seperti dalam IC) *">
+              <Field label="Alamat (seperti dalam IC) *" error={errors.landlordAddress}>
                 <Input value={form.landlordAddress} onChange={e => set("landlordAddress", e.target.value)} placeholder="cth. No. 12, Jalan Maju, 50000 Kuala Lumpur" />
               </Field>
             </div>
@@ -489,21 +556,21 @@ export default function NewAgreementPage() {
           <div>
             <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.14 40)", marginBottom: "16px" }}>Penyewa</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
-              <Field label="Nama Penuh (seperti dalam IC) *">
+              <Field label="Nama Penuh (seperti dalam IC) *" error={errors.tenantName}>
                 <Input value={form.tenantName} onChange={e => set("tenantName", e.target.value)} placeholder="cth. Siti binti Aminah" />
               </Field>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                <Field label="No. IC *">
-                  <Input value={form.tenantIc} onChange={e => set("tenantIc", e.target.value)} placeholder="900515-10-1234" />
+                <Field label="No. IC *" error={errors.tenantIc}>
+                  <Input value={form.tenantIc} onChange={e => set("tenantIc", e.target.value)} placeholder="900515101234" />
                 </Field>
-                <Field label="No. Telefon *">
+                <Field label="No. Telefon *" error={errors.tenantPhone}>
                   <Input value={form.tenantPhone} onChange={e => set("tenantPhone", e.target.value)} placeholder="0198765432" />
                 </Field>
               </div>
               <Field label="E-mel (pilihan)">
                 <Input value={form.tenantEmail} onChange={e => set("tenantEmail", e.target.value)} placeholder="siti@email.com" />
               </Field>
-              <Field label="Alamat (seperti dalam IC) *">
+              <Field label="Alamat (seperti dalam IC) *" error={errors.tenantAddress}>
                 <Input value={form.tenantAddress} onChange={e => set("tenantAddress", e.target.value)} placeholder="cth. No. 57, Jalan Damai, 40150 Shah Alam" />
               </Field>
               <Toggle label="Penyewa adalah warga asing dengan permit kerja (aktifkan Klausa Ekspatriat)" checked={form.tenantIsForeigner as boolean} onChange={v => set("tenantIsForeigner", v)} />
@@ -519,11 +586,11 @@ export default function NewAgreementPage() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
             {templateType === "room" && (
-              <Field label="Pengenalan Bilik *" hint="cth. Bilik Utama, Bilik 2, Bilik Belakang">
+              <Field label="Pengenalan Bilik *" hint="cth. Bilik Utama, Bilik 2, Bilik Belakang" error={errors.roomIdentifier}>
                 <Input value={form.roomIdentifier} onChange={e => set("roomIdentifier", e.target.value)} placeholder="cth. Bilik Utama (Master Bedroom)" />
               </Field>
             )}
-            <Field label="Alamat Penuh Hartanah *">
+            <Field label="Alamat Penuh Hartanah *" error={errors.propertyAddress}>
               <Input value={form.propertyAddress} onChange={e => set("propertyAddress", e.target.value)} placeholder="cth. No. 64, Jalan Karyawan Bestari, Puncak Bestari, 42300 Bandar Puncak Alam, Selangor" />
             </Field>
             <Field label="Perihal Hartanah Penuh (pilihan — untuk Section D/E)" hint="Untuk hartanah dengan nombor hakmilik, lot, mukim dan daerah. Biarkan kosong jika tidak berkenaan.">
@@ -583,7 +650,7 @@ export default function NewAgreementPage() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-              <Field label="Sewa Bulanan (RM) *">
+              <Field label="Sewa Bulanan (RM) *" error={errors.monthlyRent}>
                 <Input type="number" value={form.monthlyRent} onChange={e => set("monthlyRent", e.target.value)} placeholder="2500" />
               </Field>
               <Field label="Yuran Penyelenggaraan (RM/bulan)" hint="Biarkan kosong jika tiada">
@@ -607,7 +674,7 @@ export default function NewAgreementPage() {
                   )}
                 </Select>
               </Field>
-              <Field label="Tarikh Mula *">
+              <Field label="Tarikh Mula *" error={errors.startDate}>
                 <Input type="date" value={form.startDate} onChange={e => set("startDate", e.target.value)} />
               </Field>
               <Field label="Tarikh Tamat (auto)">
@@ -673,7 +740,7 @@ export default function NewAgreementPage() {
 
             <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.50 0.003 264)", marginBottom: "4px" }}>Maklumat Bank (Pembayaran Sewa)</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-              <Field label="Nama Bank *">
+              <Field label="Nama Bank *" error={errors.bankName}>
                 <Select value={form.bankName} onChange={e => set("bankName", e.target.value)}>
                   <option value="">Pilih bank</option>
                   {["Maybank", "CIMB", "Public Bank", "RHB", "Hong Leong", "AmBank", "Bank Islam", "BSN"].map(b => (
@@ -681,10 +748,10 @@ export default function NewAgreementPage() {
                   ))}
                 </Select>
               </Field>
-              <Field label="No. Akaun *">
+              <Field label="No. Akaun *" error={errors.bankAccountNo}>
                 <Input value={form.bankAccountNo} onChange={e => set("bankAccountNo", e.target.value)} placeholder="1234567890" />
               </Field>
-              <Field label="Nama Akaun *" >
+              <Field label="Nama Akaun *" error={errors.bankAccountName}>
                 <Input value={form.bankAccountName} onChange={e => set("bankAccountName", e.target.value)} placeholder="Ahmad bin Rosli" />
               </Field>
             </div>
@@ -738,10 +805,20 @@ export default function NewAgreementPage() {
       </div>
 
       {/* Nav buttons — attached to bottom of form area, same width */}
+      {Object.keys(errors).length > 0 && (
+        <div style={{
+          marginTop: "12px", padding: "12px 16px", borderRadius: "12px",
+          background: "oklch(0.93 0.06 27 / 0.10)",
+          border: "1px solid oklch(0.85 0.08 27 / 0.4)",
+          fontSize: "0.8125rem", color: "oklch(0.45 0.15 27)",
+        }}>
+          ⚠ Sila lengkapkan semua medan yang diperlukan sebelum meneruskan.
+        </div>
+      )}
       <div style={{
         display: "flex", justifyContent: "space-between", alignItems: "center",
-        marginTop: "16px",
-        background: "oklch(0.963 0.002 264)",
+        marginTop: "12px",
+        background: "oklch(0.998 0 0)",
         border: "1.5px solid oklch(0.876 0.003 264)",
         borderRadius: "16px",
         padding: "16px 24px",
