@@ -49,16 +49,16 @@ export default defineSchema({
       v.literal("completed")        // Delivered to all parties
     ),
 
-    // Agreement reference
-    agreementRef: v.string(), // e.g. SA-2026-0001
+    // Agreement reference (optional for old records)
+    agreementRef: v.optional(v.string()),
 
-    // Agreement type
-    agreementType: v.union(
+    // Agreement type (optional for old records)
+    agreementType: v.optional(v.union(
       v.literal("residential"),
       v.literal("room"),
       v.literal("short_term"),
       v.literal("commercial")
-    ),
+    )),
 
     // Room rental extras
     roomIdentifier: v.optional(v.string()),       // e.g. "Master Bedroom"
@@ -72,14 +72,14 @@ export default defineSchema({
     landlordIc: v.string(),
     landlordPhone: v.string(),
     landlordEmail: v.optional(v.string()),
-    landlordAddress: v.string(),
+    landlordAddress: v.optional(v.string()),
 
     // Tenant details
     tenantName: v.string(),
     tenantIc: v.string(),
     tenantPhone: v.string(),
     tenantEmail: v.optional(v.string()),
-    tenantAddress: v.string(),
+    tenantAddress: v.optional(v.string()),
     tenantIsForeigner: v.boolean(),
 
     // Property details
@@ -90,7 +90,7 @@ export default defineSchema({
       v.literal("room"),
       v.literal("commercial")
     ),
-    useOfPremises: v.union(v.literal("residential"), v.literal("commercial")),
+    useOfPremises: v.optional(v.union(v.literal("residential"), v.literal("commercial"))),
     isFurnished: v.union(
       v.literal("furnished"),
       v.literal("partially"),
