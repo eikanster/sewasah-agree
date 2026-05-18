@@ -13,7 +13,8 @@ export default function Home() {
     if (isLoaded && userId) router.push("/dashboard");
   }, [isLoaded, userId, router]);
 
-  if (!isLoaded || userId) return null;
+  if (!isLoaded) return null;
+  if (userId) return null;
 
   return (
     <div style={{ minHeight: "100vh", background: "oklch(0.998 0 0)", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
