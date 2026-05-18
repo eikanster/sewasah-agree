@@ -5,55 +5,31 @@ import { useRouter, usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useAppUser } from "@/hooks/use-app-user";
+import { PERMISSIONS, AppRole } from "@/lib/permissions";
 import { Home, ClipboardCheck, Plus, FolderOpen, Settings } from "lucide-react";
 
-const TOP_NAV = [
-  { href: "/dashboard",                label: "Dashboard"       },
-  { href: "/dashboard/agreements/new", label: "Perjanjian Baru" },
-  { href: "/dashboard/lawyer",         label: "Semakan Peguam"  },
-  { href: "/dashboard/settings",       label: "Tetapan"         },
-];
-
+type TopNavItem = { href: string; label: string; show: (r: AppRole) => boolean };
 type BotItem = {
-  href: string;
-  label: string;
+  href: string; label: string;
   Icon: React.ComponentType<{ size?: number }>;
   check: (p: string) => boolean;
+  show: (r: AppRole) => boolean;
   center?: boolean;
 };
 
+const TOP_NAV: TopNavItem[] = [
+  { href: "/dashboard",                label: "Dashboard",       show: PERMISSIONS.canViewDashboard    },
+  { href: "/dashboard/agreements/new", label: "Perjanjian Baru", show: PERMISSIONS.canCreateAgreement  },
+  { href: "/dashboard/lawyer",         label: "Semakan Peguam",  show: PERMISSIONS.canReviewAgreements },
+  { href: "/dashboard/settings",       label: "Tetapan",         show: PERMISSIONS.canViewSettings     },
+];
+
 const BOTTOM_NAV: BotItem[] = [
-  {
-    href: "/dashboard",
-    label: "Utama",
-    Icon: Home,
-    check: (p) => p === "/dashboard",
-  },
-  {
-    href: "/dashboard/lawyer",
-    label: "Semak",
-    Icon: ClipboardCheck,
-    check: (p) => p.startsWith("/dashboard/lawyer"),
-  },
-  {
-    href: "/dashboard/agreements/new",
-    label: "Baru",
-    Icon: Plus,
-    check: (p) => p === "/dashboard/agreements/new",
-    center: true,
-  },
-  {
-    href: "/dashboard",
-    label: "Fail",
-    Icon: FolderOpen,
-    check: (p) => p.startsWith("/dashboard/agreements/") && !p.includes("/new"),
-  },
-  {
-    href: "/dashboard/settings",
-    label: "Tetapan",
-    Icon: Settings,
-    check: (p) => p.startsWith("/dashboard/settings"),
-  },
+  { href: "/dashboard",                label: "Utama",   Icon: Home,          check: (p) => p === "/dashboard",                                         show: PERMISSIONS.canViewDashboard    },
+  { href: "/dashboard/lawyer",         label: "Semak",   Icon: ClipboardCheck, check: (p) => p.startsWith("/dashboard/lawyer"),                          show: PERMISSIONS.canReviewAgreements },
+  { href: "/dashboard/agreements/new", label: "Baru",    Icon: Plus,           check: (p) => p === "/dashboard/agreements/new", center: true,            show: PERMISSIONS.canCreateAgreement  },
+  { href: "/dashboard",                label: "Fail",    Icon: FolderOpen,     check: (p) => p.startsWith("/dashboard/agreements/") && !p.includes("/new"), show: PERMISSIONS.canViewDashboard },
+  { href: "/dashboard/settings",       label: "Tetapan", Icon: Settings,       check: (p) => p.startsWith("/dashboard/settings"),                        show: PERMISSIONS.canViewSettings     },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -78,6 +54,42 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
+  const role = (appUser?.role ?? "user") as AppRole;
+
+  // "user" role — show waiting screen
+  if (role === "user") {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "oklch(0.998 0 0)" }}>
+        <div style={{
+          background: "oklch(0.998 0 0)", border: "1px solid oklch(0.876 0.003 264)",
+          borderRadius: "20px", padding: "52px 48px", maxWidth: "440px", width: "100%",
+          textAlign: "center", boxShadow: "0 2px 16px oklch(0.12 0.006 264 / 0.08)",
+        }}>
+          <div style={{
+            width: "52px", height: "52px", background: "oklch(0.930 0.065 72)",
+            borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "1.5rem", margin: "0 auto 20px",
+          }}>⏳</div>
+          <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: "oklch(0.09 0.006 264)", margin: "0 0 10px" }}>
+            Menunggu Peruntukan Akses
+          </h1>
+          <p style={{ fontSize: "0.9375rem", color: "oklch(0.56 0.003 264)", lineHeight: 1.6, margin: "0 0 24px" }}>
+            Akaun anda telah berjaya didaftar. Pemilik firma sedang menyemak dan akan memberikan akses kepada anda tidak lama lagi.
+          </p>
+          <p style={{ fontSize: "0.8125rem", color: "oklch(0.56 0.003 264)", margin: 0 }}>
+            Daftar masuk sebagai: <strong style={{ color: "oklch(0.09 0.006 264)" }}>{appUser?.email}</strong>
+          </p>
+          <div style={{ marginTop: "24px" }}>
+            <UserButton />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const visibleTopNav = TOP_NAV.filter(item => item.show(role));
+  const visibleBottomNav = BOTTOM_NAV.filter(item => item.show(role));
+
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "oklch(0.998 0 0)" }}>
 
@@ -90,66 +102,50 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }}>
         <div style={{
           display: "flex", alignItems: "center",
-          padding: "0 16px",
-          gap: "0",
-          overflowX: "auto",
-          scrollbarWidth: "none",
+          padding: "0 16px", gap: "0",
+          overflowX: "auto", scrollbarWidth: "none",
         }}>
           {/* Logo */}
           <div style={{
             display: "flex", alignItems: "center", gap: "10px",
             paddingRight: "20px",
             borderRight: "1px solid oklch(0.22 0.006 264)",
-            marginRight: "8px",
-            height: "56px",
-            flexShrink: 0,
+            marginRight: "8px", height: "56px", flexShrink: 0,
           }}>
             <div style={{
               width: "32px", height: "32px",
-              background: "oklch(0.55 0.14 40)",
-              borderRadius: "9px",
+              background: "oklch(0.55 0.14 40)", borderRadius: "9px",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "0.8125rem", fontWeight: 800,
-              color: "oklch(0.998 0 0)",
-              boxShadow: "0 2px 6px oklch(0.55 0.14 40 / 0.35)",
-              flexShrink: 0,
+              fontSize: "0.8125rem", fontWeight: 800, color: "oklch(0.998 0 0)",
+              boxShadow: "0 2px 6px oklch(0.55 0.14 40 / 0.35)", flexShrink: 0,
             }}>SA</div>
             <span style={{
               fontWeight: 700, fontSize: "0.9375rem",
               color: "oklch(0.970 0.002 264)",
-              letterSpacing: "-0.01em",
-              whiteSpace: "nowrap",
+              letterSpacing: "-0.01em", whiteSpace: "nowrap",
             }}>Sewasah Agree</span>
           </div>
 
-          {/* Tab Nav — hidden on mobile via .top-nav-tabs class */}
+          {/* Tab Nav */}
           <nav className="top-nav-tabs" style={{ display: "flex", alignItems: "flex-end", height: "56px", flex: 1, gap: "2px" }}>
-            {TOP_NAV.map((item) => {
+            {visibleTopNav.map((item) => {
               const active = item.href === "/dashboard"
                 ? pathname === item.href
                 : pathname.startsWith(item.href);
               return (
                 <Link key={item.href} href={item.href} style={{ textDecoration: "none" }}>
                   <div style={{
-                    padding: "0 18px",
-                    height: "56px",
+                    padding: "0 18px", height: "56px",
                     display: "flex", alignItems: "center",
                     fontSize: "0.875rem",
                     fontWeight: active ? 600 : 400,
                     color: active ? "oklch(0.998 0 0)" : "oklch(0.54 0.003 264)",
-                    borderBottom: active
-                      ? "2.5px solid oklch(0.55 0.14 40)"
-                      : "2.5px solid transparent",
+                    borderBottom: active ? "2.5px solid oklch(0.55 0.14 40)" : "2.5px solid transparent",
                     transition: "color 140ms ease-out, border-color 140ms ease-out",
-                    whiteSpace: "nowrap",
-                    cursor: "pointer",
+                    whiteSpace: "nowrap", cursor: "pointer",
                   }}
-                  onMouseEnter={e => {
-                    if (!active) (e.currentTarget as HTMLElement).style.color = "oklch(0.78 0.012 56)";
-                  }}
-                  onMouseLeave={e => {
-                    if (!active) (e.currentTarget as HTMLElement).style.color = "oklch(0.54 0.003 264)";
-                  }}>
+                  onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = "oklch(0.78 0.012 56)"; }}
+                  onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = "oklch(0.54 0.003 264)"; }}>
                     {item.label}
                   </div>
                 </Link>
@@ -180,7 +176,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* ── Bottom Nav (Mobile Only) ── */}
       <nav className="bottom-nav">
-        {BOTTOM_NAV.map((item) => {
+        {visibleBottomNav.map((item) => {
           const active = item.check(pathname);
 
           if (item.center) {
@@ -208,7 +204,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           );
         })}
 
-        {/* Profile slot */}
+        {/* Profile */}
         <div className="bottom-nav-item" style={{ flex: 1, gap: "5px" }}>
           <div style={{ transform: "scale(0.9)", lineHeight: 0 }}>
             <UserButton />
