@@ -239,6 +239,7 @@ export default function EditAgreementPage() {
 
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
   const [loaded, setLoaded] = useState(false);
 
@@ -351,52 +352,71 @@ export default function EditAgreementPage() {
     document.getElementById("main-scroll")?.scrollTo(0, 0);
   };
 
+  const buildUpdatePayload = () => ({
+    id: agreement._id,
+    roomIdentifier: form.roomIdentifier || undefined,
+    utilitiesHandling: templateType === "room" ? form.utilitiesHandling : undefined,
+    wifiIncluded: templateType === "room" ? form.wifiIncluded : undefined,
+    waterIncluded: templateType === "room" ? form.waterIncluded : undefined,
+    latePaymentInterest: templateType === "room" ? parseFloat(form.latePaymentInterest) || 1.5 : undefined,
+    meterReading: templateType === "room" ? form.meterReading || undefined : undefined,
+    rentFreePeriod: templateType === "room" ? parseInt(form.rentFreePeriod) || 0 : undefined,
+    utilitiesIncluded: templateType === "short_term" ? form.utilitiesIncluded : undefined,
+    landlordName: form.landlordName, landlordIc: form.landlordIc,
+    landlordPhone: form.landlordPhone, landlordEmail: form.landlordEmail || undefined,
+    landlordAddress: form.landlordAddress,
+    tenantName: form.tenantName, tenantIc: form.tenantIc,
+    tenantPhone: form.tenantPhone, tenantEmail: form.tenantEmail || undefined,
+    tenantAddress: form.tenantAddress,
+    tenantIsForeigner: form.tenantIsForeigner,
+    propertyAddress: form.propertyAddress,
+    propertyType: form.propertyType as "apartment" | "landed" | "room" | "commercial",
+    useOfPremises: form.useOfPremises as "residential" | "commercial",
+    isFurnished: form.isFurnished as "furnished" | "partially" | "unfurnished",
+    monthlyRent: rent, tenancyDuration: duration,
+    startDate: form.startDate, endDate,
+    paymentDueDay: parseInt(form.paymentDueDay),
+    securityDeposit: secDeposit,
+    utilitiesDeposit: parseFloat(form.utilitiesDeposit) || 300,
+    petsAllowed: form.petsAllowed,
+    sublettingAllowed: form.sublettingAllowed,
+    renovationAllowed: form.renovationAllowed,
+    airconUnits: parseInt(form.airconUnits),
+    propertyLegalDesc: form.propertyLegalDesc || undefined,
+    bankName: form.bankName, bankAccountNo: form.bankAccountNo,
+    bankAccountName: form.bankAccountName,
+    maintenanceFee: form.maintenanceFee ? parseFloat(form.maintenanceFee) : undefined,
+    stampDuty, aiFlags: flags,
+  });
+
+  const handleSaveDraft = async () => {
+    if (!agreement._id) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await updateAgreement(buildUpdatePayload());
+      router.refresh();
+      router.push(`/dashboard/agreements/${agreement._id}`);
+    } catch (e) {
+      console.error(e);
+      setSaveError(e instanceof Error ? e.message : String(e));
+    }
+    finally { setSaving(false); }
+  };
+
   const handleSave = async () => {
     if (!agreement._id) return;
     setSaving(true);
+    setSaveError(null);
     try {
-      await updateAgreement({
-        id: agreement._id,
-        roomIdentifier: form.roomIdentifier || undefined,
-        utilitiesHandling: templateType === "room" ? form.utilitiesHandling : undefined,
-        wifiIncluded: templateType === "room" ? form.wifiIncluded : undefined,
-        waterIncluded: templateType === "room" ? form.waterIncluded : undefined,
-        latePaymentInterest: templateType === "room" ? parseFloat(form.latePaymentInterest) || 1.5 : undefined,
-        meterReading: templateType === "room" ? form.meterReading || undefined : undefined,
-        rentFreePeriod: templateType === "room" ? parseInt(form.rentFreePeriod) || 0 : undefined,
-        utilitiesIncluded: templateType === "short_term" ? form.utilitiesIncluded : undefined,
-        landlordName: form.landlordName, landlordIc: form.landlordIc,
-        landlordPhone: form.landlordPhone, landlordEmail: form.landlordEmail || undefined,
-        landlordAddress: form.landlordAddress,
-        tenantName: form.tenantName, tenantIc: form.tenantIc,
-        tenantPhone: form.tenantPhone, tenantEmail: form.tenantEmail || undefined,
-        tenantAddress: form.tenantAddress,
-        tenantIsForeigner: form.tenantIsForeigner,
-        propertyAddress: form.propertyAddress,
-        propertyType: form.propertyType as "apartment" | "landed" | "room" | "commercial",
-        useOfPremises: form.useOfPremises as "residential" | "commercial",
-        isFurnished: form.isFurnished as "furnished" | "partially" | "unfurnished",
-        monthlyRent: rent, tenancyDuration: duration,
-        startDate: form.startDate, endDate,
-        paymentDueDay: parseInt(form.paymentDueDay),
-        securityDeposit: secDeposit,
-        utilitiesDeposit: parseFloat(form.utilitiesDeposit) || 300,
-        petsAllowed: form.petsAllowed,
-        sublettingAllowed: form.sublettingAllowed,
-        renovationAllowed: form.renovationAllowed,
-        airconUnits: parseInt(form.airconUnits),
-        propertyLegalDesc: form.propertyLegalDesc || undefined,
-        bankName: form.bankName, bankAccountNo: form.bankAccountNo,
-        bankAccountName: form.bankAccountName,
-        maintenanceFee: form.maintenanceFee ? parseFloat(form.maintenanceFee) : undefined,
-        stampDuty, aiFlags: flags,
-      });
-      // If changes_requested, reset status back to draft so lawyer gets fresh review
-      if (agreement.status === "changes_requested") {
-        await updateStatus({ id: agreement._id, status: "draft" });
-      }
-      router.push(`/dashboard/agreements/${agreement._id}`);
-    } catch (e) { console.error(e); }
+      await updateAgreement(buildUpdatePayload());
+      await updateStatus({ id: agreement._id, status: "pending_review" });
+      router.refresh();
+      router.push("/dashboard");
+    } catch (e) {
+      console.error(e);
+      setSaveError(e instanceof Error ? e.message : String(e));
+    }
     finally { setSaving(false); }
   };
 
@@ -719,8 +739,8 @@ export default function EditAgreementPage() {
             ))}
           </div>
           {agreement.status === "changes_requested" && (
-            <div style={{ marginTop: "16px", padding: "12px 16px", borderRadius: "10px", background: "oklch(0.96 0.04 145 / 0.5)", border: "1px solid oklch(0.80 0.10 145 / 0.4)", fontSize: "0.875rem", color: "oklch(0.30 0.10 145)" }}>
-              Selepas disimpan, status perjanjian akan kembali ke <strong>Draf</strong> untuk dihantar semula kepada peguam.
+            <div style={{ marginTop: "16px", padding: "12px 16px", borderRadius: "10px", background: "oklch(0.96 0.04 80 / 0.5)", border: "1px solid oklch(0.80 0.10 80 / 0.4)", fontSize: "0.875rem", color: "oklch(0.35 0.12 60)" }}>
+              ⚠ Peguam meminta perubahan. Gunakan <strong>Simpan & Hantar ke Peguam</strong> apabila sudah selesai.
             </div>
           )}
         </StepCard>
@@ -737,6 +757,16 @@ export default function EditAgreementPage() {
         </div>
       )}
 
+      {saveError && (
+        <div style={{
+          marginTop: "12px", padding: "12px 16px", borderRadius: "12px",
+          background: "oklch(0.93 0.06 27 / 0.15)", border: "1px solid oklch(0.75 0.12 27 / 0.5)",
+          fontSize: "0.8125rem", color: "oklch(0.40 0.18 27)",
+        }}>
+          ❌ Ralat semasa menyimpan: {saveError}
+        </div>
+      )}
+
       {/* Nav */}
       <div style={{
         display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -750,6 +780,10 @@ export default function EditAgreementPage() {
           {step > 1 && (
             <button style={btnGhost} onClick={() => goToStep(step - 1)}>← Kembali</button>
           )}
+          <button style={{ ...btnGhost, opacity: saving ? 0.7 : 1 }}
+            disabled={saving} onClick={handleSaveDraft}>
+            {saving ? "..." : "Simpan Draf"}
+          </button>
           {step < 5 ? (
             <button style={btnPrimary} onClick={() => goToStep(step + 1)}>Seterusnya →</button>
           ) : (
@@ -757,7 +791,7 @@ export default function EditAgreementPage() {
               style={{ ...btnPrimary, background: "oklch(0.42 0.09 145)", opacity: saving ? 0.7 : 1 }}
               disabled={saving} onClick={handleSave}
             >
-              {saving ? "Menyimpan..." : "Simpan Perubahan →"}
+              {saving ? "Menyimpan..." : "Simpan & Hantar ke Peguam →"}
             </button>
           )}
         </div>
