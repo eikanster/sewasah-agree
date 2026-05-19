@@ -140,6 +140,67 @@ export const create = mutation({
   },
 });
 
+// Update agreement fields (draft or changes_requested only)
+export const update = mutation({
+  args: {
+    id: v.id("agreements"),
+    roomIdentifier: v.optional(v.string()),
+    utilitiesHandling: v.optional(v.string()),
+    wifiIncluded: v.optional(v.boolean()),
+    waterIncluded: v.optional(v.boolean()),
+    latePaymentInterest: v.optional(v.number()),
+    meterReading: v.optional(v.string()),
+    rentFreePeriod: v.optional(v.number()),
+    utilitiesIncluded: v.optional(v.boolean()),
+    landlordName: v.string(),
+    landlordIc: v.string(),
+    landlordPhone: v.string(),
+    landlordEmail: v.optional(v.string()),
+    landlordAddress: v.string(),
+    tenantName: v.string(),
+    tenantIc: v.string(),
+    tenantPhone: v.string(),
+    tenantEmail: v.optional(v.string()),
+    tenantAddress: v.string(),
+    tenantIsForeigner: v.boolean(),
+    propertyAddress: v.string(),
+    propertyType: v.union(
+      v.literal("apartment"),
+      v.literal("landed"),
+      v.literal("room"),
+      v.literal("commercial")
+    ),
+    useOfPremises: v.union(v.literal("residential"), v.literal("commercial")),
+    isFurnished: v.union(
+      v.literal("furnished"),
+      v.literal("partially"),
+      v.literal("unfurnished")
+    ),
+    monthlyRent: v.number(),
+    tenancyDuration: v.number(),
+    startDate: v.string(),
+    endDate: v.string(),
+    paymentDueDay: v.number(),
+    securityDeposit: v.number(),
+    utilitiesDeposit: v.number(),
+    petsAllowed: v.boolean(),
+    sublettingAllowed: v.boolean(),
+    renovationAllowed: v.boolean(),
+    airconUnits: v.number(),
+    propertyLegalDesc: v.optional(v.string()),
+    bankName: v.string(),
+    bankAccountNo: v.string(),
+    bankAccountName: v.string(),
+    maintenanceFee: v.optional(v.number()),
+    stampDuty: v.number(),
+    aiFlags: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...fields } = args;
+    await ctx.db.patch(id, { ...fields, updatedAt: Date.now() });
+  },
+});
+
 // Update status
 export const updateStatus = mutation({
   args: {

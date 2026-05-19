@@ -169,6 +169,36 @@ export default function AgreementDetailPage() {
         </div>
       </div>
 
+      {/* Lawyer notes — changes requested */}
+      {agreement.status === "changes_requested" && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-5">
+          <p className="font-semibold text-red-800 text-sm mb-1">Pindaan Diminta oleh Peguam</p>
+          {agreement.lawyerNotes ? (
+            <p className="text-sm text-red-700 leading-relaxed">{agreement.lawyerNotes}</p>
+          ) : (
+            <p className="text-sm text-red-500 italic">Tiada nota diberikan.</p>
+          )}
+          <button
+            onClick={() => router.push(`/dashboard/agreements/${agreement._id}/edit`)}
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition-colors"
+          >
+            ✏ Edit & Hantar Semula
+          </button>
+        </div>
+      )}
+
+      {/* Edit button — draft status */}
+      {agreement.status === "draft" && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => router.push(`/dashboard/agreements/${agreement._id}/edit`)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-border hover:border-primary hover:text-primary transition-colors"
+          >
+            ✏ Edit Perjanjian
+          </button>
+        </div>
+      )}
+
       {/* AI Flags */}
       {agreement.aiFlags && agreement.aiFlags.length > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">

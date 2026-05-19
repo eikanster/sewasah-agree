@@ -221,7 +221,7 @@ function ProgressBar({ step }: { step: number }) {
 
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <label style={{
+    <label onClick={() => onChange(!checked)} style={{
       display: "flex", alignItems: "center", gap: "12px",
       cursor: "pointer", userSelect: "none",
       padding: "12px 16px",
