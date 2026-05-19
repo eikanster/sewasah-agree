@@ -28,6 +28,7 @@ export default function AgreementDetailPage() {
   const agreement = useQuery(api.agreements.getById, { id: id as Id<"agreements"> });
   const firm = useQuery(api.firms.getById, appUser?.firmId ? { id: appUser.firmId } : "skip");
   const updateStatus = useMutation(api.agreements.updateStatus);
+  const createAgreement = useMutation(api.agreements.create);
 
   if (!agreement) {
     return (
@@ -47,6 +48,66 @@ export default function AgreementDetailPage() {
 
   const handleReset = async () => {
     await updateStatus({ id: agreement._id, status: "pending_review" });
+  };
+
+  const buildCopyPayload = (advanceDates = false) => {
+    let startDate = agreement.startDate;
+    let endDate = agreement.endDate;
+    if (advanceDates) {
+      const d = new Date(agreement.endDate);
+      d.setDate(d.getDate() + 1);
+      startDate = d.toISOString().split("T")[0];
+      const end = new Date(startDate);
+      end.setMonth(end.getMonth() + agreement.tenancyDuration);
+      end.setDate(end.getDate() - 1);
+      endDate = end.toISOString().split("T")[0];
+    }
+    return {
+      firmId: agreement.firmId, createdBy: appUser!._id,
+      agreementType: agreement.agreementType as "residential" | "room" | "short_term" | "commercial",
+      landlordName: agreement.landlordName, landlordIc: agreement.landlordIc,
+      landlordPhone: agreement.landlordPhone, landlordEmail: agreement.landlordEmail,
+      landlordAddress: agreement.landlordAddress ?? "",
+      tenantName: agreement.tenantName, tenantIc: agreement.tenantIc,
+      tenantPhone: agreement.tenantPhone, tenantEmail: agreement.tenantEmail,
+      tenantAddress: agreement.tenantAddress ?? "",
+      tenantIsForeigner: agreement.tenantIsForeigner,
+      propertyAddress: agreement.propertyAddress,
+      propertyType: agreement.propertyType as "apartment" | "landed" | "room" | "commercial",
+      useOfPremises: (agreement.useOfPremises ?? "residential") as "residential" | "commercial",
+      isFurnished: agreement.isFurnished as "furnished" | "partially" | "unfurnished",
+      monthlyRent: agreement.monthlyRent, tenancyDuration: agreement.tenancyDuration,
+      startDate, endDate,
+      paymentDueDay: agreement.paymentDueDay,
+      securityDeposit: agreement.securityDeposit,
+      utilitiesDeposit: agreement.utilitiesDeposit,
+      petsAllowed: agreement.petsAllowed, sublettingAllowed: agreement.sublettingAllowed,
+      renovationAllowed: agreement.renovationAllowed, airconUnits: agreement.airconUnits,
+      propertyLegalDesc: agreement.propertyLegalDesc,
+      bankName: agreement.bankName, bankAccountNo: agreement.bankAccountNo,
+      bankAccountName: agreement.bankAccountName,
+      maintenanceFee: agreement.maintenanceFee,
+      stampDuty: agreement.stampDuty,
+      aiFlags: agreement.aiFlags ?? [],
+      roomIdentifier: agreement.roomIdentifier,
+      utilitiesHandling: agreement.utilitiesHandling,
+      wifiIncluded: agreement.wifiIncluded, waterIncluded: agreement.waterIncluded,
+      latePaymentInterest: agreement.latePaymentInterest,
+      meterReading: agreement.meterReading, rentFreePeriod: agreement.rentFreePeriod,
+      utilitiesIncluded: agreement.utilitiesIncluded,
+    };
+  };
+
+  const handleCopy = async () => {
+    if (!appUser?._id) return;
+    const newId = await createAgreement(buildCopyPayload(false));
+    router.push(`/dashboard/agreements/${newId}/edit`);
+  };
+
+  const handleRenew = async () => {
+    if (!appUser?._id) return;
+    const newId = await createAgreement(buildCopyPayload(true));
+    router.push(`/dashboard/agreements/${newId}/edit`);
   };
 
   const handlePreview = async () => {
@@ -365,6 +426,20 @@ export default function AgreementDetailPage() {
           <p className="text-sm text-green-600 mt-1">All done — stamped and delivered to all parties.</p>
         </div>
       )}
+
+      {/* Copy / Renew */}
+      <div className="bg-white rounded-2xl border border-border p-5">
+        <p className="font-medium text-foreground text-sm mb-1">Salin atau Perbaharui</p>
+        <p className="text-xs text-muted-foreground mb-4">Buat perjanjian baru berdasarkan perjanjian ini</p>
+        <div className="flex gap-3">
+          <Button variant="outline" className="flex-1 rounded-xl" onClick={handleCopy}>
+            📋 Salin Perjanjian
+          </Button>
+          <Button variant="outline" className="flex-1 rounded-xl" onClick={handleRenew}>
+            🔄 Perbaharui (Tarikh Baru)
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

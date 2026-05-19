@@ -21,16 +21,40 @@ export default function LawyerPage() {
   );
   const updateStatus = useMutation(api.agreements.updateStatus);
 
+  const sendEmail = (type: "approved" | "changes_requested", a: NonNullable<typeof pending>[number]) => {
+    fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type,
+        agreementRef: a.agreementRef,
+        landlordName: a.landlordName,
+        tenantName: a.tenantName,
+        propertyAddress: a.propertyAddress,
+        monthlyRent: a.monthlyRent,
+        startDate: a.startDate,
+        endDate: a.endDate,
+        stampDuty: a.stampDuty,
+        firmEmail: firm?.email,
+        lawyerNotes: notes[a._id] || undefined,
+      }),
+    }).catch(() => {});
+  };
+
   const handleApprove = async (id: Id<"agreements">) => {
     if (!appUser?._id) return;
     setLoading(id);
+    const a = pending?.find(x => x._id === id);
     await updateStatus({ id, status: "approved", approvedBy: appUser._id, lawyerNotes: notes[id] || undefined });
+    if (a) sendEmail("approved", a);
     setLoading(null);
   };
 
   const handleRequestChanges = async (id: Id<"agreements">) => {
     setLoading(id);
+    const a = pending?.find(x => x._id === id);
     await updateStatus({ id, status: "changes_requested", lawyerNotes: notes[id] || undefined });
+    if (a) sendEmail("changes_requested", a);
     setLoading(null);
   };
 

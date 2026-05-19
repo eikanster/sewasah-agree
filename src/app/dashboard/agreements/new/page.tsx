@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { useAppUser } from "@/hooks/use-app-user";
@@ -353,6 +353,7 @@ function TemplateSelector({ onSelect }: { onSelect: (t: AgreementType) => void }
 export default function NewAgreementPage() {
   const router = useRouter();
   const { appUser } = useAppUser();
+  const firm = useQuery(api.firms.getById, appUser?.firmId ? { id: appUser.firmId } : "skip");
   const createAgreement = useMutation(api.agreements.create);
   const updateStatus = useMutation(api.agreements.updateStatus);
   const [templateType, setTemplateType] = useState<AgreementType | "">("");
@@ -465,8 +466,25 @@ export default function NewAgreementPage() {
     if (!appUser?.firmId || !appUser?._id) return;
     setSaving(true);
     try {
-      const id = await createAgreement(buildPayload());
+      const payload = buildPayload();
+      const id = await createAgreement(payload);
       await updateStatus({ id: id as Id<"agreements">, status: "pending_review" });
+      fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "submitted",
+          agreementRef: `(baru)`,
+          landlordName: payload.landlordName,
+          tenantName: payload.tenantName,
+          propertyAddress: payload.propertyAddress,
+          monthlyRent: payload.monthlyRent,
+          startDate: payload.startDate,
+          endDate: payload.endDate,
+          stampDuty: payload.stampDuty,
+          firmEmail: firm?.email,
+        }),
+      }).catch(() => {});
       router.push("/dashboard");
     } catch (e) { console.error(e); }
     finally { setSaving(false); }
