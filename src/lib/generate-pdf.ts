@@ -50,6 +50,15 @@ export interface AgreementData {
   // Optional maintenance fee (e.g. condo maintenance)
   maintenanceFee?: number;
 
+  // Room rental extras
+  roomIdentifier?: string;
+  utilitiesHandling?: string;
+  wifiIncluded?: boolean;
+  waterIncluded?: boolean;
+  latePaymentInterest?: number;
+  meterReading?: string;
+  rentFreePeriod?: number;
+
   // Optional full legal property description (title, lot, mukim, etc.)
   propertyLegalDesc?: string;
 
@@ -438,6 +447,296 @@ ${additionalClauses.map((clause, i) => `
   </div>
 </div>
 ` : ""}
+
+</body>
+</html>`;
+}
+
+// ── Bilik Sewa (Room Rental) Agreement ──────────────────────────────────────
+// Template reference: SpacePlus Tenant Management System structure
+// Pending lawyer review — for data collection purposes
+
+export function buildRoomAgreementHtml(data: AgreementData): string {
+  const durationText = data.tenancyDuration >= 365
+    ? `${numberToWords(Math.round(data.tenancyDuration / 12))} (${Math.round(data.tenancyDuration / 12)}) YEAR(S)`
+    : `${data.tenancyDuration} MONTH(S)`;
+
+  const utilityMode =
+    data.utilitiesHandling === "landlord" ? "Included in monthly rent — landlord bears all utility charges" :
+    data.utilitiesHandling === "submeter" ? "Individual smart meter per room — tenant pays based on own usage" :
+    "Shared equally among all room tenants — split by number of rooms";
+
+  const css = `
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: "Times New Roman", Times, serif; font-size: 11.5pt; line-height: 1.65; color: #000; padding: 60px 70px; max-width: 850px; margin: 0 auto; }
+    .draft-banner { background: #fff8e1; border: 1px solid #f0c040; padding: 8px 16px; font-size: 9.5pt; text-align: center; font-family: Arial, sans-serif; margin-bottom: 24px; border-radius: 4px; }
+    .ref-line { text-align: right; font-size: 9.5pt; color: #555; font-family: Arial, sans-serif; margin-bottom: 8px; }
+    h1 { font-size: 14pt; text-align: center; text-decoration: underline; text-transform: uppercase; margin-bottom: 24px; letter-spacing: 0.05em; }
+    h2 { font-size: 11.5pt; font-weight: bold; text-decoration: underline; text-transform: uppercase; margin: 20px 0 8px; }
+    p { margin-bottom: 10px; text-align: justify; }
+    .center { text-align: center; }
+    .schedule-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    .schedule-table td { border: 1px solid #000; padding: 7px 10px; vertical-align: top; font-size: 11pt; }
+    .schedule-table td:first-child { width: 6%; font-weight: bold; text-align: center; }
+    .schedule-table td:nth-child(2) { width: 36%; }
+    .sig-block { display: inline-block; width: 45%; vertical-align: top; margin-right: 8%; }
+    .sig-line { border-top: 1px solid #000; margin-top: 56px; margin-bottom: 6px; }
+    ol.alpha { list-style-type: lower-alpha; padding-left: 28px; }
+    ol.alpha li { margin-bottom: 8px; text-align: justify; }
+    .page-break { page-break-before: always; }
+    .rules-section h3 { font-size: 11.5pt; font-weight: bold; margin: 16px 0 8px; }
+    .rules-section ul { padding-left: 24px; margin-bottom: 12px; }
+    .rules-section ul li { margin-bottom: 4px; }
+    @media print { .draft-banner { display: none; } body { padding: 48px 54px; } }
+  `;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>${css}</style></head>
+<body>
+
+${data.firmName ? `
+<div style="text-align:center;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #000;">
+  <p style="font-size:14pt;font-weight:bold;margin:0 0 4px;">${data.firmName}</p>
+  ${data.firmAddress ? `<p style="font-size:10pt;margin:2px 0;">${data.firmAddress}</p>` : ""}
+  <p style="font-size:10pt;margin:2px 0;">${[data.firmPhone, data.firmEmail].filter(Boolean).join("  |  ")}</p>
+  ${data.lawyerName ? `<p style="font-size:10pt;margin:6px 0 0;"><em>${data.lawyerName}${data.lawyerBarNo ? ` (No. Bar: ${data.lawyerBarNo})` : ""}</em></p>` : ""}
+</div>` : ""}
+
+<div class="draft-banner">⚠ DRAF — Menunggu semakan peguam dan pengesahan eDutiSetem</div>
+${data.agreementRef ? `<div class="ref-line">Rujukan: ${data.agreementRef}</div>` : ""}
+
+<h1>Room Rental Tenancy Agreement</h1>
+
+<p>AN <strong>AGREEMENT</strong> made the date and year as stated in Section 1 of Schedule A hereto <strong>BETWEEN</strong> the party whose name and address are stated in Section 2 of Schedule A hereto (hereinafter referred to as <strong>"the Landlord"</strong>) of the one part <strong>AND</strong> the party whose name and address are stated in Section 3 of Schedule A hereto (hereinafter referred to as <strong>"the Tenant"</strong>) of the other part.</p>
+
+<p><strong>WHEREAS:</strong></p>
+<ol class="alpha">
+  <li>The Landlord is the owner of the property described in Section 4 of Schedule A hereto (<strong>"Demised Premises"</strong>).</li>
+  <li>The Tenant has viewed and inspected the Demised Premises and is satisfied with the state and conditions and suitability of the Demised Premises for its intended use.</li>
+  <li>The Landlord agrees to let and the Tenant agrees to take a tenancy of the Demised Premises in the state and condition on as-is-where-is basis upon the terms and conditions hereinafter contained.</li>
+</ol>
+
+<p><strong>NOW IT IS HEREBY AGREED</strong> as follows:</p>
+
+<h2>1. Agreement for Tenancy</h2>
+<p>1.1 The Landlord hereby lets unto and the Tenant hereby takes a tenancy of the Demised Premises (the Room as described in Schedule A) for the term as stated in Section 8 of Schedule A commencing on the date described in Section 12 of Schedule A and ending on the date described in Section 13 of Schedule A at the monthly rental as stated in Section 15 of Schedule A, payable in advance on the day as stated in Section 19 of Schedule A and subject to the terms and conditions hereinafter contained.</p>
+${(data.rentFreePeriod ?? 0) > 0 ? `<p>1.2 The Landlord hereby on ex grata basis grants the Tenant a rental free period of <strong>${data.rentFreePeriod} day(s)</strong> commencing from the commencement date as an act of goodwill to allow the Tenant to settle in.</p>` : ""}
+
+<h2>2. Deposits</h2>
+<p>2.1 Upon execution of this Agreement, the Tenant shall pay to the Landlord the Security Deposit as stated in Section 17 of Schedule A for the due observance and performance by the Tenant of all the terms and conditions herein. The Security Deposit shall not be treated as payment of rent and shall be refunded free of interest upon determination of this tenancy, less any deductible sums for outstanding rent, damages or other charges.</p>
+
+<h2>3. The Tenant's Covenants</h2>
+<p>The Tenant hereby agrees and covenants as follows:</p>
+<ol class="alpha">
+  <li>To use the Demised Premises for residential purposes only and not for any commercial, business or illegal purpose;</li>
+  <li>To pay the Rent at the time and manner as set out in Schedule A;</li>
+  <li>To pay and discharge punctually ${data.utilitiesHandling === "landlord" ? "charges as may be applicable under Schedule A" : "electricity charges for the Demised Premises and such proportion of shared utilities as agreed in Schedule A"};</li>
+  <li>To keep the Demised Premises including the room, doors, windows, locks, wiring, sanitary wares and the Landlord's fixtures in good and tenantable repair and condition (fair wear and tear excepted);</li>
+  <li>To maintain the common areas (living room, kitchen, bathrooms, corridors) in clean and tidy condition at all times and to remove personal items from communal areas after use;</li>
+  <li>To permit the Landlord at all reasonable times to enter upon the Demised Premises to view the condition thereof;</li>
+  <li>Not to assign, transfer, sublet or part with the possession of the Demised Premises without the prior written consent of the Landlord;</li>
+  <li>Not to use the Demised Premises or any part thereof for any unlawful, illegal or immoral purpose;</li>
+  <li>Not to cause or permit any noise, nuisance or disturbance to other occupants or neighbours, especially during quiet hours as set out in the House Rules;</li>
+  <li>Not to bring or keep any animal or pet of any kind in the Demised Premises;</li>
+  <li>Not to make any alterations or additions to the Demised Premises without the prior written consent of the Landlord;</li>
+  <li>To observe and comply with all House Rules as set out in Schedule B of this Agreement;</li>
+  <li>At the expiration or sooner determination of this tenancy, to yield up peaceably the Demised Premises in good and tenantable repair and condition, fair wear and tear excepted;</li>
+  <li>To bear and pay all legal costs and expenses in the event the Landlord commences legal proceedings for recovery of arrears of rent or breach of this Agreement.</li>
+</ol>
+
+<h2>4. The Landlord's Covenants</h2>
+<p>The Landlord hereby covenants with the Tenant as follows:</p>
+<ol class="alpha">
+  <li>To pay all quit rent and assessment charges in respect of the Demised Premises;</li>
+  ${data.waterIncluded ? "<li>To pay and discharge water charges falling due in respect of the Demised Premises throughout the Term of this tenancy;</li>" : ""}
+  ${data.wifiIncluded ? "<li>To provide wifi/internet access to the Tenant free of any charges during the Term of this tenancy, provided however that interruption of such service shall not entitle the Tenant to any deduction from Rent;</li>" : ""}
+  <li>To permit the Tenant, if the Tenant punctually pays the Rent and observes all the terms and stipulations herein, to quietly enjoy the Demised Premises without interference by the Landlord.</li>
+</ol>
+
+<h2>5. Event of Default</h2>
+<p>5.1 If the Tenant fails to pay any Rent when due and payable, or fails to observe or perform any term and condition of this Agreement, the Landlord shall be entitled to serve a Seven (7) days' notice upon the Tenant specifying the breach. Upon expiry of said notice, if the breach is not remedied, the Landlord shall be entitled to terminate this tenancy and re-enter the Demised Premises, without prejudice to any rights of the Landlord, and the Security Deposit shall be forfeited.</p>
+<p>5.2 In the event the Tenant defaults in payment on due date, the Tenant shall pay to the Landlord interest at the rate of <strong>${data.latePaymentInterest ?? 1.5}% per month</strong> on a daily basis from the due date to the date of actual payment.</p>
+
+<h2>6. Termination</h2>
+<p>Either party may terminate this Agreement by giving the other party not less than <strong>One (1) month's</strong> written notice prior to the intended date of termination, subject to any terms and conditions herein contained.</p>
+
+<h2>7. House Rules</h2>
+<p>The Tenant hereby agrees to observe and comply with the House Rules as set out in Schedule B. Violation of House Rules may result in written warning or immediate termination of this Agreement.</p>
+
+<h2>8. Costs and Stamp Duty</h2>
+<p>All stamp duty, legal costs and expenses incidental to the preparation and completion of this Agreement shall be borne and paid by the Tenant.</p>
+
+<h2>9. Governing Law</h2>
+<p>This Agreement shall be governed by and construed in accordance with the laws of Malaysia.</p>
+
+<div style="margin-top:40px;">
+  <p><strong>IN WITNESS WHEREOF</strong> the Landlord and the Tenant have set their hands the day and year as stated in Section 1 of the Schedule A of this Agreement.</p>
+  <div style="margin-top:32px;">
+    <div class="sig-block">
+      <p><strong>The Landlord</strong></p>
+      <p>Signed by the Landlord<br>in the presence of</p>
+      <div class="sig-line"></div>
+      <p><strong>${data.landlordName.toUpperCase()}</strong><br>(NO. K/P: ${data.landlordIc})</p>
+    </div>
+    <div class="sig-block">
+      <p><strong>The Tenant</strong></p>
+      <p>Signed by the Tenant<br>in the presence of</p>
+      <div class="sig-line"></div>
+      <p><strong>${data.tenantName.toUpperCase()}</strong><br>(NO. K/P: ${data.tenantIc})</p>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<p style="text-align:center;font-weight:bold;font-size:13pt;margin-bottom:6px;">SCHEDULE A</p>
+<p style="text-align:center;font-size:10.5pt;margin-bottom:16px;">(Which shall be read and construed as part of this Agreement)</p>
+
+<table class="schedule-table">
+  <tr><td>1</td><td>Date of Agreement</td><td>${formatDate(data.agreementDate)}</td></tr>
+  <tr><td>2</td><td>The Landlord</td><td>
+    <strong>${data.landlordName.toUpperCase()}</strong><br>
+    (NO. K/P: ${data.landlordIc})<br>
+    ${data.landlordAddress}<br>
+    Tel: ${data.landlordPhone}${data.landlordEmail ? `<br>${data.landlordEmail}` : ""}
+  </td></tr>
+  <tr><td>3</td><td>The Tenant</td><td>
+    <strong>${data.tenantName.toUpperCase()}</strong><br>
+    (NO. K/P: ${data.tenantIc})<br>
+    ${data.tenantAddress}<br>
+    Tel: ${data.tenantPhone}${data.tenantEmail ? `<br>${data.tenantEmail}` : ""}
+  </td></tr>
+  <tr><td>4</td><td>Description of Demised Premises</td><td>
+    Property: ${data.propertyAddress}<br>
+    Room: <strong>${data.roomIdentifier ?? "—"}</strong>
+  </td></tr>
+  <tr><td>5</td><td>Type of Demised Premises</td><td>${data.propertyType === "apartment" ? "Stratified / Apartment" : data.propertyType === "landed" ? "Landed Property" : "Residential"}</td></tr>
+  <tr><td>6</td><td>Car Park</td><td>Not Applicable</td></tr>
+  <tr><td>7</td><td>Fixed Term</td><td>${durationText}</td></tr>
+  <tr><td>8</td><td>Renewed Term</td><td>1 year(s) upon mutual agreement</td></tr>
+  <tr><td>9</td><td>Rental for Renewed Term</td><td>Market prevailing rate</td></tr>
+  <tr><td>10</td><td>Use</td><td>For residential purposes only</td></tr>
+  <tr><td>11</td><td>Commencement Date</td><td>${formatDate(data.startDate)}</td></tr>
+  <tr><td>12</td><td>Completion Date</td><td>${formatDate(data.endDate)}</td></tr>
+  <tr><td>13</td><td>Rent Free Period</td><td>${(data.rentFreePeriod ?? 0) > 0 ? `${data.rentFreePeriod} day(s)` : "Not Applicable"}</td></tr>
+  <tr><td>14</td><td>Monthly Rent</td><td>${moneyInWords(data.monthlyRent)} (${formatMoney(data.monthlyRent)}) per month</td></tr>
+  <tr><td>15</td><td>Advanced Rental</td><td>First month rental payable upon execution of this Agreement</td></tr>
+  <tr><td>16</td><td>Security Deposit</td><td>${moneyInWords(data.securityDeposit)} (${formatMoney(data.securityDeposit)}) — equivalent to two (2) months rental</td></tr>
+  <tr><td>17</td><td>Manner of Payment</td><td>Bank transfer / online transfer</td></tr>
+  <tr><td>18</td><td>Payment Date</td><td>On or before the ${ordinal(data.paymentDueDay)} day of each calendar month</td></tr>
+  <tr><td>19</td><td>Late Payment Interest</td><td>${data.latePaymentInterest ?? 1.5}% per month</td></tr>
+  <tr><td>20</td><td>Bank Account</td><td>
+    Account holder: ${data.bankAccountName}<br>
+    Bank: ${data.bankName}<br>
+    Account No: ${data.bankAccountNo}
+  </td></tr>
+  ${data.meterReading ? `<tr><td>21</td><td>Electricity Meter Reading at Commencement</td><td>${data.meterReading}</td></tr>` : ""}
+</table>
+
+<div class="page-break"></div>
+
+<p style="text-align:center;font-weight:bold;font-size:13pt;margin-bottom:6px;">SCHEDULE B</p>
+<p style="text-align:center;font-size:10.5pt;margin-bottom:16px;">Additional Conditions &amp; House Rules<br>(Which shall be read and construed as part of this Agreement)</p>
+
+<h2>Additional Conditions</h2>
+
+<p><strong>1. Electricity Charges</strong><br>
+${data.utilitiesHandling === "landlord"
+  ? "The Landlord agrees to bear all electricity charges for the Demised Premises throughout the tenancy."
+  : data.utilitiesHandling === "submeter"
+  ? "The Demised Premises is connected to an individual sub-meter. The Tenant shall pay electricity charges based on actual usage as recorded by the sub-meter at the prevailing TNB tariff rate."
+  : "Electricity charges shall be shared equally among all room tenants. Each tenant shall pay their proportionate share of the total electricity bill as assessed by the Landlord, whose decision shall be final."
+}</p>
+
+<p><strong>2. Water Charges</strong><br>
+${data.waterIncluded
+  ? "The Landlord agrees to pay and discharge water charges falling due in respect of the Demised Premises throughout the Term of this tenancy."
+  : "Water charges shall be shared equally among all room tenants based on the Landlord's assessment."
+}</p>
+
+<p><strong>3. Wifi / Internet Access</strong><br>
+${data.wifiIncluded
+  ? "The Landlord hereby agrees to provide wifi/internet access to the Tenant free of any charges during the Term of this tenancy. In the event the Tenant's use of and access to the wifi/internet is interrupted at any time for any reason whatsoever, the Tenant shall not be entitled to any deduction from the Rent."
+  : "Wifi/internet access is not included in this tenancy. The Tenant may arrange their own internet connection subject to the Landlord's consent."
+}</p>
+
+<p><strong>4. Loss of Key(s)</strong><br>
+In the event the Tenant mislays or loses the key(s) to the Demised Premises, the Tenant shall immediately inform the Landlord and at the Tenant's own cost replace or change the relevant lock(s) with new lock(s) of similar quality.</p>
+
+<div class="rules-section">
+<h2>House Rules</h2>
+<p>The following House Rules apply to all occupants of the property. Violation may result in written warning or immediate termination of this Agreement with forfeiture of deposit.</p>
+
+<h3>General Rules</h3>
+<ul>
+  <li>Drugs, weapons and other intoxicants are strictly forbidden on the premises.</li>
+  <li>Smoking and vaping are not permitted inside the premises at any time.</li>
+  <li>The room shall not be used for any commercial purposes.</li>
+  <li>No illegal activities are permitted anywhere on the property.</li>
+</ul>
+
+<h3>Quiet Hours &amp; Harmony</h3>
+<ul>
+  <li>Quiet hours: 11:00pm to 8:00am (weekdays) and 11:00pm to 10:00am (weekends).</li>
+  <li>Please be considerate towards other housemates at all times.</li>
+  <li>No religious gatherings, ceremonies or loud chanting in the premises or common areas.</li>
+  <li>Inappropriate behaviour towards other tenants, management or neighbours is forbidden.</li>
+</ul>
+
+<h3>Cleanliness</h3>
+<ul>
+  <li>Each tenant is responsible for keeping their own room clean at all times.</li>
+  <li>Common areas (kitchen, living room, bathrooms, corridors) must be kept clean after every use.</li>
+  <li>Please dispose of rubbish properly in the bins provided. Wet rubbish in kitchen bins only.</li>
+  <li>Do not leave food out that may attract pests.</li>
+</ul>
+
+<h3>Visitors</h3>
+<ul>
+  <li>All visitors must leave the premises by 12:00am midnight.</li>
+  <li>No overnight visitors are permitted without prior consent of the Landlord and all housemates.</li>
+  <li>No parties or gatherings in the premises without the Landlord's written consent.</li>
+</ul>
+
+<h3>Kitchen</h3>
+<ul>
+  <li>The kitchen is for the use of all tenants. Only light cooking and reheating are permitted.</li>
+  <li>Clean all utensils, counters and appliances immediately after use.</li>
+  <li>Label all food stored in the refrigerator. Unlabelled food may be discarded.</li>
+</ul>
+
+<h3>Animals &amp; Pets</h3>
+<ul>
+  <li>No animals or pets of any kind are permitted in the premises at any time.</li>
+</ul>
+
+<h3>Property &amp; Furniture</h3>
+<ul>
+  <li>Do not move or exchange furniture between rooms without the Landlord's consent.</li>
+  <li>Do not affix hooks, nails, screws or adhesives to walls or furniture without consent.</li>
+  <li>Report any damage or defects to the Landlord as soon as possible.</li>
+  <li>The Landlord reserves the right to inspect rooms periodically with prior notice.</li>
+</ul>
+
+<h3>Energy Conservation</h3>
+<ul>
+  <li>All lights, fans, air conditioners and electrical appliances must be switched off when not in use.</li>
+</ul>
+</div>
+
+<div style="margin-top:40px;">
+  <div class="sig-block">
+    <p><strong>The Landlord</strong></p>
+    <div class="sig-line"></div>
+    <p><strong>${data.landlordName.toUpperCase()}</strong><br>(NO. K/P: ${data.landlordIc})</p>
+  </div>
+  <div class="sig-block">
+    <p><strong>The Tenant</strong></p>
+    <div class="sig-line"></div>
+    <p><strong>${data.tenantName.toUpperCase()}</strong><br>(NO. K/P: ${data.tenantIc})</p>
+  </div>
+</div>
 
 </body>
 </html>`;

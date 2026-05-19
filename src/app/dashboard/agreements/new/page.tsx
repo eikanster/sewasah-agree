@@ -385,6 +385,11 @@ export default function NewAgreementPage() {
     // Room rental
     roomIdentifier: "",
     utilitiesHandling: "split",
+    wifiIncluded: true,
+    waterIncluded: true,
+    latePaymentInterest: "1.5",
+    meterReading: "",
+    rentFreePeriod: "0",
     // Short-term
     utilitiesIncluded: false,
     monthlyRent: "", maintenanceFee: "", tenancyDuration: "12", startDate: "", paymentDueDay: "6",
@@ -415,6 +420,11 @@ export default function NewAgreementPage() {
         agreementType: (templateType || "residential") as "residential" | "room" | "short_term" | "commercial",
         roomIdentifier: form.roomIdentifier || undefined,
         utilitiesHandling: templateType === "room" ? form.utilitiesHandling : undefined,
+        wifiIncluded: templateType === "room" ? form.wifiIncluded as boolean : undefined,
+        waterIncluded: templateType === "room" ? form.waterIncluded as boolean : undefined,
+        latePaymentInterest: templateType === "room" ? parseFloat(form.latePaymentInterest) || 1.5 : undefined,
+        meterReading: templateType === "room" ? form.meterReading || undefined : undefined,
+        rentFreePeriod: templateType === "room" ? parseInt(form.rentFreePeriod) || 0 : undefined,
         utilitiesIncluded: templateType === "short_term" ? form.utilitiesIncluded as boolean : undefined,
         landlordName: form.landlordName, landlordIc: form.landlordIc,
         landlordPhone: form.landlordPhone, landlordEmail: form.landlordEmail || undefined,
@@ -725,6 +735,24 @@ export default function NewAgreementPage() {
             </div>
             {templateType === "short_term" && (
               <Toggle label="Utiliti & internet termasuk dalam sewa bulanan" checked={form.utilitiesIncluded as boolean} onChange={v => set("utilitiesIncluded", v)} />
+            )}
+            {templateType === "room" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <p style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "oklch(0.55 0.025 50)", margin: 0 }}>Kemudahan Bilik</p>
+                <Toggle label="Wifi/Internet percuma disediakan oleh tuan rumah" checked={form.wifiIncluded as boolean} onChange={v => set("wifiIncluded", v)} />
+                <Toggle label="Tuan rumah tanggung bayaran air" checked={form.waterIncluded as boolean} onChange={v => set("waterIncluded", v)} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <Field label="Faedah Lewat Bayar (%/bulan)" hint="Lazimnya 1.5%">
+                    <Input type="number" value={form.latePaymentInterest} onChange={e => set("latePaymentInterest", e.target.value)} placeholder="1.5" />
+                  </Field>
+                  <Field label="Tempoh Sewa Percuma (hari)" hint="0 jika tiada">
+                    <Input type="number" value={form.rentFreePeriod} onChange={e => set("rentFreePeriod", e.target.value)} placeholder="0" />
+                  </Field>
+                </div>
+                <Field label="Bacaan Meter Elektrik (semasa masuk)" hint="Pilihan — rekod semasa penyewa masuk">
+                  <Input value={form.meterReading} onChange={e => set("meterReading", e.target.value)} placeholder="cth. 1234.5" />
+                </Field>
+              </div>
             )}
             <Toggle label="Haiwan peliharaan dibenarkan" checked={form.petsAllowed as boolean} onChange={v => set("petsAllowed", v)} />
             <Toggle label="Penyewaan semula dibenarkan (dengan kebenaran bertulis)" checked={form.sublettingAllowed as boolean} onChange={v => set("sublettingAllowed", v)} />

@@ -59,6 +59,13 @@ export default function LawyerPage() {
       bankAccountName: agreement.bankAccountName,
       maintenanceFee: agreement.maintenanceFee,
       stampDuty: agreement.stampDuty,
+      roomIdentifier: agreement.roomIdentifier,
+      utilitiesHandling: agreement.utilitiesHandling,
+      wifiIncluded: agreement.wifiIncluded,
+      waterIncluded: agreement.waterIncluded,
+      latePaymentInterest: agreement.latePaymentInterest,
+      meterReading: agreement.meterReading,
+      rentFreePeriod: agreement.rentFreePeriod,
     };
     const res = await fetch("/api/generate-pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
       ...data,

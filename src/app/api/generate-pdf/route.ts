@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { buildAgreementHtml, AgreementData } from "@/lib/generate-pdf";
+import { buildAgreementHtml, buildRoomAgreementHtml, AgreementData } from "@/lib/generate-pdf";
 
 const TEMPLATE_LABELS: Record<string, string> = {
   room:       "Bilik Sewa",
@@ -43,7 +43,15 @@ export async function POST(req: NextRequest) {
     const data: AgreementData = body;
     const type: string = body.agreementType ?? "residential";
 
-    // Non-residential types: template pending
+    // Room rental: use dedicated template
+    if (type === "room") {
+      const html = buildRoomAgreementHtml(data);
+      return new NextResponse(html, {
+        headers: { "Content-Type": "text/html; charset=utf-8" },
+      });
+    }
+
+    // Other non-residential types: template pending
     if (type !== "residential") {
       return new NextResponse(buildPendingHtml(type, data), {
         headers: { "Content-Type": "text/html; charset=utf-8" },

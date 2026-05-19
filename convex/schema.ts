@@ -64,6 +64,11 @@ export default defineSchema({
     // Room rental extras
     roomIdentifier: v.optional(v.string()),       // e.g. "Master Bedroom"
     utilitiesHandling: v.optional(v.string()),    // "split" | "landlord" | "submeter"
+    wifiIncluded: v.optional(v.boolean()),        // wifi free
+    waterIncluded: v.optional(v.boolean()),       // landlord pays water
+    latePaymentInterest: v.optional(v.number()), // % per month e.g. 1.5
+    meterReading: v.optional(v.string()),         // electricity meter at commencement
+    rentFreePeriod: v.optional(v.number()),       // days of rent-free period
 
     // Short-term extras
     utilitiesIncluded: v.optional(v.boolean()),   // rent includes utilities
