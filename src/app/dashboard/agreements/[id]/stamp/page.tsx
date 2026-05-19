@@ -181,12 +181,12 @@ export default function StampPage() {
           </div>
         </div>
         <a
-          href="https://mystamps.my"
+          href="https://stamps.hasil.gov.my/stamps"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors"
         >
-          🔗 Open eDutiSetem.my →
+          🔗 Open eDutiSetem (LHDN) →
         </a>
       </div>
 
