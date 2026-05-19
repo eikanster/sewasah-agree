@@ -81,9 +81,16 @@ export default function SettingsPage() {
   };
 
   const handleRegenCode = async () => {
-    if (!appUser?.firmId) return;
+    if (!appUser?.firmId) {
+      console.error("No firmId found:", appUser);
+      return;
+    }
     setRegenLoading(true);
-    await regenCode({ id: appUser.firmId });
+    try {
+      await regenCode({ id: appUser.firmId });
+    } catch (e) {
+      console.error("Regen failed:", e);
+    }
     setRegenLoading(false);
   };
 
