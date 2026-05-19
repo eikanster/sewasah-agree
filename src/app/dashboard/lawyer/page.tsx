@@ -70,6 +70,7 @@ export default function LawyerPage() {
     const res = await fetch("/api/generate-pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
       ...data,
       agreementType: agreement.agreementType ?? "residential",
+      status: agreement.status,
       firmName: firm?.name,
       firmAddress: firm?.address,
       firmPhone: firm?.phone,

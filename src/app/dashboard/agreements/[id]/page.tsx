@@ -100,6 +100,7 @@ export default function AgreementDetailPage() {
       body: JSON.stringify({
         ...data,
         agreementType: agreement.agreementType ?? "residential",
+        status: agreement.status,
         firmName: firm?.name,
         firmAddress: firm?.address,
         firmPhone: firm?.phone,

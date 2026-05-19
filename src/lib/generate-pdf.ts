@@ -65,6 +65,9 @@ export interface AgreementData {
   // Calculated
   stampDuty: number;
 
+  // Agreement status (controls watermark)
+  status?: string;
+
   // Firm details for PDF header
   firmName?: string;
   firmAddress?: string;
@@ -109,6 +112,53 @@ function ordinal(n: number): string {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
+type WatermarkConfig = { text: string; color: string; bannerBg: string; bannerBorder: string; bannerText: string } | null;
+
+function getWatermark(status?: string): WatermarkConfig {
+  if (!status || status === "stamped" || status === "completed") return null;
+  if (status === "approved" || status === "pending_stamp") {
+    return {
+      text: "DILULUSKAN",
+      color: "rgba(22,163,74,0.10)",
+      bannerBg: "#f0fdf4",
+      bannerBorder: "#86efac",
+      bannerText: "✓ Diluluskan oleh peguam — menunggu pengesahan eDutiSetem",
+    };
+  }
+  return {
+    text: "DRAF",
+    color: "rgba(185,28,28,0.09)",
+    bannerBg: "#fff8e1",
+    bannerBorder: "#f0c040",
+    bannerText: "⚠ DRAF — Menunggu semakan peguam dan pengesahan eDutiSetem",
+  };
+}
+
+function buildWatermarkCss(wm: WatermarkConfig): string {
+  if (!wm) return "";
+  return `
+  body::before {
+    content: "${wm.text}";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-size: 96pt;
+    font-weight: 900;
+    font-family: Arial, sans-serif;
+    color: ${wm.color};
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 0;
+    letter-spacing: 0.1em;
+  }`;
+}
+
+function buildBanner(wm: WatermarkConfig): string {
+  if (!wm) return "";
+  return `<div style="background:${wm.bannerBg};border:1px solid ${wm.bannerBorder};padding:8px 16px;font-size:9.5pt;text-align:center;font-family:Arial,sans-serif;margin-bottom:24px;border-radius:4px;">${wm.bannerText}</div>`;
+}
+
 export function buildAgreementHtml(data: AgreementData): string {
   const durationYears = Math.round(data.tenancyDuration / 12);
   const durationText = `${numberToWords(durationYears)} (${durationYears}) YEAR${durationYears > 1 ? "S" : ""}`;
@@ -145,6 +195,7 @@ export function buildAgreementHtml(data: AgreementData): string {
   }
 
   const hasAdditional = additionalClauses.length > 0;
+  const wm = getWatermark(data.status);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -205,6 +256,7 @@ export function buildAgreementHtml(data: AgreementData): string {
     .draft-banner { display: none; }
     body { padding: 54px 60px; }
   }
+  ${buildWatermarkCss(wm)}
 </style>
 </head>
 <body>
@@ -219,7 +271,7 @@ ${data.firmName ? `
   ${data.lawyerName ? `<p style="font-size:10pt;margin:6px 0 0;"><em>${data.lawyerName}${data.lawyerBarNo ? ` (No. Bar: ${data.lawyerBarNo})` : ""}</em></p>` : ""}
 </div>
 ` : ""}
-<div class="draft-banner">⚠ DRAF — Menunggu semakan peguam dan pengesahan eDutiSetem</div>
+${buildBanner(wm)}
 ${data.agreementRef ? `<div class="ref-line">Rujukan: ${data.agreementRef}</div>` : ""}
 
 <h1>Tenancy Agreement</h1>
@@ -488,6 +540,7 @@ export function buildRoomAgreementHtml(data: AgreementData): string {
     .rules-section ul { padding-left: 24px; margin-bottom: 12px; }
     .rules-section ul li { margin-bottom: 4px; }
     @media print { .draft-banner { display: none; } body { padding: 48px 54px; } }
+    ${buildWatermarkCss(getWatermark(data.status))}
   `;
 
   return `<!DOCTYPE html>
@@ -503,7 +556,7 @@ ${data.firmName ? `
   ${data.lawyerName ? `<p style="font-size:10pt;margin:6px 0 0;"><em>${data.lawyerName}${data.lawyerBarNo ? ` (No. Bar: ${data.lawyerBarNo})` : ""}</em></p>` : ""}
 </div>` : ""}
 
-<div class="draft-banner">⚠ DRAF — Menunggu semakan peguam dan pengesahan eDutiSetem</div>
+${buildBanner(getWatermark(data.status))}
 ${data.agreementRef ? `<div class="ref-line">Rujukan: ${data.agreementRef}</div>` : ""}
 
 <h1>Room Rental Tenancy Agreement</h1>
