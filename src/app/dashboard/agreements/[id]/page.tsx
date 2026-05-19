@@ -349,11 +349,11 @@ export default function AgreementDetailPage() {
           <Button
             onClick={async () => {
               await updateStatus({ id: agreement._id, status: "pending_stamp" });
-              router.push(`/dashboard/agreements/${agreement._id}/stamp`);
+              window.open("https://stamps.hasil.gov.my/stamps", "_blank");
             }}
             className="gradient-brand text-white border-0 rounded-xl"
           >
-            📮 Go to Stamping →
+            📮 Pergi ke eDutiSetem →
           </Button>
         </div>
       )}
