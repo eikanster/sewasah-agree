@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
 import { useAppUser } from "@/hooks/use-app-user";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -353,6 +354,7 @@ export default function NewAgreementPage() {
   const router = useRouter();
   const { appUser } = useAppUser();
   const createAgreement = useMutation(api.agreements.create);
+  const updateStatus = useMutation(api.agreements.updateStatus);
   const [templateType, setTemplateType] = useState<AgreementType | "">("");
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
@@ -411,47 +413,60 @@ export default function NewAgreementPage() {
   const endDate = calcEndDate(form.startDate, duration);
   const flags = aiFlags({ ...form, airconUnits: parseInt(form.airconUnits) });
 
+  const buildPayload = () => ({
+    firmId: appUser!.firmId, createdBy: appUser!._id,
+    agreementType: (templateType || "residential") as "residential" | "room" | "short_term" | "commercial",
+    roomIdentifier: form.roomIdentifier || undefined,
+    utilitiesHandling: templateType === "room" ? form.utilitiesHandling : undefined,
+    wifiIncluded: templateType === "room" ? form.wifiIncluded as boolean : undefined,
+    waterIncluded: templateType === "room" ? form.waterIncluded as boolean : undefined,
+    latePaymentInterest: templateType === "room" ? parseFloat(form.latePaymentInterest) || 1.5 : undefined,
+    meterReading: templateType === "room" ? form.meterReading || undefined : undefined,
+    rentFreePeriod: templateType === "room" ? parseInt(form.rentFreePeriod) || 0 : undefined,
+    utilitiesIncluded: templateType === "short_term" ? form.utilitiesIncluded as boolean : undefined,
+    landlordName: form.landlordName, landlordIc: form.landlordIc,
+    landlordPhone: form.landlordPhone, landlordEmail: form.landlordEmail || undefined,
+    landlordAddress: form.landlordAddress,
+    tenantName: form.tenantName, tenantIc: form.tenantIc,
+    tenantPhone: form.tenantPhone, tenantEmail: form.tenantEmail || undefined,
+    tenantAddress: form.tenantAddress,
+    tenantIsForeigner: form.tenantIsForeigner as boolean,
+    propertyAddress: form.propertyAddress,
+    propertyType: form.propertyType as "apartment" | "landed" | "room" | "commercial",
+    useOfPremises: form.useOfPremises as "residential" | "commercial",
+    isFurnished: form.isFurnished as "furnished" | "partially" | "unfurnished",
+    monthlyRent: rent, tenancyDuration: duration,
+    startDate: form.startDate, endDate,
+    paymentDueDay: parseInt(form.paymentDueDay),
+    securityDeposit: secDeposit,
+    utilitiesDeposit: parseFloat(form.utilitiesDeposit) || 300,
+    petsAllowed: form.petsAllowed as boolean,
+    sublettingAllowed: form.sublettingAllowed as boolean,
+    renovationAllowed: form.renovationAllowed as boolean,
+    airconUnits: parseInt(form.airconUnits),
+    propertyLegalDesc: form.propertyLegalDesc || undefined,
+    bankName: form.bankName, bankAccountNo: form.bankAccountNo,
+    bankAccountName: form.bankAccountName,
+    maintenanceFee: form.maintenanceFee ? parseFloat(form.maintenanceFee) : undefined,
+    stampDuty, aiFlags: flags,
+  });
+
+  const handleSaveDraft = async () => {
+    if (!appUser?.firmId || !appUser?._id) return;
+    setSaving(true);
+    try {
+      const id = await createAgreement(buildPayload());
+      router.push(`/dashboard/agreements/${id}`);
+    } catch (e) { console.error(e); }
+    finally { setSaving(false); }
+  };
+
   const handleSubmit = async () => {
     if (!appUser?.firmId || !appUser?._id) return;
     setSaving(true);
     try {
-      await createAgreement({
-        firmId: appUser.firmId, createdBy: appUser._id,
-        agreementType: (templateType || "residential") as "residential" | "room" | "short_term" | "commercial",
-        roomIdentifier: form.roomIdentifier || undefined,
-        utilitiesHandling: templateType === "room" ? form.utilitiesHandling : undefined,
-        wifiIncluded: templateType === "room" ? form.wifiIncluded as boolean : undefined,
-        waterIncluded: templateType === "room" ? form.waterIncluded as boolean : undefined,
-        latePaymentInterest: templateType === "room" ? parseFloat(form.latePaymentInterest) || 1.5 : undefined,
-        meterReading: templateType === "room" ? form.meterReading || undefined : undefined,
-        rentFreePeriod: templateType === "room" ? parseInt(form.rentFreePeriod) || 0 : undefined,
-        utilitiesIncluded: templateType === "short_term" ? form.utilitiesIncluded as boolean : undefined,
-        landlordName: form.landlordName, landlordIc: form.landlordIc,
-        landlordPhone: form.landlordPhone, landlordEmail: form.landlordEmail || undefined,
-        landlordAddress: form.landlordAddress,
-        tenantName: form.tenantName, tenantIc: form.tenantIc,
-        tenantPhone: form.tenantPhone, tenantEmail: form.tenantEmail || undefined,
-        tenantAddress: form.tenantAddress,
-        tenantIsForeigner: form.tenantIsForeigner as boolean,
-        propertyAddress: form.propertyAddress,
-        propertyType: form.propertyType as "apartment" | "landed" | "room" | "commercial",
-        useOfPremises: form.useOfPremises as "residential" | "commercial",
-        isFurnished: form.isFurnished as "furnished" | "partially" | "unfurnished",
-        monthlyRent: rent, tenancyDuration: duration,
-        startDate: form.startDate, endDate,
-        paymentDueDay: parseInt(form.paymentDueDay),
-        securityDeposit: secDeposit,
-        utilitiesDeposit: parseFloat(form.utilitiesDeposit) || 300,
-        petsAllowed: form.petsAllowed as boolean,
-        sublettingAllowed: form.sublettingAllowed as boolean,
-        renovationAllowed: form.renovationAllowed as boolean,
-        airconUnits: parseInt(form.airconUnits),
-        propertyLegalDesc: form.propertyLegalDesc || undefined,
-        bankName: form.bankName, bankAccountNo: form.bankAccountNo,
-        bankAccountName: form.bankAccountName,
-        maintenanceFee: form.maintenanceFee ? parseFloat(form.maintenanceFee) : undefined,
-        stampDuty, aiFlags: flags,
-      });
+      const id = await createAgreement(buildPayload());
+      await updateStatus({ id: id as Id<"agreements">, status: "pending_review" });
       router.push("/dashboard");
     } catch (e) { console.error(e); }
     finally { setSaving(false); }
@@ -871,12 +886,20 @@ export default function NewAgreementPage() {
               Seterusnya →
             </button>
           ) : (
-            <button style={{ ...btnPrimary, background: "oklch(0.42 0.09 145)" }}
-              disabled={saving} onClick={handleSubmit}
-              onMouseEnter={e => { if (!saving) (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = ""}>
-              {saving ? "Menyimpan..." : "Jana & Hantar ke Peguam →"}
-            </button>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button style={btnGhost}
+                disabled={saving} onClick={handleSaveDraft}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.55 0.14 40)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.14 40)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.876 0.003 264)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.50 0.003 264)"; }}>
+                {saving ? "..." : "Simpan Draf"}
+              </button>
+              <button style={{ ...btnPrimary, background: "oklch(0.42 0.09 145)" }}
+                disabled={saving} onClick={handleSubmit}
+                onMouseEnter={e => { if (!saving) (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.transform = ""}>
+                {saving ? "Menyimpan..." : "Jana & Hantar ke Peguam →"}
+              </button>
+            </div>
           )}
         </div>
       </div>
