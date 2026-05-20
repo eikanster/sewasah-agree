@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useAppUser } from "@/hooks/use-app-user";
 import { PERMISSIONS, AppRole } from "@/lib/permissions";
-import { Home, ClipboardCheck, Plus, FolderOpen, Settings, LayoutGrid } from "lucide-react";
+import { Home, ClipboardCheck, Plus, FolderOpen, Settings, LayoutGrid, Menu, X, ShieldAlert, Info } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 
@@ -28,15 +28,15 @@ const TOP_NAV: TopNavItem[] = [
 
 const BOTTOM_NAV: BotItem[] = [
   { href: "/dashboard",                label: "Utama",   Icon: Home,          check: (p) => p === "/dashboard" || (p.startsWith("/dashboard/agreements/") && !p.includes("/new")), show: PERMISSIONS.canViewDashboard },
-  { href: "/dashboard/lawyer",         label: "Semak",   Icon: ClipboardCheck, check: (p) => p.startsWith("/dashboard/lawyer"),                          show: PERMISSIONS.canReviewAgreements },
   { href: "/dashboard/agreements/new", label: "Baru",    Icon: Plus,           check: (p) => p === "/dashboard/agreements/new", center: true,            show: PERMISSIONS.canCreateAgreement  },
-  { href: "/dashboard/settings",       label: "Tetapan", Icon: Settings,       check: (p) => p.startsWith("/dashboard/settings"),                        show: PERMISSIONS.canViewSettings     },
+  { href: "/dashboard/lawyer",         label: "Semak",   Icon: ClipboardCheck, check: (p) => p.startsWith("/dashboard/lawyer"),                          show: PERMISSIONS.canReviewAgreements },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { needsSetup, isLoaded, appUser } = useAppUser();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -214,7 +214,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               background: "oklch(0.18 0.006 264)",
               padding: "4px 12px", borderRadius: "999px",
             }}>🇲🇾 Malaysia</span>
-            <UserButton />
+            <div className="hidden md:block">
+              <UserButton />
+            </div>
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="md:hidden flex items-center justify-center p-2 rounded-lg text-[oklch(0.970_0.002_264)] hover:bg-white/5 transition-all cursor-pointer animate-fade-in"
+              style={{ border: "none", background: "transparent" }}
+              aria-label="Menu"
+            >
+              <Menu size={20} />
+            </button>
           </div>
         </div>
       </header>
@@ -268,8 +278,150 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           );
         })}
 
-
       </nav>
+
+      {/* ── Mobile Hamburger Drawer Overlay ── */}
+      {isMenuOpen && (
+        <div
+          onClick={() => setIsMenuOpen(false)}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] md:hidden"
+          style={{
+            animation: "fadeIn 200ms ease-out forwards",
+          }}
+        >
+          {/* Drawer Panel */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="fixed top-0 right-0 h-full w-[310px] max-w-[85vw] bg-[oklch(0.118_0.008_264)] border-l border-[oklch(0.22_0.006_264)] p-5 flex flex-col justify-between"
+            style={{
+              animation: "slideIn 240ms cubic-bezier(0.16, 1, 0.3, 1) both",
+              boxShadow: "-10px 0 30px oklch(0.10 0.004 264 / 0.5)",
+            }}
+          >
+            {/* Drawer Header */}
+            <div>
+              <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 bg-[oklch(0.55_0.14_40)] rounded-lg flex items-center justify-center text-[10px] font-extrabold text-[oklch(0.998_0_0)] shadow-[0_2px_6px_oklch(0.55_0.14_40_/_0.35)]">
+                    SA
+                  </div>
+                  <span className="font-bold text-sm text-[oklch(0.970_0.002_264)]">Sewasah Menu</span>
+                </div>
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  className="p-1.5 rounded-lg hover:bg-white/5 text-[oklch(0.60_0.003_264)] hover:text-[oklch(0.970_0.002_264)] transition-colors cursor-pointer"
+                  style={{ border: "none", background: "transparent" }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Profile Card */}
+              <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10 mb-6">
+                <UserButton />
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[10px] text-[oklch(0.60_0.003_264)] font-medium">Log Masuk Sebagai</span>
+                  <span className="text-xs font-semibold text-[oklch(0.970_0.002_264)] truncate max-w-[180px]">{appUser?.email}</span>
+                </div>
+              </div>
+
+              {/* Menu Links */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-semibold text-[oklch(0.44_0.003_264)] uppercase tracking-wider block mb-2 px-1">
+                  Menu Utama
+                </span>
+                
+                {/* Home/Utama */}
+                <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} style={{ textDecoration: "none" }}>
+                  <div className="flex items-center gap-3 p-2.5 text-[oklch(0.970_0.002_264)] hover:bg-white/5 rounded-xl transition-all cursor-pointer">
+                    <Home size={18} className="text-[oklch(0.55_0.14_40)]" />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">Halaman Utama</span>
+                    </div>
+                  </div>
+                </Link>
+
+                {/* Perjanjian Baru */}
+                <Link href="/dashboard/agreements/new" onClick={() => setIsMenuOpen(false)} style={{ textDecoration: "none" }}>
+                  <div className="flex items-center gap-3 p-2.5 text-[oklch(0.970_0.002_264)] hover:bg-white/5 rounded-xl transition-all cursor-pointer">
+                    <Plus size={18} className="text-[oklch(0.55_0.14_40)]" />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">Draf Perjanjian Baru</span>
+                    </div>
+                  </div>
+                </Link>
+
+                {/* Semakan Peguam */}
+                {PERMISSIONS.canReviewAgreements(role) && (
+                  <Link href="/dashboard/lawyer" onClick={() => setIsMenuOpen(false)} style={{ textDecoration: "none" }}>
+                    <div className="flex items-center gap-3 p-2.5 text-[oklch(0.970_0.002_264)] hover:bg-white/5 rounded-xl transition-all cursor-pointer">
+                      <ClipboardCheck size={18} className="text-[oklch(0.55_0.14_40)]" />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">Semakan Peguam</span>
+                      </div>
+                    </div>
+                  </Link>
+                )}
+
+                {/* Settings */}
+                {PERMISSIONS.canViewSettings(role) && (
+                  <Link href="/dashboard/settings" onClick={() => setIsMenuOpen(false)} style={{ textDecoration: "none" }}>
+                    <div className="flex items-center gap-3 p-2.5 text-[oklch(0.970_0.002_264)] hover:bg-white/5 rounded-xl transition-all cursor-pointer">
+                      <Settings size={18} className="text-[oklch(0.55_0.14_40)]" />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">Tetapan</span>
+                      </div>
+                    </div>
+                  </Link>
+                )}
+
+                {/* Platform Admin */}
+                {role === "super_admin" && (
+                  <Link href="/admin" onClick={() => setIsMenuOpen(false)} style={{ textDecoration: "none" }}>
+                    <div className="flex items-center gap-3 p-2.5 text-[oklch(0.970_0.002_264)] hover:bg-white/5 rounded-xl transition-all cursor-pointer">
+                      <LayoutGrid size={18} className="text-[oklch(0.55_0.14_40)]" />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">Platform Admin</span>
+                      </div>
+                    </div>
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom About & Disclaimer */}
+            <div className="space-y-3 pt-4 border-t border-white/10">
+              {/* About */}
+              <div className="p-2.5 bg-white/5 rounded-xl space-y-1">
+                <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[oklch(0.55_0.14_40)] uppercase tracking-wider">
+                  <Info size={12} />
+                  <span>Mengenai Sewasah</span>
+                </div>
+                <p className="text-[10px] text-[oklch(0.60_0.003_264)] leading-relaxed">
+                  Sistem pengurusan draf dan semakan perjanjian sewa pintar, direka khas untuk firma guaman di Malaysia.
+                </p>
+              </div>
+
+              {/* Disclaimer */}
+              <div className="p-2.5 bg-[oklch(0.55_0.14_40_/_0.04)] border border-[oklch(0.55_0.14_40_/_0.15)] rounded-xl space-y-1">
+                <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[oklch(0.55_0.14_40)] uppercase tracking-wider">
+                  <ShieldAlert size={12} />
+                  <span>Penafian Ringkas</span>
+                </div>
+                <p className="text-[9px] text-[oklch(0.60_0.003_264)] leading-relaxed">
+                  Sistem ini menyediakan alat bantu penyediaan draf. Draf yang dijana bukan pengganti nasihat guaman formal sehingga disemak/disahkan oleh peguam.
+                </p>
+              </div>
+
+              {/* Footer */}
+              <div className="text-center text-[9px] text-[oklch(0.44_0.003_264)] pt-1">
+                Sewasah Agree v1.0.0
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

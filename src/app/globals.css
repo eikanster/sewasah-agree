@@ -287,6 +287,15 @@
                 0 0 0 4px oklch(0.22 0.006 264);
   }
 
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+
   /* ── Mobile breakpoint ───────────────────────────────────────────────────── */
   @media (max-width: 768px) {
     .bottom-nav { display: flex; }
