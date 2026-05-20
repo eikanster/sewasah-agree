@@ -27,10 +27,9 @@ const TOP_NAV: TopNavItem[] = [
 ];
 
 const BOTTOM_NAV: BotItem[] = [
-  { href: "/dashboard",                label: "Utama",   Icon: Home,          check: (p) => p === "/dashboard",                                         show: PERMISSIONS.canViewDashboard    },
+  { href: "/dashboard",                label: "Utama",   Icon: Home,          check: (p) => p === "/dashboard" || (p.startsWith("/dashboard/agreements/") && !p.includes("/new")), show: PERMISSIONS.canViewDashboard },
   { href: "/dashboard/lawyer",         label: "Semak",   Icon: ClipboardCheck, check: (p) => p.startsWith("/dashboard/lawyer"),                          show: PERMISSIONS.canReviewAgreements },
   { href: "/dashboard/agreements/new", label: "Baru",    Icon: Plus,           check: (p) => p === "/dashboard/agreements/new", center: true,            show: PERMISSIONS.canCreateAgreement  },
-  { href: "/dashboard",                label: "Fail",    Icon: FolderOpen,     check: (p) => p.startsWith("/dashboard/agreements/") && !p.includes("/new"), show: PERMISSIONS.canViewDashboard },
   { href: "/dashboard/settings",       label: "Tetapan", Icon: Settings,       check: (p) => p.startsWith("/dashboard/settings"),                        show: PERMISSIONS.canViewSettings     },
 ];
 
@@ -269,13 +268,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           );
         })}
 
-        {/* Profile */}
-        <div className="bottom-nav-item" style={{ flex: 1, gap: "5px" }}>
-          <div style={{ transform: "scale(0.9)", lineHeight: 0 }}>
-            <UserButton />
-          </div>
-          <span className="bottom-nav-label">Profil</span>
-        </div>
+
       </nav>
     </div>
   );
