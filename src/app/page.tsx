@@ -20,14 +20,16 @@ export default function Home() {
     <div style={{ minHeight: "100vh", background: "oklch(0.998 0 0)", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
 
       {/* ── Nav ── */}
-      <nav style={{
-        position: "sticky", top: 0, zIndex: 50,
-        background: "oklch(0.998 0 0 / 0.92)",
-        backdropFilter: "blur(12px)",
-        borderBottom: "1px solid oklch(0.938 0.002 264)",
-        padding: "0 40px", height: "60px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
+      <nav
+        className="px-4 sm:px-10 flex items-center justify-between"
+        style={{
+          position: "sticky", top: 0, zIndex: 50,
+          background: "oklch(0.998 0 0 / 0.92)",
+          backdropFilter: "blur(12px)",
+          borderBottom: "1px solid oklch(0.938 0.002 264)",
+          height: "60px",
+        }}
+      >
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <div style={{
             width: "30px", height: "30px", background: "oklch(0.55 0.14 40)",
@@ -167,12 +169,18 @@ export default function Home() {
           {/* Mock dashboard */}
           <div style={{ padding: "24px", background: "oklch(0.963 0.002 264)" }}>
             {/* Mock nav */}
-            <div style={{ background: "oklch(0.118 0.008 264)", borderRadius: "12px", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+            <div
+              className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0"
+              style={{
+                background: "oklch(0.118 0.008 264)", borderRadius: "12px", padding: "12px 20px",
+                marginBottom: "20px"
+              }}
+            >
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <div style={{ width: "28px", height: "28px", background: "oklch(0.55 0.14 40)", borderRadius: "7px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6875rem", fontWeight: 800, color: "white" }}>SA</div>
                 <span style={{ color: "oklch(0.998 0 0)", fontWeight: 600, fontSize: "0.875rem" }}>Sewasah Agree</span>
               </div>
-              <div style={{ display: "flex", gap: "20px" }}>
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-5">
                 {["Dashboard", "Perjanjian Baru", "Semakan Peguam"].map((t, i) => (
                   <span key={t} style={{ fontSize: "0.8125rem", color: i === 0 ? "oklch(0.998 0 0)" : "oklch(0.50 0.003 264)", fontWeight: i === 0 ? 600 : 400, borderBottom: i === 0 ? "2px solid oklch(0.55 0.14 40)" : "none", paddingBottom: "2px" }}>{t}</span>
                 ))}
@@ -180,7 +188,7 @@ export default function Home() {
             </div>
 
             {/* Mock stats */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "20px" }}>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" style={{ marginBottom: "20px" }}>
               {[
                 { label: "Menunggu Semak", value: "3", accent: true },
                 { label: "Tunggu Setem",   value: "1", accent: false },
@@ -243,7 +251,7 @@ export default function Home() {
             Daripada maklumat klien hingga dokumen distamp — dalam masa 10 minit.
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { step: "01", icon: "📋", title: "Isi Borang",       desc: "Admin isi borang AI — maklumat tuan rumah, penyewa, hartanah dan terma. Sistem kira duti setem secara automatik." },
               { step: "02", icon: "⚖️", title: "Semakan Peguam",   desc: "Peguam semak dan luluskan perjanjian dalam dashboard. AI tandakan klausa luar biasa untuk perhatian peguam." },
@@ -280,7 +288,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
             {[
               { icon: "🤖", title: "Jana Automatik",        desc: "AI kumpul maklumat klien dan jana draf perjanjian serta-merta. Tiada lagi salin tampal dari Word." },
               { icon: "⚖️", title: "Pengesahan Peguam",     desc: "Setiap perjanjian disemak dan diluluskan oleh peguam berlesen sebelum diserahkan kepada klien." },

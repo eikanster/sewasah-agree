@@ -187,7 +187,7 @@ export default function AgreementDetailPage() {
   return (
     <div className="max-w-3xl space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <button onClick={() => router.back()} className="text-muted-foreground hover:text-foreground text-sm">
             ← Back
@@ -196,7 +196,7 @@ export default function AgreementDetailPage() {
             {agreement.landlordName} → {agreement.tenantName}
           </h1>
         </div>
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${statusConfig[agreement.status]?.color}`}>
+        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium self-start sm:self-auto ${statusConfig[agreement.status]?.color}`}>
           {statusConfig[agreement.status]?.label}
         </span>
       </div>
@@ -273,7 +273,7 @@ export default function AgreementDetailPage() {
       )}
 
       {/* Details Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Landlord */}
         <div className="bg-white rounded-2xl border border-border p-5 space-y-3">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Landlord</p>
@@ -301,7 +301,7 @@ export default function AgreementDetailPage() {
         </div>
 
         {/* Property */}
-        <div className="bg-white rounded-2xl border border-border p-5 col-span-2 space-y-2">
+        <div className="bg-white rounded-2xl border border-border p-5 col-span-1 sm:col-span-2 space-y-2">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Property</p>
           <p className="font-medium text-foreground">{agreement.propertyAddress}</p>
           <div className="flex gap-2">
@@ -357,7 +357,7 @@ export default function AgreementDetailPage() {
         </div>
 
         {/* Bank Details */}
-        <div className="bg-white rounded-2xl border border-border p-5 col-span-2 space-y-2">
+        <div className="bg-white rounded-2xl border border-border p-5 col-span-1 sm:col-span-2 space-y-2">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Bank Details (Rental Payment)</p>
           <p className="text-sm font-medium">{agreement.bankName} — {agreement.bankAccountNo}</p>
           <p className="text-sm text-muted-foreground">{agreement.bankAccountName}</p>
@@ -377,24 +377,24 @@ export default function AgreementDetailPage() {
       )}
 
       {/* Preview Agreement */}
-      <div className="bg-white rounded-2xl border border-border p-5 flex items-center justify-between">
+      <div className="bg-white rounded-2xl border border-border p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <p className="font-medium text-foreground text-sm">Agreement Document</p>
           <p className="text-xs text-muted-foreground mt-0.5">Preview the generated tenancy agreement</p>
         </div>
-        <Button onClick={handlePreview} variant="outline" className="rounded-xl">
+        <Button onClick={handlePreview} variant="outline" className="w-full sm:w-auto rounded-xl">
           👁 Preview Agreement
         </Button>
       </div>
 
       {/* Action Button */}
       {nextStatus && agreement.status !== "approved" && (
-        <div className="bg-white rounded-2xl border border-border p-5 flex items-center justify-between">
+        <div className="bg-white rounded-2xl border border-border p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <p className="font-medium text-foreground text-sm">Next Step</p>
             <p className="text-xs text-muted-foreground mt-0.5">Move this agreement to the next stage</p>
           </div>
-          <Button onClick={handleNextStatus} className="gradient-brand text-white border-0 rounded-xl">
+          <Button onClick={handleNextStatus} className="gradient-brand text-white border-0 rounded-xl w-full sm:w-auto">
             {nextLabel[agreement.status] ?? "Next →"}
           </Button>
         </div>
@@ -402,7 +402,7 @@ export default function AgreementDetailPage() {
 
       {/* Stamping shortcut when approved */}
       {agreement.status === "approved" && (
-        <div className="bg-white rounded-2xl border border-border p-5 flex items-center justify-between">
+        <div className="bg-white rounded-2xl border border-border p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <p className="font-medium text-foreground text-sm">Ready for Stamping</p>
             <p className="text-xs text-muted-foreground mt-0.5">Agreement approved — proceed to stamp with eDutiSetem</p>
@@ -412,7 +412,7 @@ export default function AgreementDetailPage() {
               await updateStatus({ id: agreement._id, status: "pending_stamp" });
               window.open("https://stamps.hasil.gov.my/stamps", "_blank");
             }}
-            className="gradient-brand text-white border-0 rounded-xl"
+            className="gradient-brand text-white border-0 rounded-xl w-full sm:w-auto"
           >
             📮 Pergi ke eDutiSetem →
           </Button>
@@ -431,11 +431,11 @@ export default function AgreementDetailPage() {
       <div className="bg-white rounded-2xl border border-border p-5">
         <p className="font-medium text-foreground text-sm mb-1">Salin atau Perbaharui</p>
         <p className="text-xs text-muted-foreground mb-4">Buat perjanjian baru berdasarkan perjanjian ini</p>
-        <div className="flex gap-3">
-          <Button variant="outline" className="flex-1 rounded-xl" onClick={handleCopy}>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button variant="outline" className="w-full sm:flex-1 rounded-xl" onClick={handleCopy}>
             📋 Salin Perjanjian
           </Button>
-          <Button variant="outline" className="flex-1 rounded-xl" onClick={handleRenew}>
+          <Button variant="outline" className="w-full sm:flex-1 rounded-xl" onClick={handleRenew}>
             🔄 Perbaharui (Tarikh Baru)
           </Button>
         </div>

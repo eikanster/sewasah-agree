@@ -156,7 +156,7 @@ export default function LawyerPage() {
           }}>
 
             {/* Card header */}
-            <div style={{ padding: "20px 24px", borderBottom: "1px solid oklch(0.895 0.002 264)", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-4" style={{ padding: "20px 24px", borderBottom: "1px solid oklch(0.895 0.002 264)" }}>
               <div>
                 <p style={{ fontWeight: 700, fontSize: "1rem", color: "oklch(0.09 0.006 264)", margin: 0 }}>
                   {a.landlordName} → {a.tenantName}
@@ -184,7 +184,7 @@ export default function LawyerPage() {
                   )}
                 </div>
               </div>
-              <div style={{ textAlign: "right", flexShrink: 0 }}>
+              <div className="text-left sm:text-right" style={{ flexShrink: 0 }}>
                 <p style={{ fontWeight: 800, fontSize: "1.25rem", color: "oklch(0.55 0.14 40)", letterSpacing: "-0.02em", margin: 0 }}>
                   RM {a.monthlyRent.toLocaleString()}
                 </p>
@@ -203,7 +203,7 @@ export default function LawyerPage() {
             )}
 
             {/* Key details */}
-            <div style={{ padding: "16px 24px", borderBottom: "1px solid oklch(0.895 0.002 264)", display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "12px" }}>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" style={{ padding: "16px 24px", borderBottom: "1px solid oklch(0.895 0.002 264)" }}>
               {[
                 { label: "Tarikh Mula", value: a.startDate },
                 { label: "Tarikh Tamat", value: a.endDate },
@@ -243,15 +243,16 @@ export default function LawyerPage() {
             </div>
 
             {/* Actions */}
-            <div style={{ padding: "16px 24px", display: "flex", gap: "10px" }}>
+            <div className="flex flex-col sm:flex-row gap-3" style={{ padding: "16px 24px" }}>
               <button onClick={() => handlePreview(a)}
-                className="btn-ghost"
-                style={{ flex: 1, fontSize: "0.875rem", padding: "10px" }}>
+                className="btn-ghost w-full sm:flex-1"
+                style={{ fontSize: "0.875rem", padding: "10px" }}>
                 👁 Lihat Perjanjian
               </button>
               <button
                 onClick={() => handleRequestChanges(a._id)}
                 disabled={loading === a._id}
+                className="w-full sm:w-auto"
                 style={{
                   background: "oklch(0.93 0.06 27 / 0.15)",
                   color: "oklch(0.48 0.18 27)",
@@ -265,8 +266,8 @@ export default function LawyerPage() {
               <button
                 onClick={() => handleApprove(a._id)}
                 disabled={loading === a._id}
-                className="btn-brand"
-                style={{ flex: 1, fontSize: "0.875rem", padding: "10px" }}>
+                className="btn-brand w-full sm:flex-1"
+                style={{ fontSize: "0.875rem", padding: "10px" }}>
                 {loading === a._id ? "Memproses..." : "✓ Luluskan"}
               </button>
             </div>

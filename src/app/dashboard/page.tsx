@@ -177,7 +177,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Stats ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}>
+      <div className="stats-grid">
         <StatCard value={counts?.pendingReview  ?? 0} label="Menunggu Semak" sub="Perlu tindakan peguam"  accent  delay={0}   />
         <StatCard value={counts?.pendingStamp   ?? 0} label="Tunggu Setem"   sub="Sedia untuk eDutiSetem"         delay={50}  />
         <StatCard value={counts?.completed      ?? 0} label="Selesai"        sub="Bulan ini"                      delay={100} />
@@ -185,15 +185,14 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Filter Bar ── */}
-      <div style={{
-        display: "flex", gap: "10px", alignItems: "center",
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center" style={{
         background: "oklch(0.998 0 0)",
         border: "1px solid oklch(0.876 0.003 264)",
         borderRadius: "14px", padding: "12px 16px",
         boxShadow: "0 1px 2px oklch(0.12 0.006 264 / 0.04)",
       }}>
         {/* Search */}
-        <div style={{ flex: 1, position: "relative" }}>
+        <div className="w-full sm:flex-1" style={{ position: "relative" }}>
           <span style={{
             position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)",
             fontSize: "0.875rem", color: "oklch(0.60 0.003 264)", pointerEvents: "none",
@@ -218,6 +217,7 @@ export default function DashboardPage() {
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
+          className="w-full sm:w-[180px]"
           style={{
             padding: "8px 32px 8px 12px", border: "1px solid oklch(0.876 0.003 264)",
             borderRadius: "9px", fontSize: "0.875rem",
@@ -227,7 +227,6 @@ export default function DashboardPage() {
             appearance: "none",
             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
             backgroundRepeat: "no-repeat", backgroundPosition: "right 10px center",
-            minWidth: "160px",
           }}
         >
           {STATUS_OPTIONS.map(o => (
@@ -311,94 +310,96 @@ export default function DashboardPage() {
 
         {/* Table */}
         {filtered.length > 0 && (
-          <table className="mobile-card-table" style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <SortTh label="Tuan Rumah"  field="landlordName" sort={sortField} dir={sortDir} onSort={handleSort} width="18%" />
-                <SortTh label="Penyewa"     field="tenantName"   sort={sortField} dir={sortDir} onSort={handleSort} width="18%" />
-                <th className="col-hide-mobile" style={{
-                  padding: "10px 18px", textAlign: "left", fontSize: "0.6875rem", fontWeight: 600,
-                  letterSpacing: "0.07em", textTransform: "uppercase", width: "22%",
-                  color: "oklch(0.54 0.003 264)", borderBottom: "1px solid oklch(0.880 0.002 264)",
-                  background: "oklch(0.955 0.002 264)",
-                }}>Hartanah</th>
-                <SortTh label="Sewa"   field="monthlyRent" sort={sortField} dir={sortDir} onSort={handleSort} width="12%" />
-                <SortTh label="Status" field="status"      sort={sortField} dir={sortDir} onSort={handleSort} width="17%" />
-                <SortTh label="Tarikh" field="createdAt"   sort={sortField} dir={sortDir} onSort={handleSort} width="10%" />
-                <th style={{
-                  padding: "10px 18px", background: "oklch(0.955 0.002 264)",
-                  borderBottom: "1px solid oklch(0.880 0.002 264)", width: "3%",
-                }} />
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((a, idx) => {
-                const s = STATUS[a.status] ?? STATUS.draft;
-                const even = idx % 2 === 0;
-                return (
-                  <tr key={a._id}
-                    style={{
-                      background: even ? "oklch(0.998 0 0)" : "oklch(0.980 0.001 264)",
-                      borderBottom: idx < filtered.length - 1
-                        ? "1px solid oklch(0.918 0.002 264)" : "none",
-                      transition: "background 100ms ease-out",
-                    }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.945 0.002 264)")}
-                    onMouseLeave={e => (e.currentTarget.style.background = even ? "oklch(0.998 0 0)" : "oklch(0.980 0.001 264)")}>
+          <div className="overflow-x-auto">
+            <table className="mobile-card-table" style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  <SortTh label="Tuan Rumah"  field="landlordName" sort={sortField} dir={sortDir} onSort={handleSort} width="18%" />
+                  <SortTh label="Penyewa"     field="tenantName"   sort={sortField} dir={sortDir} onSort={handleSort} width="18%" />
+                  <th className="col-hide-mobile" style={{
+                    padding: "10px 18px", textAlign: "left", fontSize: "0.6875rem", fontWeight: 600,
+                    letterSpacing: "0.07em", textTransform: "uppercase", width: "22%",
+                    color: "oklch(0.54 0.003 264)", borderBottom: "1px solid oklch(0.880 0.002 264)",
+                    background: "oklch(0.955 0.002 264)",
+                  }}>Hartanah</th>
+                  <SortTh label="Sewa"   field="monthlyRent" sort={sortField} dir={sortDir} onSort={handleSort} width="12%" />
+                  <SortTh label="Status" field="status"      sort={sortField} dir={sortDir} onSort={handleSort} width="17%" />
+                  <SortTh label="Tarikh" field="createdAt"   sort={sortField} dir={sortDir} onSort={handleSort} width="10%" />
+                  <th style={{
+                    padding: "10px 18px", background: "oklch(0.955 0.002 264)",
+                    borderBottom: "1px solid oklch(0.880 0.002 264)", width: "3%",
+                  }} />
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((a, idx) => {
+                  const s = STATUS[a.status] ?? STATUS.draft;
+                  const even = idx % 2 === 0;
+                  return (
+                    <tr key={a._id}
+                      style={{
+                        background: even ? "oklch(0.998 0 0)" : "oklch(0.980 0.001 264)",
+                        borderBottom: idx < filtered.length - 1
+                          ? "1px solid oklch(0.918 0.002 264)" : "none",
+                        transition: "background 100ms ease-out",
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.945 0.002 264)")}
+                      onMouseLeave={e => (e.currentTarget.style.background = even ? "oklch(0.998 0 0)" : "oklch(0.980 0.001 264)")}>
 
-                    <td style={{ padding: "13px 18px", fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.09 0.006 264)" }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
-                        {a.landlordName}
-                        {a.agreementRef && (
-                          <span style={{ fontSize: "0.6875rem", color: "oklch(0.60 0.003 264)", fontWeight: 400 }}>
-                            {a.agreementRef}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td style={{ padding: "13px 18px", fontSize: "0.875rem", color: "oklch(0.42 0.003 264)" }}>
-                      {a.tenantName}
-                    </td>
-                    <td className="col-hide-mobile" style={{ padding: "13px 18px", fontSize: "0.8125rem", color: "oklch(0.42 0.003 264)", maxWidth: "200px" }}>
-                      <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {a.propertyAddress.split(",")[0]}
-                      </span>
-                    </td>
-                    <td style={{ padding: "13px 18px", fontSize: "0.875rem", fontWeight: 700, color: "oklch(0.20 0.004 264)", letterSpacing: "-0.01em" }}>
-                      RM {a.monthlyRent.toLocaleString()}
-                    </td>
-                    <td style={{ padding: "13px 18px" }}>
-                      <span className={s.pulse ? "pulse-dot" : ""} style={{
-                        background: s.bg, color: s.fg,
-                        padding: "3px 10px", borderRadius: "999px",
-                        fontSize: "0.6875rem", fontWeight: 600,
-                        whiteSpace: "nowrap", display: "inline-flex", alignItems: "center",
-                      }}>{s.label}</span>
-                    </td>
-                    <td className="col-hide-mobile" style={{ padding: "13px 18px", fontSize: "0.8125rem", color: "oklch(0.56 0.003 264)", whiteSpace: "nowrap" }}>
-                      {new Date(a.createdAt).toLocaleDateString("ms-MY", { day: "numeric", month: "short" })}
-                    </td>
-                    <td style={{ padding: "13px 18px" }}>
-                      <Link href={`/dashboard/agreements/${a._id}`}>
-                        <button style={{
-                          background: "none", border: "none",
-                          color: "oklch(0.55 0.14 40)",
-                          fontSize: "0.8125rem", fontWeight: 600,
-                          cursor: "pointer", padding: "4px 8px",
-                          borderRadius: "6px",
-                          transition: "background 120ms ease-out",
-                        }}
-                        onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.55 0.14 40 / 0.08)")}
-                        onMouseLeave={e => (e.currentTarget.style.background = "none")}>
-                          Buka →
-                        </button>
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      <td style={{ padding: "13px 18px", fontWeight: 600, fontSize: "0.875rem", color: "oklch(0.09 0.006 264)" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+                          {a.landlordName}
+                          {a.agreementRef && (
+                            <span style={{ fontSize: "0.6875rem", color: "oklch(0.60 0.003 264)", fontWeight: 400 }}>
+                              {a.agreementRef}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td style={{ padding: "13px 18px", fontSize: "0.875rem", color: "oklch(0.42 0.003 264)" }}>
+                        {a.tenantName}
+                      </td>
+                      <td className="col-hide-mobile" style={{ padding: "13px 18px", fontSize: "0.8125rem", color: "oklch(0.42 0.003 264)", maxWidth: "200px" }}>
+                        <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {a.propertyAddress.split(",")[0]}
+                        </span>
+                      </td>
+                      <td style={{ padding: "13px 18px", fontSize: "0.875rem", fontWeight: 700, color: "oklch(0.20 0.004 264)", letterSpacing: "-0.01em" }}>
+                        RM {a.monthlyRent.toLocaleString()}
+                      </td>
+                      <td style={{ padding: "13px 18px" }}>
+                        <span className={s.pulse ? "pulse-dot" : ""} style={{
+                          background: s.bg, color: s.fg,
+                          padding: "3px 10px", borderRadius: "999px",
+                          fontSize: "0.6875rem", fontWeight: 600,
+                          whiteSpace: "nowrap", display: "inline-flex", alignItems: "center",
+                        }}>{s.label}</span>
+                      </td>
+                      <td className="col-hide-mobile" style={{ padding: "13px 18px", fontSize: "0.8125rem", color: "oklch(0.56 0.003 264)", whiteSpace: "nowrap" }}>
+                        {new Date(a.createdAt).toLocaleDateString("ms-MY", { day: "numeric", month: "short" })}
+                      </td>
+                      <td style={{ padding: "13px 18px" }}>
+                        <Link href={`/dashboard/agreements/${a._id}`}>
+                          <button style={{
+                            background: "none", border: "none",
+                            color: "oklch(0.55 0.14 40)",
+                            fontSize: "0.8125rem", fontWeight: 600,
+                            cursor: "pointer", padding: "4px 8px",
+                            borderRadius: "6px",
+                            transition: "background 120ms ease-out",
+                          }}
+                          onMouseEnter={e => (e.currentTarget.style.background = "oklch(0.55 0.14 40 / 0.08)")}
+                          onMouseLeave={e => (e.currentTarget.style.background = "none")}>
+                            Buka →
+                          </button>
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

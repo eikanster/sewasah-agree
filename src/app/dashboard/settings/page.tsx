@@ -182,7 +182,7 @@ export default function SettingsPage() {
             <Input value={form.address} onChange={e => set("address", e.target.value)}
               placeholder="cth. Suite 12-3, Menara ABC, Jalan Ampang, 50450 Kuala Lumpur" />
           </Field>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="No. Telefon">
               <Input value={form.phone} onChange={e => set("phone", e.target.value)}
                 placeholder="cth. 03-2123 4567" />
