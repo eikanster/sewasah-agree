@@ -134,12 +134,12 @@ export default function FirmDetailPage() {
       </div>
 
       {/* Firm Header */}
-      <div style={{
+      <div className="p-4 sm:p-8" style={{
         background: "oklch(0.998 0 0)", border: "1px solid oklch(0.876 0.003 264)",
-        borderRadius: "18px", padding: "28px 32px", marginBottom: "24px",
+        borderRadius: "18px", marginBottom: "24px",
         boxShadow: "0 1px 4px oklch(0.12 0.006 264 / 0.06)",
       }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "20px" }}>
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 sm:gap-0" style={{ marginBottom: "20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             {/* Avatar */}
             <div style={{
@@ -203,7 +203,7 @@ export default function FirmDetailPage() {
 
           {/* Actions */}
           {!editing && (
-            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <div className="flex flex-wrap items-center gap-2" style={{ flexShrink: 0 }}>
               <button onClick={() => { setEditing(true); setEditName(firm.name); }} style={{
                 background: "none", border: "1px solid oklch(0.876 0.003 264)",
                 borderRadius: "10px", padding: "8px 16px", fontSize: "0.875rem",
@@ -249,7 +249,10 @@ export default function FirmDetailPage() {
         </div>
 
         {/* Key metrics strip */}
-        <div style={{ display: "flex", gap: "24px", paddingTop: "16px", borderTop: "1px solid oklch(0.938 0.002 264)" }}>
+        <div
+          className="grid grid-cols-2 sm:grid-cols-5 gap-4"
+          style={{ paddingTop: "16px", borderTop: "1px solid oklch(0.938 0.002 264)" }}
+        >
           {[
             { label: "Perjanjian",  value: agreements?.length ?? 0 },
             { label: "Selesai",     value: completedCount },
@@ -270,7 +273,10 @@ export default function FirmDetailPage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: "2px", marginBottom: "20px", background: "oklch(0.963 0.002 264)", borderRadius: "12px", padding: "4px" }}>
+      <div
+        className="flex flex-wrap sm:flex-nowrap gap-1"
+        style={{ marginBottom: "20px", background: "oklch(0.963 0.002 264)", borderRadius: "12px", padding: "4px" }}
+      >
         {TABS.map(({ key, label, count }) => (
           <button key={key} onClick={() => setTab(key)} style={{
             flex: 1, padding: "8px 16px", borderRadius: "9px",
@@ -296,7 +302,7 @@ export default function FirmDetailPage() {
 
       {/* Tab: Overview */}
       {tab === "overview" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Section title="Maklumat Firma">
             <InfoRow label="Nama Firma"   value={firm.name} />
             <InfoRow label="E-mel"        value={firm.email} />
@@ -349,7 +355,8 @@ export default function FirmDetailPage() {
               Tiada perjanjian lagi untuk firma ini.
             </p>
           ) : (
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <div className="overflow-x-auto">
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "oklch(0.955 0.002 264)" }}>
                   {["Rujukan", "Tuan Rumah", "Penyewa", "Sewa", "Status", "Tarikh"].map(h => (
@@ -394,8 +401,8 @@ export default function FirmDetailPage() {
                 })}
               </tbody>
             </table>
-          )}
-        </Section>
+          </div>
+        )}</Section>
       )}
 
       {/* Tab: Users */}
@@ -405,11 +412,13 @@ export default function FirmDetailPage() {
             {users?.map((u, idx) => {
               const colors = ROLE_COLORS[u.role] ?? ROLE_COLORS.user;
               return (
-                <div key={u._id} style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "16px 24px",
-                  borderBottom: idx < (users.length - 1) ? "1px solid oklch(0.938 0.002 264)" : "none",
-                }}>
+                <div key={u._id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0"
+                  style={{
+                    padding: "16px 24px",
+                    borderBottom: idx < (users.length - 1) ? "1px solid oklch(0.938 0.002 264)" : "none",
+                  }}
+                >
                   <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                     <div style={{
                       width: "36px", height: "36px", borderRadius: "50%",
@@ -510,7 +519,10 @@ export default function FirmDetailPage() {
             <div style={{ padding: "16px 24px", borderBottom: "1px solid oklch(0.93 0.06 27 / 0.3)", background: "oklch(0.98 0.02 27 / 0.3)" }}>
               <p style={{ fontWeight: 700, fontSize: "0.875rem", color: "oklch(0.45 0.15 27)", margin: 0 }}>⚠️ Zon Bahaya</p>
             </div>
-            <div style={{ padding: "24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0"
+              style={{ padding: "24px" }}
+            >
               <div>
                 <p style={{ fontWeight: 600, fontSize: "0.9375rem", color: "oklch(0.09 0.006 264)", margin: "0 0 4px" }}>
                   {firm.isActive ? "Nyahaktifkan Firma" : "Aktifkan Semula Firma"}

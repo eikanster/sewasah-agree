@@ -38,20 +38,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         boxShadow: "0 2px 16px oklch(0.05 0.003 264 / 0.4)",
         position: "sticky", top: 0, zIndex: 50, flexShrink: 0,
       }}>
-        <div style={{ display: "flex", alignItems: "center", padding: "0 24px", gap: "0", height: "56px" }}>
+        <div className="px-3 sm:px-6 flex items-center justify-between" style={{ height: "56px", gap: "12px", overflowX: "auto", scrollbarWidth: "none" }}>
 
           {/* Logo + Platform badge */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0, marginRight: "24px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>
             <div style={{
               width: "32px", height: "32px", background: "oklch(0.55 0.14 40)",
               borderRadius: "9px", display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "0.8125rem", fontWeight: 800, color: "oklch(0.998 0 0)",
             }}>SA</div>
-            <div>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: "oklch(0.998 0 0)", letterSpacing: "-0.01em" }}>
                 Sewasah Agree
               </span>
-              <span style={{
+              <span className="hidden sm:inline-block" style={{
                 marginLeft: "10px", fontSize: "0.625rem", fontWeight: 700,
                 letterSpacing: "0.1em", textTransform: "uppercase",
                 color: "oklch(0.55 0.14 40)", background: "oklch(0.55 0.14 40 / 0.15)",
@@ -68,7 +68,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               return (
                 <Link key={href} href={href} style={{ textDecoration: "none" }}>
                   <div style={{
-                    padding: "0 16px", height: "56px",
+                    padding: "0 12px", height: "56px",
                     display: "flex", alignItems: "center", gap: "7px",
                     fontSize: "0.875rem", fontWeight: active ? 600 : 400,
                     color: active ? "oklch(0.998 0 0)" : "oklch(0.50 0.003 264)",
@@ -88,7 +88,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           {/* Right */}
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>
-            <span style={{ fontSize: "0.75rem", color: "oklch(0.40 0.003 264)" }}>
+            <span className="hidden sm:inline" style={{ fontSize: "0.75rem", color: "oklch(0.40 0.003 264)" }}>
               {appUser.email}
             </span>
             <UserButton />
@@ -97,7 +97,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </header>
 
       {/* ── Content ── */}
-      <main style={{ flex: 1, overflowY: "auto", padding: "32px" }} className="page-enter">
+      <main className="p-4 sm:p-8 flex-1 overflow-y-auto page-enter">
         {children}
       </main>
     </div>
