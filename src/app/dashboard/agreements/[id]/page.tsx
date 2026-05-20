@@ -29,6 +29,7 @@ export default function AgreementDetailPage() {
   const firm = useQuery(api.firms.getById, appUser?.firmId ? { id: appUser.firmId } : "skip");
   const updateStatus = useMutation(api.agreements.updateStatus);
   const createAgreement = useMutation(api.agreements.create);
+  const deleteAgreement = useMutation(api.agreements.remove);
 
   if (!agreement) {
     return (
@@ -108,6 +109,21 @@ export default function AgreementDetailPage() {
     if (!appUser?._id) return;
     const newId = await createAgreement(buildCopyPayload(true));
     router.push(`/dashboard/agreements/${newId}/edit`);
+  };
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+      "Adakah anda pasti mahu memadam perjanjian ini? Tindakan ini adalah kekal dan tidak boleh dikembalikan."
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await deleteAgreement({ id: agreement._id });
+      router.push("/dashboard");
+    } catch (err) {
+      console.error(err);
+      alert("Gagal memadam perjanjian. Sila cuba lagi.");
+    }
   };
 
   const handlePreview = async () => {
@@ -439,6 +455,19 @@ export default function AgreementDetailPage() {
             🔄 Perbaharui (Tarikh Baru)
           </Button>
         </div>
+      </div>
+
+      {/* Danger Zone */}
+      <div className="bg-red-50/50 border border-red-200 rounded-2xl p-5">
+        <p className="font-medium text-red-800 text-sm mb-1">Zon Bahaya</p>
+        <p className="text-xs text-red-600/80 mb-4">Tindakan ini tidak boleh diundurkan. Semua data berkaitan perjanjian ini akan dipadam selama-lamanya.</p>
+        <Button
+          variant="destructive"
+          className="w-full sm:w-auto rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold flex items-center justify-center gap-2 animate-fade-in"
+          onClick={handleDelete}
+        >
+          🗑️ Padam Perjanjian Ini
+        </Button>
       </div>
     </div>
   );

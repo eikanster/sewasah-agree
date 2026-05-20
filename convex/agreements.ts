@@ -239,3 +239,12 @@ export const updatePdfUrl = mutation({
     await ctx.db.patch(id, { ...updates, updatedAt: Date.now() });
   },
 });
+
+// Delete agreement
+export const remove = mutation({
+  args: { id: v.id("agreements") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+    return true;
+  },
+});
